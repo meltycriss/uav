@@ -1,1 +1,0 @@
-/usr/bin/g++-4.9      CMakeFiles/snoptDemo.dir/sntoya.o  -o snoptDemo -rdynamic ../../lib/snopt/libsnopt7_cpp.so ../../lib/snopt/libsnopt7.so -Wl,-rpath,/home/criss/uav/lib/snopt 

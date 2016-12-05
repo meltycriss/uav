@@ -1,1 +1,0 @@
-/usr/bin/g++-4.9      CMakeFiles/irisDemo.dir/iris_demo.o  -o irisDemo -rdynamic ../../lib/iris/libiris.so ../../lib/iris/libiris_geometry.so -Wl,-rpath,/home/criss/uav/lib/iris 

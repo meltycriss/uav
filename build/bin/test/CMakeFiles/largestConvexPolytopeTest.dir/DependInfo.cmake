@@ -4,7 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/criss/uav/src/iris_demo.cpp" "/home/criss/uav/build/bin/CMakeFiles/irisDemo.dir/iris_demo.o"
+  "/home/criss/uav/src/test/LargestConvexPolytopeTest.cpp" "/home/criss/uav/build/bin/test/CMakeFiles/largestConvexPolytopeTest.dir/LargestConvexPolytopeTest.o"
+  "/home/criss/uav/src/LargestConvexPolytope.cpp" "/home/criss/uav/build/bin/test/CMakeFiles/largestConvexPolytopeTest.dir/__/LargestConvexPolytope.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
@@ -15,9 +16,10 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../src/../include/iris"
-  "../src/../include/snopt"
-  "../src/../include/iris/eigen3"
+  "../src/test/../../include/iris"
+  "../src/test/../../include/snopt"
+  "../src/test/../../include/iris/eigen3"
+  "../src/test/.."
   )
 
 # Targets to which this target links.

@@ -14,6 +14,7 @@ int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
   //test getObstacleBar()
+  cout << "-----------------getObstacleBar()-----------------" << endl;
   vector<LargestConvexPolytope::Polytope> uavShapes;
   vector<LargestConvexPolytope::Polytope> staticObstacles;
   vector<LargestConvexPolytope::Polytope> dynamicObstacles;
@@ -72,6 +73,7 @@ int main(){
   vector<LargestConvexPolytope::Polytope4d> vecPoly4d = lcp.getObstacleBar();
 
   // test directedLargestConvexRegionInFreeSpace()
+  cout << "-----------------directedLargestConvexRegionInFreeSpace()-----------------" << endl;
   vector<LargestConvexPolytope::Point> uavs;
   LargestConvexPolytope::Point gDir;
 
@@ -110,6 +112,7 @@ int main(){
   }
 
   //test getLargestConvexPolytope()
+  cout << "-----------------getLargestConvexPolytope()-----------------" << endl;
   lcp.setGDir(gDir);
   vector<LargestConvexPolytope::Polytope> vecUavs;
   vecUavs.push_back(uavs);
@@ -117,7 +120,6 @@ int main(){
   Eigen::MatrixXd A;
   Eigen::VectorXd B;
   lcp.getLargestConvexPolytope(A, B);
-  cout << "testing directedLargestConvexRegionInFreeSpace" << endl;
   cout << "A" << endl
     << A.format(np_array) << endl;
   cout << "B" << endl

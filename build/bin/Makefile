@@ -110,111 +110,6 @@ depend:
 	cd /home/criss/uav/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-# Convenience name for target.
-bin/CMakeFiles/main.dir/rule:
-	cd /home/criss/uav/build && $(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/main.dir/rule
-.PHONY : bin/CMakeFiles/main.dir/rule
-
-# Convenience name for target.
-main: bin/CMakeFiles/main.dir/rule
-
-.PHONY : main
-
-# fast build rule for target.
-main/fast:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/build
-.PHONY : main/fast
-
-# Convenience name for target.
-bin/CMakeFiles/snoptDemo.dir/rule:
-	cd /home/criss/uav/build && $(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/snoptDemo.dir/rule
-.PHONY : bin/CMakeFiles/snoptDemo.dir/rule
-
-# Convenience name for target.
-snoptDemo: bin/CMakeFiles/snoptDemo.dir/rule
-
-.PHONY : snoptDemo
-
-# fast build rule for target.
-snoptDemo/fast:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/build
-.PHONY : snoptDemo/fast
-
-# Convenience name for target.
-bin/CMakeFiles/irisDemo.dir/rule:
-	cd /home/criss/uav/build && $(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/irisDemo.dir/rule
-.PHONY : bin/CMakeFiles/irisDemo.dir/rule
-
-# Convenience name for target.
-irisDemo: bin/CMakeFiles/irisDemo.dir/rule
-
-.PHONY : irisDemo
-
-# fast build rule for target.
-irisDemo/fast:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/build
-.PHONY : irisDemo/fast
-
-# target to build an object file
-LargestConvexPolytope.o:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/LargestConvexPolytope.o
-.PHONY : LargestConvexPolytope.o
-
-# target to preprocess a source file
-LargestConvexPolytope.i:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/LargestConvexPolytope.i
-.PHONY : LargestConvexPolytope.i
-
-# target to generate assembly for a file
-LargestConvexPolytope.s:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/LargestConvexPolytope.s
-.PHONY : LargestConvexPolytope.s
-
-# target to build an object file
-iris_demo.o:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/iris_demo.o
-.PHONY : iris_demo.o
-
-# target to preprocess a source file
-iris_demo.i:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/iris_demo.i
-.PHONY : iris_demo.i
-
-# target to generate assembly for a file
-iris_demo.s:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/iris_demo.s
-.PHONY : iris_demo.s
-
-# target to build an object file
-main.o:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/main.o
-.PHONY : main.o
-
-# target to preprocess a source file
-main.i:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/main.i
-.PHONY : main.i
-
-# target to generate assembly for a file
-main.s:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/main.s
-.PHONY : main.s
-
-# target to build an object file
-sntoya.o:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/sntoya.o
-.PHONY : sntoya.o
-
-# target to preprocess a source file
-sntoya.i:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/sntoya.i
-.PHONY : sntoya.i
-
-# target to generate assembly for a file
-sntoya.s:
-	cd /home/criss/uav/build && $(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/sntoya.s
-.PHONY : sntoya.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -222,22 +117,7 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
-	@echo "... main"
-	@echo "... snoptDemo"
 	@echo "... rebuild_cache"
-	@echo "... irisDemo"
-	@echo "... LargestConvexPolytope.o"
-	@echo "... LargestConvexPolytope.i"
-	@echo "... LargestConvexPolytope.s"
-	@echo "... iris_demo.o"
-	@echo "... iris_demo.i"
-	@echo "... iris_demo.s"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
-	@echo "... sntoya.o"
-	@echo "... sntoya.i"
-	@echo "... sntoya.s"
 .PHONY : help
 
 

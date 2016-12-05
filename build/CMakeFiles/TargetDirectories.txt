@@ -1,7 +1,7 @@
 /home/criss/uav/build/CMakeFiles/edit_cache.dir
 /home/criss/uav/build/CMakeFiles/rebuild_cache.dir
 /home/criss/uav/build/bin/CMakeFiles/edit_cache.dir
-/home/criss/uav/build/bin/CMakeFiles/main.dir
-/home/criss/uav/build/bin/CMakeFiles/snoptDemo.dir
 /home/criss/uav/build/bin/CMakeFiles/rebuild_cache.dir
-/home/criss/uav/build/bin/CMakeFiles/irisDemo.dir
+/home/criss/uav/build/bin/test/CMakeFiles/edit_cache.dir
+/home/criss/uav/build/bin/test/CMakeFiles/rebuild_cache.dir
+/home/criss/uav/build/bin/test/CMakeFiles/largestConvexPolytopeTest.dir

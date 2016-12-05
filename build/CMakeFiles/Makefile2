@@ -63,132 +63,72 @@ CMAKE_BINARY_DIR = /home/criss/uav/build
 # Directory level rules for directory bin
 
 # Convenience name for "all" pass in the directory.
-bin/all: bin/CMakeFiles/main.dir/all
-bin/all: bin/CMakeFiles/snoptDemo.dir/all
-bin/all: bin/CMakeFiles/irisDemo.dir/all
+bin/all: bin/test/all
 
 .PHONY : bin/all
 
 # Convenience name for "clean" pass in the directory.
-bin/clean: bin/CMakeFiles/main.dir/clean
-bin/clean: bin/CMakeFiles/snoptDemo.dir/clean
-bin/clean: bin/CMakeFiles/irisDemo.dir/clean
+bin/clean: bin/test/clean
 
 .PHONY : bin/clean
 
 # Convenience name for "preinstall" pass in the directory.
-bin/preinstall:
+bin/preinstall: bin/test/preinstall
 
 .PHONY : bin/preinstall
 
 #=============================================================================
-# Target rules for target bin/CMakeFiles/main.dir
+# Directory level rules for directory bin/test
+
+# Convenience name for "all" pass in the directory.
+bin/test/all: bin/test/CMakeFiles/largestConvexPolytopeTest.dir/all
+
+.PHONY : bin/test/all
+
+# Convenience name for "clean" pass in the directory.
+bin/test/clean: bin/test/CMakeFiles/largestConvexPolytopeTest.dir/clean
+
+.PHONY : bin/test/clean
+
+# Convenience name for "preinstall" pass in the directory.
+bin/test/preinstall:
+
+.PHONY : bin/test/preinstall
+
+#=============================================================================
+# Target rules for target bin/test/CMakeFiles/largestConvexPolytopeTest.dir
 
 # All Build rule for target.
-bin/CMakeFiles/main.dir/all:
-	$(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/depend
-	$(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/criss/uav/build/CMakeFiles --progress-num=3,4,5 "Built target main"
-.PHONY : bin/CMakeFiles/main.dir/all
+bin/test/CMakeFiles/largestConvexPolytopeTest.dir/all:
+	$(MAKE) -f bin/test/CMakeFiles/largestConvexPolytopeTest.dir/build.make bin/test/CMakeFiles/largestConvexPolytopeTest.dir/depend
+	$(MAKE) -f bin/test/CMakeFiles/largestConvexPolytopeTest.dir/build.make bin/test/CMakeFiles/largestConvexPolytopeTest.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/criss/uav/build/CMakeFiles --progress-num=1,2,3 "Built target largestConvexPolytopeTest"
+.PHONY : bin/test/CMakeFiles/largestConvexPolytopeTest.dir/all
 
 # Include target in all.
-all: bin/CMakeFiles/main.dir/all
+all: bin/test/CMakeFiles/largestConvexPolytopeTest.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-bin/CMakeFiles/main.dir/rule: cmake_check_build_system
+bin/test/CMakeFiles/largestConvexPolytopeTest.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 3
-	$(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/main.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 bin/test/CMakeFiles/largestConvexPolytopeTest.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 0
-.PHONY : bin/CMakeFiles/main.dir/rule
+.PHONY : bin/test/CMakeFiles/largestConvexPolytopeTest.dir/rule
 
 # Convenience name for target.
-main: bin/CMakeFiles/main.dir/rule
+largestConvexPolytopeTest: bin/test/CMakeFiles/largestConvexPolytopeTest.dir/rule
 
-.PHONY : main
-
-# clean rule for target.
-bin/CMakeFiles/main.dir/clean:
-	$(MAKE) -f bin/CMakeFiles/main.dir/build.make bin/CMakeFiles/main.dir/clean
-.PHONY : bin/CMakeFiles/main.dir/clean
+.PHONY : largestConvexPolytopeTest
 
 # clean rule for target.
-clean: bin/CMakeFiles/main.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target bin/CMakeFiles/snoptDemo.dir
-
-# All Build rule for target.
-bin/CMakeFiles/snoptDemo.dir/all:
-	$(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/depend
-	$(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/criss/uav/build/CMakeFiles --progress-num=6,7 "Built target snoptDemo"
-.PHONY : bin/CMakeFiles/snoptDemo.dir/all
-
-# Include target in all.
-all: bin/CMakeFiles/snoptDemo.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-bin/CMakeFiles/snoptDemo.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/snoptDemo.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 0
-.PHONY : bin/CMakeFiles/snoptDemo.dir/rule
-
-# Convenience name for target.
-snoptDemo: bin/CMakeFiles/snoptDemo.dir/rule
-
-.PHONY : snoptDemo
+bin/test/CMakeFiles/largestConvexPolytopeTest.dir/clean:
+	$(MAKE) -f bin/test/CMakeFiles/largestConvexPolytopeTest.dir/build.make bin/test/CMakeFiles/largestConvexPolytopeTest.dir/clean
+.PHONY : bin/test/CMakeFiles/largestConvexPolytopeTest.dir/clean
 
 # clean rule for target.
-bin/CMakeFiles/snoptDemo.dir/clean:
-	$(MAKE) -f bin/CMakeFiles/snoptDemo.dir/build.make bin/CMakeFiles/snoptDemo.dir/clean
-.PHONY : bin/CMakeFiles/snoptDemo.dir/clean
-
-# clean rule for target.
-clean: bin/CMakeFiles/snoptDemo.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target bin/CMakeFiles/irisDemo.dir
-
-# All Build rule for target.
-bin/CMakeFiles/irisDemo.dir/all:
-	$(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/depend
-	$(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/criss/uav/build/CMakeFiles --progress-num=1,2 "Built target irisDemo"
-.PHONY : bin/CMakeFiles/irisDemo.dir/all
-
-# Include target in all.
-all: bin/CMakeFiles/irisDemo.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-bin/CMakeFiles/irisDemo.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 bin/CMakeFiles/irisDemo.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/criss/uav/build/CMakeFiles 0
-.PHONY : bin/CMakeFiles/irisDemo.dir/rule
-
-# Convenience name for target.
-irisDemo: bin/CMakeFiles/irisDemo.dir/rule
-
-.PHONY : irisDemo
-
-# clean rule for target.
-bin/CMakeFiles/irisDemo.dir/clean:
-	$(MAKE) -f bin/CMakeFiles/irisDemo.dir/build.make bin/CMakeFiles/irisDemo.dir/clean
-.PHONY : bin/CMakeFiles/irisDemo.dir/clean
-
-# clean rule for target.
-clean: bin/CMakeFiles/irisDemo.dir/clean
+clean: bin/test/CMakeFiles/largestConvexPolytopeTest.dir/clean
 
 .PHONY : clean
 
