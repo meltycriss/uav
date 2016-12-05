@@ -1,1 +1,0 @@
-/usr/bin/g++-4.9      CMakeFiles/largestConvexPolytopeTest.dir/LargestConvexPolytopeTest.o CMakeFiles/largestConvexPolytopeTest.dir/__/LargestConvexPolytope.o  -o largestConvexPolytopeTest -rdynamic ../../../lib/iris/libiris.so ../../../lib/iris/libiris_geometry.so -Wl,-rpath,/home/criss/uav/lib/iris 
