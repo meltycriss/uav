@@ -1,0 +1,1 @@
+/usr/bin/g++-4.9      CMakeFiles/main.dir/main.o CMakeFiles/main.dir/LargestConvexPolytope.o  -o main -rdynamic ../../lib/iris/libiris.so ../../lib/iris/libiris_geometry.so -Wl,-rpath,/home/criss/uav/lib/iris 

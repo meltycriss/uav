@@ -1,0 +1,2 @@
+PROJECT(uav)
+ADD_SUBDIRECTORY(src bin)
