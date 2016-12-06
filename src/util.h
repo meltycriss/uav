@@ -4,7 +4,6 @@
 #include <vector>
 #include <Eigen/Core>
 #include "iris/iris.h"
-#include "iris/iris_mosek.h"
 #include "definition.h"
 
 namespace uav{
