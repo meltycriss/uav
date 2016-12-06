@@ -2,10 +2,11 @@
 #include <iostream>
 #include <string>
 using namespace std;
+using namespace uav;
 
-LargestConvexPolytope::Point traj1(LargestConvexPolytope::Point p, double t){
-  LargestConvexPolytope::Point res = p;
-  LargestConvexPolytope::Point dir(0, -1, 0);
+Point traj1(Point p, double t){
+  Point res = p;
+  Point dir(0, -1, 0);
   res += dir * t;
   return res;
 }
@@ -15,19 +16,19 @@ int main(){
 
   //test getObstacleBar()
   cout << "-----------------getObstacleBar()-----------------" << endl;
-  vector<LargestConvexPolytope::Polytope> uavShapes;
-  vector<LargestConvexPolytope::Polytope> staticObstacles;
-  vector<LargestConvexPolytope::Polytope> dynamicObstacles;
-  vector<LargestConvexPolytope::trajectory> dynamicObstaclesTrajectories;
+  vector<Polytope> uavShapes;
+  vector<Polytope> staticObstacles;
+  vector<Polytope> dynamicObstacles;
+  vector<trajectory> dynamicObstaclesTrajectories;
   double timeInterval = 1;
   double currTime = 2;
 
-  LargestConvexPolytope::Polytope uavShape;
-  LargestConvexPolytope::Polytope staticObstacle;
-  LargestConvexPolytope::Polytope dynamicObstacle;
-  LargestConvexPolytope::trajectory dynamicObstaclesTrajectory;
+  Polytope uavShape;
+  Polytope staticObstacle;
+  Polytope dynamicObstacle;
+  trajectory dynamicObstaclesTrajectory;
 
-  LargestConvexPolytope::Point p;
+  Point p;
   p << 1,1,0;
   uavShape.push_back(p);
   p << -1,1,0;
@@ -70,14 +71,14 @@ int main(){
   lcp.setTimeInterval(timeInterval);
   lcp.setCurrTime(currTime);
 
-  //vector<LargestConvexPolytope::Polytope4d> vecPoly4d = lcp.getObstacleBar();
+  //vector<Polytope4d> vecPoly4d = lcp.getObstacleBar();
 
   // test directedLargestConvexRegionInFreeSpace()
   cout << "-----------------directedLargestConvexRegionInFreeSpace()-----------------" << endl;
-  vector<LargestConvexPolytope::Point> uavs;
-  LargestConvexPolytope::Point gDir;
+  vector<Point> uavs;
+  Point gDir;
 
-  LargestConvexPolytope::Point uav;
+  Point uav;
   uav << -1,1,0;
   uavs.push_back(uav);
   uav << -1,-1,0;
@@ -89,12 +90,12 @@ int main(){
 
   gDir << -1,-2,0; 
 
-  vector<LargestConvexPolytope::Point4d> vecPoint4d;
-  LargestConvexPolytope::Point4d point4d;
+  vector<Point4d> vecPoint4d;
+  Point4d point4d;
 
   for(int i=0; i<uavs.size(); ++i){
-    LargestConvexPolytope::Point p3d = uavs[i];
-    LargestConvexPolytope::Point4d p4d(p3d.data());
+    Point p3d = uavs[i];
+    Point4d p4d(p3d.data());
     vecPoint4d.push_back(p4d);
   }
   point4d << gDir, timeInterval;
@@ -114,7 +115,7 @@ int main(){
   //test getLargestConvexPolytope()
   cout << "-----------------getLargestConvexPolytope()-----------------" << endl;
   lcp.setGDir(gDir);
-  vector<LargestConvexPolytope::Polytope> vecUavs;
+  vector<Polytope> vecUavs;
   vecUavs.push_back(uavs);
   lcp.setUavs(vecUavs);
   Eigen::MatrixXd A;
