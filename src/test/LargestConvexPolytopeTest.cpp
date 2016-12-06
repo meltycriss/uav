@@ -70,7 +70,7 @@ int main(){
   lcp.setTimeInterval(timeInterval);
   lcp.setCurrTime(currTime);
 
-  vector<LargestConvexPolytope::Polytope4d> vecPoly4d = lcp.getObstacleBar();
+  //vector<LargestConvexPolytope::Polytope4d> vecPoly4d = lcp.getObstacleBar();
 
   // test directedLargestConvexRegionInFreeSpace()
   cout << "-----------------directedLargestConvexRegionInFreeSpace()-----------------" << endl;
@@ -100,16 +100,16 @@ int main(){
   point4d << gDir, timeInterval;
   vecPoint4d.push_back(point4d);
 
-  iris::IRISRegion region;
-  if(lcp.directedLargestConvexRegionInFreeSpace(region, vecPoint4d, vecPoly4d)){
-    cout << "A" << endl 
-      << region.polyhedron.getA() << endl;
-    cout << "B" << endl 
-      << region.polyhedron.getB() << endl;
-  }
-  else{
-    cout << "shoot" << endl;
-  }
+  //iris::IRISRegion region;
+  //if(lcp.directedLargestConvexRegionInFreeSpace(region, vecPoint4d, vecPoly4d)){
+  //  cout << "A" << endl 
+  //    << region.polyhedron.getA() << endl;
+  //  cout << "B" << endl 
+  //    << region.polyhedron.getB() << endl;
+  //}
+  //else{
+  //  cout << "shoot" << endl;
+  //}
 
   //test getLargestConvexPolytope()
   cout << "-----------------getLargestConvexPolytope()-----------------" << endl;

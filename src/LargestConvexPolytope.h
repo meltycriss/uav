@@ -39,8 +39,9 @@ class LargestConvexPolytope{
 
       }
 
-    //main function
-    std::vector<Polytope4d> getObstacleBar();
+    //core function
+    //return true if valid convex polytope, false otherwise
+    //linear constraints is passed through _A and _B
     bool getLargestConvexPolytope(Eigen::MatrixXd&, Eigen::VectorXd&); //return 0 if status ii/iii
 
     //getter
@@ -97,20 +98,33 @@ class LargestConvexPolytope{
 
 
   private:
-    Point gDir_;
-    std::vector<Polytope> uavs_;
-    std::vector<Polytope> uavShapes_;
+    //all coordinates are w.r.t formation centroid
+    Point gDir_;  //goal
+    std::vector<Polytope> uavs_; 
+    std::vector<Polytope> uavShapes_; 
     std::vector<Polytope> staticObstacles_;
-    std::vector<Polytope> dynamicObstacles_; //relative corrd w.r.t uav centroid
+    std::vector<Polytope> dynamicObstacles_; //relative coord w.r.t uav centroid
     double timeInterval_;
     double currTime_;
-    std::vector<trajectory> dynamicObstaclesTrajectories_;
+    std::vector<trajectory> dynamicObstaclesTrajectories_; //relative velocity
 
-  public:
-    Polytope minkowskiSum(const Polytope&, const Polytope&) const;
-    Polytope polytopeAfterMove(const Polytope&, double, trajectory) const;
-    Polytope4d poly3dToPoly4d(const Polytope&, double) const;
-    bool directedLargestConvexRegionInFreeSpace(iris::IRISRegion&, const std::vector<Point4d>&, const std::vector<Polytope4d>&) const;
+  private:
+    //return (O+V)x[0,TimeInterval] U Union(U(D+V)xt)
+    std::vector<Polytope4d> getObstacleBar();
+
+    Polytope minkowskiSum(const Polytope &lhs, const Polytope &rhs) const;
+
+    //return polytope after moving
+    Polytope polytopeAfterMove(const Polytope &poly, double time, trajectory m) const;
+
+    //return poly4d appending x to each vertice in poly3d
+    Polytope4d poly3dToPoly4d(const Polytope &poly3d, double x) const;
+
+    //return true if valid convex polytope, false otherwise
+    //region of directed largest convex region in free space is return through param
+    bool directedLargestConvexRegionInFreeSpace(iris::IRISRegion &region, const std::vector<Point4d> &in, const std::vector<Polytope4d> &obstacles) const;
+
+    //return bounds generated from lb to ub
     iris::Polyhedron getPolyFromBounds(const Point4d&, const Point4d&) const;
 
 
