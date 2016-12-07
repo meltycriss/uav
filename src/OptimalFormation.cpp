@@ -29,36 +29,61 @@ namespace uav{
       char      *cu,  int *lencu,
       int    iu[],    int *leniu,
       double ru[],    int *lenru ){
+    // x:
+    // t0 t1 t2 s q0 q1 q2 q3
+    // F:
+    // [0]         : obj
+    // [1-#v*#rows]: C1
+    // [#v*#rows+1]: C2
+    // [#v*#rows+2]: C3
+
     //interact with iris
     int rowsA = sA_.rows();
     int colsA = sA_.cols();
-    if(colsA != 3){
-      cout << "[error] colsA != 3" << endl;
-      return;
-    }
+    Polytope fs = sFormation_.convexHull;
+    double radius = sFormation_.radius;
+    double minDis = sFormation_.minInterDis;
+
+    // t
+    double xx0 = x[0] - sG_(0);
+    double xx1 = x[1] - sG_(1);
+    double xx2 = x[2] - sG_(2);
+    // s
+    double xx3 = x[3] - sS_;
+    // q
+    double xx4 = x[4] - sQ_(0);
+    double xx5 = x[5] - sQ_(1);
+    double xx6 = x[6] - sQ_(2);
+    double xx7 = x[7] - sQ_(3);
+    // t^2, s^2, q^2
+    double ttSquare = xx0*xx0 + xx1*xx1 + xx2*xx2;
+    double ssSquare = xx3*xx3;
+    double qqSquare = xx4*xx4 + xx5*xx5 + xx6*xx6 + xx7*xx7;
 
     if ( *needF > 0 ) {
-      //objective func: dis to point(2sqrt(3),2,3)
-      F[0] = (x[0] - 2*sqrt(3)) * (x[0] - 2*sqrt(3))
-        + (x[1] - 2) * (x[1] - 2)
-        + (x[2] - 3) * (x[2] - 3);
+      //obj function
+      F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + sFormation_.pref;
 
       //constraints
+      //to do
       for(int i=1; i<=rowsA; ++i){
         F[i] = sA_(i-1, 0) * x[0] + sA_(i-1, 1) * x[1] + sA_(i-1, 2) * x[2];
       }
     }
 
     if ( *needG > 0 ) {
-      //iGfun[i*3+j] = i
-      //jGvar[i*3+j] = j
-
       //derivative of objcetive func
-      G[0] = 2*(x[0]-2*sqrt(3));
-      G[1] = 2*(x[1]-2);
-      G[2] = 2*(x[2]-3);
+      G[0] = 2 * sWT_ * xx0;
+      G[1] = 2 * sWT_ * xx1;
+      G[2] = 2 * sWT_ * xx2;
+      G[3] = 2 * sWS_ * xx3;
+      G[4] = 2 * sWQ_ * xx4;
+      G[5] = 2 * sWQ_ * xx5;
+      G[6] = 2 * sWQ_ * xx6;
+      G[7] = 2 * sWQ_ * xx7;
 
       //derivative of constraints
+      //to do
       for(int i=1; i<=rowsA; ++i){
         for(int j=0; j<3; ++j){
           G[i*3+j] = sA_(i-1,j);
@@ -86,9 +111,9 @@ namespace uav{
 
     // Allocate and initialize;
     // t0 t1 t2 s q0 q1 q2 q3
-    int n     =  8; 
+    int n     =  8;
     // first term : obj_func
-    // second term: each vertice satisfies Az<=b, 
+    // second term: each vertice satisfies Az<=b,
     // third term : C2,C3
     int neF   =  1 + rowsA * fs.size() + 2;
 
@@ -137,7 +162,7 @@ namespace uav{
       }
     }
     Flow[fs.size()*rowsA+1] = -INFI;
-    Fupp[fs.size()*rowsA+1] = (-2.0) * radius / (minInterDis);
+    Fupp[fs.size()*rowsA+1] = (-2.0) * radius / (minDis);
     Flow[fs.size()*rowsA+2] = 1.0;
     Fupp[fs.size()*rowsA+2] = 1.0;
 
@@ -165,6 +190,11 @@ namespace uav{
     ToyProb.setIntParameter( "Verify level ", 3 );
     ToyProb.solve          ( Cold );
 
+    Vector8d res;
+    for(int i=0; i<n; ++i){
+      res(i) = x[i];
+    }
+
     for (int i = 0; i < n; i++ ){
       cout << "x = " << x[i] << " xstate = " << xstate[i] << endl;
     }
@@ -181,7 +211,7 @@ namespace uav{
     delete []Fmul;   delete []Fstate;
 
 
-    return Vector8d();
+    return res;
   }
 
 }

@@ -13,7 +13,13 @@ int main(){
 
   Vector8d v8d;
 
-  cout << v8d << endl;
+  for(int i=0; i<8; ++i){
+    v8d(i) = i;
+  }
+
+  cout << v8d(1) << endl;
+
+
 
   //OptimalFormation of;
   //Formation f;
@@ -22,6 +28,8 @@ int main(){
   Eigen::Vector3d s(1,2,3);
   Eigen::Vector3d t(2,6,6);
   cout << sqrt((s-t).transpose() * (s-t)) << endl;
+
+  
 
   return 0;
 }
