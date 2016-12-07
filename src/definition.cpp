@@ -17,7 +17,7 @@ namespace uav{
       minInterDis = getMinInterDis(uavs);
       double r = -1;
       for(int i=0; i<uavs.size(); ++i){
-        Polytope uav = uavs[i]:
+        Polytope uav = uavs[i];
         double currUavRadius = getRadius(uav);
         r = max(r, currUavRadius);
       }

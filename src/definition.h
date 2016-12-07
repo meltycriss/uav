@@ -24,7 +24,8 @@ namespace uav{
       Formation(
           std::vector<Polytope> _uavs,
           Polytope _convexHull,
-          double _pref);
+          double _pref
+          );
 
       std::vector<Polytope> uavs;
       Polytope convexHull;

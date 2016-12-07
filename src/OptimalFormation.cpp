@@ -70,18 +70,27 @@ namespace uav{
   // return index of optimal formation
   // deviation is passed through param
   Vector8d OptimalFormation::optimalDeviation(const Formation &formation){
+    // static variables required initializing
     if(!sInitialized_){
       throw OptimalFormationError();
     }
+
     //SNOPT
     int rowsA = sA_.rows();
     int colsA = sA_.cols();
+    Polytope fs = sFormation_.convexHull;
+    double radius = sFormation_.radius;
+    double minDis = sFormation_.minInterDis;
 
     snoptProblemA ToyProb;
 
     // Allocate and initialize;
-    int n     =  colsA;
-    int neF   =  rowsA+1; // #constrains + obj_func
+    // t0 t1 t2 s q0 q1 q2 q3
+    int n     =  8; 
+    // first term : obj_func
+    // second term: each vertice satisfies Az<=b, 
+    // third term : C2,C3
+    int neF   =  1 + rowsA * fs.size() + 2;
 
     double *x      = new double[n];
     double *xlow   = new double[n];
@@ -114,13 +123,23 @@ namespace uav{
     }
 
     // set the upper and lower bounds of F
+    // [0]         : obj
+    // [1-#v*#rows]: C1
+    // [#v*#rows+1]: C2
+    // [#v*#rows+2]: C3
     Flow[0] = -INFI;
     Fupp[0] = INFI;
-    for(int i=1; i<neF; ++i){
-      Flow[i] = -INFI;
-      Fupp[i] = sB_(i-1);
-      Fmul[i] = 0;
+    for(int i=0; i<fs.size(); ++i){
+      for(int j=0; j<rowsA; ++j){
+        Flow[i*rowsA+j+1] = -INFI;
+        Fupp[i*rowsA+j+1] = sB_(j);
+        Fmul[i*rowsA+j+1] = 0;
+      }
     }
+    Flow[fs.size()*rowsA+1] = -INFI;
+    Fupp[fs.size()*rowsA+1] = (-2.0) * radius / (minInterDis);
+    Flow[fs.size()*rowsA+2] = 1.0;
+    Fupp[fs.size()*rowsA+2] = 1.0;
 
     // set the indicator of G
     for(int i=0; i<neF; ++i){
