@@ -1,5 +1,6 @@
 #include <iostream>
 #include "util.h"
+#include <cmath>
 using namespace std;
 
 namespace uav{
@@ -14,7 +15,6 @@ namespace uav{
     }
     return res;
   }
-
   // return polytope after moving
   Polytope polytopeAfterMove(const Polytope &poly, double time, trajectory m){
     Polytope res;
@@ -53,5 +53,48 @@ namespace uav{
     return res;
   }
 
+  Point getCentroid(const Polytope &uav){
+    Point res(0,0,0);
+    for(int i=0; i<uav.size(); ++i){
+      res += uav[i];
+    }
+    res /= uav.size();
+    return res;
+  }
+
+  double getMinInterDis(const vector<Polytope> &uavs){
+    // compute centroids of each uav
+    vector<Point> centroids;
+    for(int i=0; i<uavs.size(); ++i){
+      Polytope uav = uavs[i];
+      Point p = getCentroid(uav);
+      centroids.push_back(p);
+    }
+
+    // compute min distance between centroids
+    double res = INT_MAX;
+    for(int i=0; i<centroids.size(); ++i){
+      for(int j=i; j<centroids.size(); ++j){
+        Point s = centroids[i];
+        Point t = centroids[j];
+        double disSquare = (s-t).transpose() * (s-t);
+        res = min(res, disSquare);
+      }
+    }
+    res = sqrt(res);
+    return res;
+  }
+
+  double getRadius(const Polytope &uav){
+    double res = -1;
+    Point centroid = getCentroid(uav);
+    for(int i=0; i<uav.size(); ++i){
+      Point p = uav[i];
+      double disSquare = (p-centroid).transpose() * (p-centroid);
+      res = max(res, disSquare);
+    }
+    res = sqrt(res);
+    return res;
+  }
 }
 

@@ -7,12 +7,19 @@
 
 #include "iris/iris.h"
 
-
-
-
 using namespace std;
 
 namespace uav{
+
+  // initialze static variables
+  bool OptimalFormation::sInitialized_ = false;
+  Formation OptimalFormation::sFormation_ = Formation();
+  Point OptimalFormation::sG_ = Point();
+  double OptimalFormation::sS_ = 1;
+  Eigen::Vector3d OptimalFormation::sQ_ = Eigen::Vector3d();
+  double OptimalFormation::sWT_ = 1;
+  double OptimalFormation::sWS_ = 1;
+  double OptimalFormation::sWQ_ = 1;
   Eigen::MatrixXd OptimalFormation::sA_ = Eigen::MatrixXd();
   Eigen::VectorXd OptimalFormation::sB_ = Eigen::VectorXd();
 
@@ -63,74 +70,9 @@ namespace uav{
   // return index of optimal formation
   // deviation is passed through param
   Vector8d OptimalFormation::optimalDeviation(const Formation &formation){
-
-
-    //------------------------------IRIS part------------------------------
-
-    //problem:
-    //    obstacle_pts
-    //    bounds
-    //    dim
-    //    seed
-    iris::IRISProblem problem(3);
-    problem.setSeedPoint(Eigen::Vector3d(0.1, 0.1, 0.1));
-
-    // format the output so as to visualize in jupyter conveniently
-    Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
-
-    // obs: dim * num of points
-    Eigen::MatrixXd obs(3,4);
-
-    obs << sqrt(3),     0,     0,    sqrt(3),
-        0,     0,     0,          0,
-        -INFI, -INFI,  INFI,       INFI;
-    problem.addObstacle(obs);
-    //std::cout << "obs1 = " << obs.format(np_array) << std::endl;
-
-    obs << sqrt(3),     0,     0,    sqrt(3),
-        1,     1,     1,          1,
-        -INFI, -INFI,  INFI,       INFI;
-    problem.addObstacle(obs);
-    obs <<       0,     0,     0,          0,
-        0,     1,     1,          0,
-        -INFI, -INFI,  INFI,       INFI;
-    problem.addObstacle(obs);
-    obs << sqrt(3), sqrt(3), sqrt(3), sqrt(3),
-        0,       1,       1,       0,
-        -INFI,   -INFI,    INFI,    INFI;
-    problem.addObstacle(obs);
-    obs << sqrt(3), sqrt(3), 0, 0,
-        0,       1, 1, 0,
-        0,       0, 0, 0;
-    problem.addObstacle(obs);
-    obs << sqrt(3), sqrt(3),     0,     0,
-        0,       1,     1,     0,
-        3.0/2,   3.0/2, 3.0/2, 3.0/2;
-    problem.addObstacle(obs);
-
-    // option require_containment
-    iris::IRISOptions options;
-    iris::IRISRegion region = inflate_region(problem, options);
-
-
-    //std::cout << "a = " << region.polyhedron.getA().format(np_array) << std::endl;
-    //std::cout << "b = " << region.polyhedron.getB().format(np_array) << std::endl;
-
-    //std::cout << "c = " << region.ellipsoid.getC().format(np_array) << std::endl;
-    //std::cout << "d = " << region.ellipsoid.getD().format(np_array) << std::endl;
-
-    sA_ = region.polyhedron.getA();
-    sB_ = region.polyhedron.getB();
-
-    //cout << "A:" << endl << A << endl
-    //  << "B:" << endl << B << endl;
-
-
-
-
-
-
-
+    if(!sInitialized_){
+      throw OptimalFormationError();
+    }
     //SNOPT
     int rowsA = sA_.rows();
     int colsA = sA_.cols();

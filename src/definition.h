@@ -24,20 +24,13 @@ namespace uav{
       Formation(
           std::vector<Polytope> _uavs,
           Polytope _convexHull,
-          double _minDis,
-          double _pref
-          ):
-        uavs(_uavs),
-        convexHull(_convexHull),
-        minDis(_minDis),
-        pref(_pref){
-
-        }
+          double _pref);
 
       std::vector<Polytope> uavs;
       Polytope convexHull;
-      double minDis;
       double pref;
+      double minInterDis;
+      double radius;
   };
 
 }

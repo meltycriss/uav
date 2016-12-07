@@ -5,8 +5,15 @@
 #include <vector>
 #include "util.h"
 #include "definition.h"
+#include <exception>
 
 namespace uav{
+  class OptimalFormationError: public std::exception{
+    public:
+      const char* what() const throw(){
+        return "OptimalFormation's static variables haven't been initialized, call OptimalFormation::init() first";
+      }
+  };
 
   class OptimalFormation{
     public:
@@ -36,22 +43,27 @@ namespace uav{
       static void init(const Eigen::MatrixXd &_A, const Eigen::VectorXd &_b,
           const Point &_gPref, double _sPref, Eigen::Vector3d _qPref,
           double _wT, double _wS, double _wQ){
-      //  sA_ = _A;
-      //  sB_ = _b;
-      //  sG_ = _gPref;
-      //  sS_ = _sPref;
-      //  sQ_ = _qPref;
-      //  sWT_ = _wT;
-      //  sWS_ = _wS;
-      //  sWQ_ = _wQ;
+        sA_ = _A;
+        sB_ = _b;
+        sG_ = _gPref;
+        sS_ = _sPref;
+        sQ_ = _qPref;
+        sWT_ = _wT;
+        sWS_ = _wS;
+        sWQ_ = _wQ;
+        sInitialized_ = true;
       }
 
-      //static Formation sFormation_;
+      // for a specific formation
+      static Formation sFormation_;
 
-      //static Point sG_;
-      //static double sS_;
-      //static Eigen::Vector3d sQ_;
-      //static double sWT_, sWS_, sWQ_, sC_;
+      // for all formations
+      static bool sInitialized_;
+
+      static Point sG_;
+      static double sS_;
+      static Eigen::Vector3d sQ_;
+      static double sWT_, sWS_, sWQ_;
 
       static Eigen::MatrixXd sA_;
       static Eigen::VectorXd sB_;

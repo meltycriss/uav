@@ -19,6 +19,15 @@ namespace uav{
   //return bounds generated from lb to ub
   iris::Polyhedron getPolyFromBounds(const Point4d&, const Point4d&);
 
+  //distance between two Polytope is the distance between their centroid
+  double getMinInterDis(const std::vector<Polytope> &uavs);
+
+  //return centroid of a polytope
+  Point getCentroid(const Polytope &uav);
+
+  //return wrapper radius of a polytope
+  double getRadius(const Polytope &uav);
+
 }
 
 #endif

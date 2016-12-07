@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "OptimalFormation.h"
+#include <cmath>
 using namespace std;
 using namespace uav;
 
@@ -14,9 +15,13 @@ int main(){
 
   cout << v8d << endl;
 
-  OptimalFormation of;
-  Formation f;
-  of.optimalDeviation(f);
+  //OptimalFormation of;
+  //Formation f;
+  //of.optimalDeviation(f);
+  //
+  Eigen::Vector3d s(1,2,3);
+  Eigen::Vector3d t(2,6,6);
+  cout << sqrt((s-t).transpose() * (s-t)) << endl;
 
   return 0;
 }
