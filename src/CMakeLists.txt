@@ -33,10 +33,13 @@ FIND_LIBRARY(SNOPT7_CPP_LIB snopt7_cpp HINTS "../lib/snopt")
 #  ${SNOPT7_CPP_LIB}
 #  ${SNOPT7_LIB})
 
-ADD_EXECUTABLE(main ./main.cpp ./LargestConvexPolytope.cpp ./util.cpp)
+#ADD_EXECUTABLE(main ./main.cpp ./LargestConvexPolytope.cpp ./util.cpp ./definition.cpp)
+ADD_EXECUTABLE(main ./main.cpp ./LargestConvexPolytope.cpp ./util.cpp ./OptimalFormation.cpp)
 TARGET_LINK_LIBRARIES(main
   ${IRIS_LIB}
-  ${IRIS_GEOMETRY_LIB})
+  ${IRIS_GEOMETRY_LIB}
+  ${SNOPT7_CPP_LIB}
+  ${SNOPT7_LIB})
 #
 target_compile_features(main PRIVATE cxx_range_for)
 

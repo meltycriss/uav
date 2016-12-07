@@ -16,8 +16,29 @@ namespace uav{
 
   const int INFI = INT_MAX;
   //const int INFI = 5; //for visualization
-  //
-  class Formation;
+  
+  class Formation{
+    public:
+      Formation(){}
+
+      Formation(
+          std::vector<Polytope> _uavs,
+          Polytope _convexHull,
+          double _minDis,
+          double _pref
+          ):
+        uavs(_uavs),
+        convexHull(_convexHull),
+        minDis(_minDis),
+        pref(_pref){
+
+        }
+
+      std::vector<Polytope> uavs;
+      Polytope convexHull;
+      double minDis;
+      double pref;
+  };
 
 }
 
