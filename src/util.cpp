@@ -96,5 +96,16 @@ namespace uav{
     res = sqrt(res);
     return res;
   }
+
+  Eigen::MatrixXd quatRotateVecDiff(const Eigen::Vector4d &q, const Eigen::Vector3d &v){
+    Eigen::MatrixXd res;
+    
+    //to do
+
+
+    return res;
+  }
+
+
 }
 

@@ -28,6 +28,8 @@ namespace uav{
   //return wrapper radius of a polytope
   double getRadius(const Polytope &uav);
 
+  Eigen::MatrixXd quatRotateVecDiff(const Eigen::Vector4d &q, const Eigen::Vector3d &v);
+
 }
 
 #endif

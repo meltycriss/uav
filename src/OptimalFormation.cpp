@@ -68,6 +68,7 @@ namespace uav{
       F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + sFormation_.pref;
 
       //constraints
+      //C1
       for(int i=0; i<fs.size(); ++i){
         Eigen::Vector3d _t;
         double _s;
@@ -106,10 +107,33 @@ namespace uav{
       G[7] = 2 * sWQ_ * xx7;
 
       //derivative of constraints
-      //to do
-      for(int i=1; i<=rowsA; ++i){
-        for(int j=0; j<3; ++j){
-          G[i*3+j] = sA_(i-1,j);
+      //C1
+      for(int i=0; i<fs.size(); ++i){
+        double _s;
+        Eigen::Vector4d _q;
+        Eigen::Vector3d _f;
+        _s = x[3];
+        _q << x[4], x[5], x[6], x[7];
+        _f = fs[i];
+        // jacobian of T
+        Eigen::MatrixXd diffMatT = sA_.block(0,0,rowsA,colsA-1);
+        // jacobian of S
+        Eigen::Vector4d rot_0;
+        rot_0 << drake::math::quatRotateVec(_q, _f), 0;
+        Eigen::MatrixXd diffMatS = sA_ * rot_0;
+        // jacobian of Q
+        Eigen::MatrixXd drot = quatRotateVecDiff(_q, _f);
+        drot = drot.block(0,0,drot.rows(),4);
+        Eigen::MatrixXd diffMatQ(rowsA, 4);
+        diffMatQ << drot, Eigen::MatrixXd::Zero(1,4);
+        // jacobian
+        Eigen::MatrixXd diffMat(rowsA, 8);
+        diffMat << diffMatT, diffMatS, diffMatQ;
+        // assign
+        for(int j=0; j<rowsA; ++j){
+          for(int z=0; z<8; ++z){
+            G[8+(i*rowsA+j)*8+z] = diffMatQ(j,z);
+          }
         }
       }
 
