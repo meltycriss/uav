@@ -3,31 +3,21 @@
 #include <string>
 #include "OptimalFormation.h"
 #include <cmath>
+#include "drake/math/quaternion.h"
+
 using namespace std;
 using namespace uav;
+using drake::math::quatRotateVec;
 
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
-  typedef Eigen::Matrix<double,8,1> Vector8d;
+  Eigen::Vector4d q(1,2,3,4);
+  q = q/q.norm();
+  Eigen::Vector3d v(3,4,5);
+  cout << v.norm() << endl;
+  cout << quatRotateVec(q,v).norm() << endl;
 
-  Vector8d v8d;
-
-  for(int i=0; i<8; ++i){
-    v8d(i) = i;
-  }
-
-  cout << v8d(1) << endl;
-
-
-
-  //OptimalFormation of;
-  //Formation f;
-  //of.optimalDeviation(f);
-  //
-  Eigen::Vector3d s(1,2,3);
-  Eigen::Vector3d t(2,6,6);
-  cout << sqrt((s-t).transpose() * (s-t)) << endl;
 
   
 

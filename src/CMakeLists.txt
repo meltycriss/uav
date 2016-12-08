@@ -1,6 +1,7 @@
 INCLUDE_DIRECTORIES("../include/iris")
 INCLUDE_DIRECTORIES("../include/snopt")
 INCLUDE_DIRECTORIES("../include/iris/eigen3")
+INCLUDE_DIRECTORIES("../include/drake")
 #
 #IF(DEBUG)
 #  ADD_DEFINITIONS(-DDEBUG)
@@ -33,13 +34,17 @@ FIND_LIBRARY(SNOPT7_CPP_LIB snopt7_cpp HINTS "../lib/snopt")
 #  ${SNOPT7_CPP_LIB}
 #  ${SNOPT7_LIB})
 
+FIND_LIBRARY(DRAKE_MATH_LIB drakeMath HINTS "../lib/drake/")
+
 #ADD_EXECUTABLE(main ./main.cpp ./LargestConvexPolytope.cpp ./util.cpp ./definition.cpp)
 ADD_EXECUTABLE(main ./main.cpp ./LargestConvexPolytope.cpp ./util.cpp ./OptimalFormation.cpp ./definition.cpp)
 TARGET_LINK_LIBRARIES(main
   ${IRIS_LIB}
   ${IRIS_GEOMETRY_LIB}
   ${SNOPT7_CPP_LIB}
-  ${SNOPT7_LIB})
+  ${SNOPT7_LIB}
+  ${DRAKE_MATH_LIB}
+  )
 #
 target_compile_features(main PRIVATE cxx_range_for)
 

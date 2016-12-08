@@ -4,6 +4,7 @@
 #include "definition.h"
 #include "OptimalFormation.h"
 #include "snoptProblem.hpp"
+#include "drake/math/quaternion.h"
 
 #include "iris/iris.h"
 
@@ -20,6 +21,7 @@ namespace uav{
   double OptimalFormation::sWT_ = 1;
   double OptimalFormation::sWS_ = 1;
   double OptimalFormation::sWQ_ = 1;
+  double OptimalFormation::sTimeInterval_ = 0.46;
   Eigen::MatrixXd OptimalFormation::sA_ = Eigen::MatrixXd();
   Eigen::VectorXd OptimalFormation::sB_ = Eigen::VectorXd();
 
@@ -66,18 +68,27 @@ namespace uav{
       F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + sFormation_.pref;
 
       //constraints
-      //to do
-      for(int i=1; i<=rowsA; ++i){
-        F[i] = sA_(i-1, 0) * x[0] + sA_(i-1, 1) * x[1] + sA_(i-1, 2) * x[2];
+      for(int i=0; i<fs.size(); ++i){
+        Eigen::Vector3d _t;
+        double _s;
+        Eigen::Vector4d _q;
+        Eigen::Vector3d _f;
+        _t << x[0], x[1], x[2];
+        _s = x[3];
+        _q << x[4], x[5], x[6], x[7];
+        _f = fs[i];
+        Eigen::Vector3d _x = _t + _s * drake::math::quatRotateVec(_q, _f);
+        Eigen::Vector4d _x4d(_x(1), _x(2), _x(3), sTimeInterval_);
+        Eigen::Vector4d _c1 = sA_ * _x4d;
+        for(int j=0; j<rowsA; ++j){
+          F[1+i*rowsA+j] = _c1[j];
+        }
       }
 
       //C2
       F[1+fs.size()*rowsA] = (-1.0) * x[3] * minDis;
       //C3
       F[1+fs.size()*rowsA+1] = x[4] * x[4] + x[5] * x[5] + x[6] * x[6] + x[7] * x[7];
-
-
-
 
     }
 
@@ -123,9 +134,6 @@ namespace uav{
           G[base+i] = 0;
         }
       }
-
-
-
     }
   }
 
