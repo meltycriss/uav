@@ -60,6 +60,7 @@ namespace uav{
     double ssSquare = xx3*xx3;
     double qqSquare = xx4*xx4 + xx5*xx5 + xx6*xx6 + xx7*xx7;
 
+    // functions
     if ( *needF > 0 ) {
       //obj function
       F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + sFormation_.pref;
@@ -69,8 +70,19 @@ namespace uav{
       for(int i=1; i<=rowsA; ++i){
         F[i] = sA_(i-1, 0) * x[0] + sA_(i-1, 1) * x[1] + sA_(i-1, 2) * x[2];
       }
+
+      //C2
+      F[1+fs.size()*rowsA] = (-1.0) * x[3] * minDis;
+      //C3
+      F[1+fs.size()*rowsA+1] = x[4] * x[4] + x[5] * x[5] + x[6] * x[6] + x[7] * x[7];
+
+
+
+
     }
 
+
+    // gradients
     if ( *needG > 0 ) {
       //derivative of objcetive func
       G[0] = 2 * sWT_ * xx0;
@@ -89,6 +101,31 @@ namespace uav{
           G[i*3+j] = sA_(i-1,j);
         }
       }
+
+      //C2
+      int base = (1 + fs.size()*rowsA) * 8;
+      for(int i=0; i<8; ++i){
+        if(i==3){
+          G[base+i] = minDis;
+        }
+        else{
+          G[base+i] = 0;
+        }
+      }
+
+      //C3
+      base = (1 + fs.size()*rowsA + 1) * 8;
+      for(int i=0; i<8; ++i){
+        if(i>=4){
+          G[base+i] = 2 * x[i];
+        }
+        else{
+          G[base+i] = 0;
+        }
+      }
+
+
+
     }
   }
 
@@ -162,7 +199,7 @@ namespace uav{
       }
     }
     Flow[fs.size()*rowsA+1] = -INFI;
-    Fupp[fs.size()*rowsA+1] = (-2.0) * radius / (minDis);
+    Fupp[fs.size()*rowsA+1] = (-2.0) * radius;
     Flow[fs.size()*rowsA+2] = 1.0;
     Fupp[fs.size()*rowsA+2] = 1.0;
 
