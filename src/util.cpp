@@ -75,7 +75,7 @@ namespace uav{
     // compute min distance between centroids
     double res = INT_MAX;
     for(int i=0; i<centroids.size(); ++i){
-      for(int j=i; j<centroids.size(); ++j){
+      for(int j=i+1; j<centroids.size(); ++j){
         Point s = centroids[i];
         Point t = centroids[j];
         double disSquare = (s-t).transpose() * (s-t);

@@ -4,6 +4,7 @@
 #include "OptimalFormation.h"
 #include <cmath>
 #include "drake/math/quaternion.h"
+#include "LargestConvexPolytope.h"
 
 using namespace std;
 using namespace uav;
@@ -15,7 +16,8 @@ int main(){
   Eigen::Vector4d q(1,4,4,6);
   Eigen::Vector3d r(4,5,6);
   q = q/q.norm();
-  cout << quatRotateVecDiff(q, r) << endl;
+  cout << quatRotateVec(q, r) << endl;
+  OptimalFormation of;
 
 
 

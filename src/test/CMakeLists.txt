@@ -2,6 +2,7 @@ INCLUDE_DIRECTORIES("../../include/iris")
 INCLUDE_DIRECTORIES("../../include/snopt")
 INCLUDE_DIRECTORIES("../../include/iris/eigen3")
 INCLUDE_DIRECTORIES("..")
+INCLUDE_DIRECTORIES("../../include/drake")
 
 IF(DEBUG)
   ADD_DEFINITIONS(-DDEBUG)
@@ -36,12 +37,25 @@ FIND_LIBRARY(SNOPT7_CPP_LIB snopt7_cpp HINTS "../../lib/snopt")
 #  ${SNOPT7_CPP_LIB}
 #  ${SNOPT7_LIB})
 
-ADD_EXECUTABLE(largestConvexPolytopeTest ./LargestConvexPolytopeTest.cpp ../LargestConvexPolytope.cpp ../util.cpp)
-TARGET_LINK_LIBRARIES(largestConvexPolytopeTest
-  ${IRIS_LIB}
-  ${IRIS_GEOMETRY_LIB})
+FIND_LIBRARY(DRAKE_MATH_LIB drakeMath HINTS "../../lib/drake")
 
-target_compile_features(largestConvexPolytopeTest PRIVATE cxx_range_for)
+#ADD_EXECUTABLE(largestConvexPolytopeTest ./LargestConvexPolytopeTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../definition.cpp)
+#TARGET_LINK_LIBRARIES(largestConvexPolytopeTest
+#  ${IRIS_LIB}
+#  ${IRIS_GEOMETRY_LIB})
+#target_compile_features(largestConvexPolytopeTest PRIVATE cxx_range_for)
+
+ADD_EXECUTABLE(optimalFormationTest ./OptimalFormationTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
+TARGET_LINK_LIBRARIES(optimalFormationTest
+  ${IRIS_LIB}
+  ${IRIS_GEOMETRY_LIB}
+  ${SNOPT7_CPP_LIB}
+  ${SNOPT7_LIB}
+  ${DRAKE_MATH_LIB}
+  )
+
+target_compile_features(optimalFormationTest PRIVATE cxx_range_for)
+
 
 #MESSAGE(STATUS "libsnopt7.so: " ${SNOPT7_LIB})
 #MESSAGE(STATUS "libsnopt7_cpp.so: " ${SNOPT7_CPP_LIB})

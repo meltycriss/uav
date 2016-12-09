@@ -29,6 +29,17 @@ namespace uav{
     }
 
     public:
+
+      // getter
+      std::vector<Formation> getFormations(){
+        return formations_;
+      }
+
+      // setter
+      void setFormations(std::vector<Formation> _formations){
+        formations_ = _formations;
+      }
+
       // all formations
       std::vector<Formation> formations_;
 
