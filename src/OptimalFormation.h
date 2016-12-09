@@ -52,7 +52,7 @@ namespace uav{
 
       // for snopt
       static void init(const Eigen::MatrixXd &_A, const Eigen::VectorXd &_b,
-          const Point &_gPref, double _sPref, Eigen::Vector3d _qPref,
+          const Point &_gPref, double _sPref, Eigen::Vector4d _qPref,
           double _wT, double _wS, double _wQ,
           double _timeInterval){
         sA_ = _A;
@@ -75,7 +75,7 @@ namespace uav{
 
       static Point sG_;
       static double sS_;
-      static Eigen::Vector3d sQ_;
+      static Eigen::Vector4d sQ_;
       static double sWT_, sWS_, sWQ_;
       static double sTimeInterval_;
 

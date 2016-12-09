@@ -17,7 +17,7 @@ namespace uav{
   Formation OptimalFormation::sFormation_ = Formation();
   Point OptimalFormation::sG_ = Point();
   double OptimalFormation::sS_ = 1;
-  Eigen::Vector3d OptimalFormation::sQ_ = Eigen::Vector3d();
+  Eigen::Vector4d OptimalFormation::sQ_ = Eigen::Vector4d();
   double OptimalFormation::sWT_ = 1;
   double OptimalFormation::sWS_ = 1;
   double OptimalFormation::sWQ_ = 1;
@@ -79,10 +79,10 @@ namespace uav{
         _q << x[4], x[5], x[6], x[7];
         _f = fs[i];
         Eigen::Vector3d _x = _t + _s * drake::math::quatRotateVec(_q, _f);
-        Eigen::Vector4d _x4d(_x(1), _x(2), _x(3), sTimeInterval_);
-        Eigen::Vector4d _c1 = sA_ * _x4d;
+        Eigen::Vector4d _x4d(_x(0), _x(1), _x(2), sTimeInterval_);
+        Eigen::MatrixXd _c1 = sA_ * _x4d;
         for(int j=0; j<rowsA; ++j){
-          F[1+i*rowsA+j] = _c1[j];
+          F[1+i*rowsA+j] = _c1(j);
         }
       }
 
@@ -124,15 +124,16 @@ namespace uav{
         // jacobian of Q
         Eigen::MatrixXd drot = quatRotateVecDiff(_q, _f);
         drot = drot.block(0,0,drot.rows(),4);
-        Eigen::MatrixXd diffMatQ(rowsA, 4);
-        diffMatQ << drot, Eigen::MatrixXd::Zero(1,4);
+        Eigen::MatrixXd auxMat(4,4);
+        auxMat << drot, Eigen::MatrixXd::Zero(1,4);
+        Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
         // jacobian
         Eigen::MatrixXd diffMat(rowsA, 8);
         diffMat << diffMatT, diffMatS, diffMatQ;
         // assign
         for(int j=0; j<rowsA; ++j){
           for(int z=0; z<8; ++z){
-            G[8+(i*rowsA+j)*8+z] = diffMatQ(j,z);
+            G[8+(i*rowsA+j)*8+z] = diffMat(j,z);
           }
         }
       }
@@ -170,6 +171,7 @@ namespace uav{
     }
 
     //SNOPT
+    sFormation_ = formation;
     int rowsA = sA_.rows();
     int colsA = sA_.cols();
     Polytope fs = sFormation_.convexHull;
