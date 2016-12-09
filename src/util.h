@@ -30,6 +30,11 @@ namespace uav{
 
   Eigen::MatrixXd quatRotateVecDiff(const Eigen::Vector4d &q, const Eigen::Vector3d &v);
 
+  Eigen::MatrixXd quatProductDiff(const Eigen::Vector4d &lhs, const Eigen::Vector4d &rhs);
+
+  Eigen::MatrixXd quatConjugateDiff(const Eigen::Vector4d &q);
+
+
 }
 
 #endif

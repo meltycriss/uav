@@ -1,6 +1,7 @@
 #include <iostream>
 #include "util.h"
 #include <cmath>
+#include "drake/math/quaternion.h"
 using namespace std;
 
 namespace uav{
@@ -98,13 +99,52 @@ namespace uav{
   }
 
   Eigen::MatrixXd quatRotateVecDiff(const Eigen::Vector4d &q, const Eigen::Vector3d &v){
-    Eigen::MatrixXd res;
-    
+    //dq
+    Eigen::MatrixXd dq(4,7);
+    dq << Eigen::MatrixXd::Identity(4,4), Eigen::MatrixXd::Zero(4,3);
+    //dr
+    Eigen::MatrixXd dr(4,7);
+    Eigen::MatrixXd auxMat(4,3);
+    auxMat << Eigen::MatrixXd::Zero(1,3), Eigen::MatrixXd::Identity(3,3);
+    dr << Eigen::MatrixXd::Zero(4,4), auxMat;
+    //q_times_r && dq_times_r
+    Eigen::Vector4d r_0;
+    r_0 << 0, v;
+    Eigen::Vector4d q_times_r = drake::math::quatProduct(q, r_0);
+    Eigen::MatrixXd dq_times_r = quatProductDiff(q, r_0);
+    //q_conj && dq_conj
+    Eigen::Vector4d q_conj = drake::math::quatConjugate(q);
+    Eigen::MatrixXd dq_conj = quatConjugateDiff(q);
+    //r_rot, dr_rot
+    Eigen::Vector4d r_rot = drake::math::quatProduct(q_times_r, q_conj);
+    Eigen::MatrixXd dr_rot = quatProductDiff(q_times_r, q_conj);
+    //dr_rot i.e., res
+    auxMat.resize(8,7);
+    auxMat << dq,dr;
+    auxMat = dq_times_r * auxMat;
+    Eigen::MatrixXd auxMat2(8,7);
+    auxMat2 << auxMat, dq_conj*dq;
+    dr_rot = dr_rot * auxMat2;
+    dr_rot = dr_rot.block(1,0,dr_rot.rows()-1,dr_rot.cols());
     //to do
 
+    return dr_rot;
+  }
+
+  Eigen::MatrixXd quatProductDiff(const Eigen::Vector4d &lhs, const Eigen::Vector4d &rhs){
+    Eigen::MatrixXd res;
+
+    //to do
 
     return res;
   }
+
+  Eigen::MatrixXd quatConjugateDiff(const Eigen::Vector4d &q){
+    Eigen::MatrixXd res;
+
+    return res;
+  }
+
 
 
 }
