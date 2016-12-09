@@ -126,23 +126,62 @@ namespace uav{
     auxMat2 << auxMat, dq_conj*dq;
     dr_rot = dr_rot * auxMat2;
     dr_rot = dr_rot.block(1,0,dr_rot.rows()-1,dr_rot.cols());
-    //to do
 
     return dr_rot;
   }
 
   Eigen::MatrixXd quatProductDiff(const Eigen::Vector4d &lhs, const Eigen::Vector4d &rhs){
-    Eigen::MatrixXd res;
+    //w1
+    double w1 = lhs(0);
+    //w2
+    double w2 = rhs(0);
+    //v1
+    Eigen::Vector3d v1 = lhs.block(1,0,3,1);
+    //v2
+    Eigen::Vector3d v2 = rhs.block(1,0,3,1);
 
-    //to do
+    //dq1
+    Eigen::MatrixXd dq1(4,8);
+    dq1 << Eigen::MatrixXd::Identity(4,4), Eigen::MatrixXd::Zero(4,4);
+    //dq2
+    Eigen::MatrixXd dq2(4,8);
+    dq2 << Eigen::MatrixXd::Zero(4,4), Eigen::MatrixXd::Identity(4,4);
+    //dw1
+    Eigen::MatrixXd dw1 = dq1.block(0,0,1,dq1.cols());
+    //dw2
+    Eigen::MatrixXd dw2 = dq2.block(0,0,1,dq2.cols());
+    //dv1
+    Eigen::MatrixXd dv1 = dq1.block(1,0,dq1.rows()-1,dq1.cols());
+    //dv2
+    Eigen::MatrixXd dv2 = dq2.block(1,0,dq2.rows()-1,dq2.cols());
+    
+    //dw3
+    Eigen::MatrixXd dw3 = w2*dw1 + w1*dw2 - v2.transpose()*dv1 - v1.transpose()*dv2;
+    //dv3
+    Eigen::MatrixXd dv3 = dcross(v1,v2,dv1,dv2) + v2*dw1 + w1*dv2 + v1*dw2 + w2*dv1;
 
-    return res;
+    //dq3
+    Eigen::MatrixXd dq3(4,8);
+    dq3 << dw3, dv3;
+
+    return dq3;
   }
 
   Eigen::MatrixXd quatConjugateDiff(const Eigen::Vector4d &q){
-    Eigen::MatrixXd res;
-
+    Eigen::MatrixXd res = -Eigen::MatrixXd::Identity(4,4);
+    res(0,0) = 1;
     return res;
+  }
+
+  Eigen::MatrixXd dcross(const Eigen::Vector3d &r1, const Eigen::Vector3d &r2, Eigen::MatrixXd &dr1, Eigen::MatrixXd &dr2){
+    Eigen::MatrixXd lhs(3,8), rhs(3,8);
+    for(int i=0; i<8; ++i){
+      Eigen::Vector3d v3d = dr2.col(i);
+      lhs.col(i) = r1.cross(v3d);
+      v3d = dr1.col(i);
+      rhs.col(i) = r2.cross(v3d);
+    }
+    return lhs-rhs;
   }
 
 

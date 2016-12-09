@@ -34,6 +34,7 @@ namespace uav{
 
   Eigen::MatrixXd quatConjugateDiff(const Eigen::Vector4d &q);
 
+  Eigen::MatrixXd dcross(const Eigen::Vector3d &v1, const Eigen::Vector3d &v2, Eigen::MatrixXd &dv1, Eigen::MatrixXd &dv2);
 
 }
 
