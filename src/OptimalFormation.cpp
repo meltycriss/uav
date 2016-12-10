@@ -258,11 +258,19 @@ namespace uav{
     }
     neG = lenG;
 
+    // A related variables must be provided when defining derivative
+    int lenA   = lenG;
+    int *iAfun = new int[lenA];
+    int *jAvar = new int[lenA];
+    double *A  = new double[lenA];
+    int neA = 0;
+
     // Load the data for ToyProb ...
     ToyProb.setProbName    ("uav");
     ToyProb.setPrintFile   ( "uav.out" );
     ToyProb.setProblemSize ( n, neF );
     ToyProb.setObjective   ( ObjRow, ObjAdd );
+    ToyProb.setA           ( lenA, neA, iAfun, jAvar, A ); // mush be set when providing derivative
     ToyProb.setX           ( x, xlow, xupp, xmul, xstate );
     ToyProb.setF           ( F, Flow, Fupp, Fmul, Fstate );
     ToyProb.setG           ( lenG, neG, iGfun, jGvar );
@@ -271,7 +279,6 @@ namespace uav{
     ToyProb.setIntParameter( "Derivative option", 1 );
     ToyProb.setIntParameter( "Major Iteration limit", 250 );
     ToyProb.setIntParameter( "Verify level ", 3 );
-    //ToyProb.setIntParameter( "Verify level ", 0 );
     ToyProb.solve          ( Cold );
 
     Vector8d res;
@@ -285,13 +292,6 @@ namespace uav{
     for (int i = 0; i < neF; i++ ){
       cout << "F = " << F[i] << " Fstate = " << Fstate[i] << endl;
     }
-
-    cout << "sd: " << x[3] * sFormation_.minInterDis << endl;
-    cout << "2r: " << 2 * sFormation_.radius << endl;
-    cout << "A: " << endl << sA_ << endl;
-    cout << "B: " << endl << sB_ << endl;
-    cout << "n: " << n << endl;
-    cout << "neF: " << neF << endl;
 
     delete []iGfun;  delete []jGvar;
 
