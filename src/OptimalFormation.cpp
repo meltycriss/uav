@@ -127,10 +127,12 @@ namespace uav{
           Eigen::MatrixXd diffMatS = sA_ * rot_0;
           // jacobian of Q
           Eigen::MatrixXd drot = quatRotateVecDiff(_q, _f);
-          drot = drot.block(0,0,3,4);
+          Eigen::MatrixXd tmp = drot.block(0,0,3,4); // don't drot = drot.block(0,0,3,4);
+          drot = tmp;
           Eigen::MatrixXd auxMat(4,4);
           auxMat << drot, Eigen::MatrixXd::Zero(1,4);
-          Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
+          //Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
+          Eigen::MatrixXd diffMatQ = 0.1 * sS_ * sA_ * auxMat;
           // jacobian
           Eigen::MatrixXd diffMat(rowsA, 8);
           diffMat << diffMatT, diffMatS, diffMatQ;
@@ -279,7 +281,7 @@ namespace uav{
     ToyProb.setIntParameter( "Derivative option", 1 );
     ToyProb.setIntParameter( "Major Iteration limit", 250 );
     ToyProb.setIntParameter( "Verify level ", 3 );
-    //ToyProb.setIntParameter( "Verify level ", 0 ); // gradient of quatRotation is not accurate
+    //ToyProb.setIntParameter( "Verify level ", 0 ); // implement of quatRotation gradient is not accurate
     ToyProb.solve          ( Cold );
 
     Vector8d res;
