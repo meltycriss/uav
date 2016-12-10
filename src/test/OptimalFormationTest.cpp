@@ -138,8 +138,6 @@ int main(){
   formations.push_back(formation);
   of.setFormations(formations);
   OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
-  //OptimalFormation::init(A.block(0,0,1,A.cols()), B.block(0,0,1,B.cols()), gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
-  //OptimalFormation::init(Eigen::MatrixXd(), Eigen::VectorXd(), gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
   of.optimalDeviation(formation);
 
 

@@ -131,8 +131,7 @@ namespace uav{
           drot = tmp;
           Eigen::MatrixXd auxMat(4,4);
           auxMat << drot, Eigen::MatrixXd::Zero(1,4);
-          //Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
-          Eigen::MatrixXd diffMatQ = 0.1 * sS_ * sA_ * auxMat;
+          Eigen::MatrixXd diffMatQ = _s * sA_ * auxMat; // should be _s rather than sS_
           // jacobian
           Eigen::MatrixXd diffMat(rowsA, 8);
           diffMat << diffMatT, diffMatS, diffMatQ;
