@@ -138,7 +138,11 @@ int main(){
   formations.push_back(formation);
   of.setFormations(formations);
   OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
-  of.optimalDeviation(formation);
+  Vector8d param;
+  int index = of.optimalFormation(param);
+  cout << "index: " << index << endl;
+  cout << "param: " << endl << param << endl;
+  
 
 
   return 0;

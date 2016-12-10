@@ -168,9 +168,9 @@ namespace uav{
     }
   }
 
-  // return index of optimal formation
-  // deviation is passed through param
-  Vector8d OptimalFormation::optimalDeviation(const Formation &formation){
+  // return minimal loss
+  // the optimal param is passed through param
+  double OptimalFormation::optimalDeviation(const Formation &formation, Vector8d &param){
     // static variables required initializing
     if(!sInitialized_){
       throw OptimalFormationError();
@@ -283,9 +283,9 @@ namespace uav{
     //ToyProb.setIntParameter( "Verify level ", 0 ); // implement of quatRotation gradient is not accurate
     ToyProb.solve          ( Cold );
 
-    Vector8d res;
+    double res = F[ObjRow];
     for(int i=0; i<n; ++i){
-      res(i) = x[i];
+      param(i) = x[i];
     }
 
     for (int i = 0; i < n; i++ ){
@@ -295,6 +295,8 @@ namespace uav{
       cout << "F = " << F[i] << " Fstate = " << Fstate[i] << endl;
     }
 
+
+
     delete []iGfun;  delete []jGvar;
 
     delete []x;      delete []xlow;   delete []xupp;
@@ -303,7 +305,23 @@ namespace uav{
     delete []F;      delete []Flow;   delete []Fupp;
     delete []Fmul;   delete []Fstate;
 
+    return res;
 
+  }
+
+  // return index of optimal formation
+  // deviation is passed through param
+  int OptimalFormation::optimalFormation(Vector8d &param){
+    int res;
+    double minLoss = INT_MAX;
+    for(int i=0; i<formations_.size(); ++i){
+      Vector8d currParam;
+      double currLoss = optimalDeviation(formations_[i], currParam);
+      if(currLoss < minLoss){
+        res = i;
+        param = currParam;
+      }
+    }
     return res;
   }
 

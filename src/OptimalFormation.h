@@ -47,8 +47,9 @@ namespace uav{
       // deviation is passed through param
       int optimalFormation(Vector8d &param);
 
-      // return the optimal param of a given formation
-      Vector8d optimalDeviation(const Formation& formation);
+      // return minimal loss
+      // the optimal param is passed through param
+      double optimalDeviation(const Formation& formation, Vector8d &param);
 
       // for snopt
       static void init(const Eigen::MatrixXd &_A, const Eigen::VectorXd &_b,
