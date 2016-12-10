@@ -125,9 +125,8 @@ namespace uav{
     Eigen::MatrixXd auxMat2(8,7);
     auxMat2 << auxMat, dq_conj*dq;
     dr_rot = dr_rot * auxMat2;
-    dr_rot = dr_rot.block(1,0,dr_rot.rows()-1,dr_rot.cols());
-
-    return dr_rot;
+    Eigen::MatrixXd res = dr_rot.block(1,0,dr_rot.rows()-1,dr_rot.cols());
+    return res;
   }
 
   Eigen::MatrixXd quatProductDiff(const Eigen::Vector4d &lhs, const Eigen::Vector4d &rhs){

@@ -279,6 +279,7 @@ namespace uav{
     ToyProb.setIntParameter( "Derivative option", 1 );
     ToyProb.setIntParameter( "Major Iteration limit", 250 );
     ToyProb.setIntParameter( "Verify level ", 3 );
+    //ToyProb.setIntParameter( "Verify level ", 0 ); // gradient of quatRotation is not accurate
     ToyProb.solve          ( Cold );
 
     Vector8d res;
