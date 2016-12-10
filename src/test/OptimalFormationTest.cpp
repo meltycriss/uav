@@ -130,14 +130,18 @@ int main(){
   //test OptimalFormation::optimalDeviation()
   cout << "-----------------optimalDeviation()-----------------" << endl;
   OptimalFormation of;
-  Formation formation(uavs, uav, 1);
+  //Formation formation(uavs, uav, 1);
+  Formation formation(uavs, vector<Point>(1, Point(1,3,5)), 1);
   cout << formation.minInterDis << endl;
   cout << formation.radius << endl;
   vector<Formation> formations;
   formations.push_back(formation);
   of.setFormations(formations);
-  OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
-  of.optimalDeviation(formation);
+  //OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
+  //OptimalFormation::init(A.block(0,0,1,A.cols()), B.block(0,0,1,B.cols()), gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
+  OptimalFormation::init(Eigen::MatrixXd(), Eigen::VectorXd(), gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
+  cout << of.optimalDeviation(formation) << endl;
+  cout << "timeInterval: " << of.sTimeInterval_ << endl;
 
 
   return 0;

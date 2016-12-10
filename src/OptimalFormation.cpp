@@ -45,6 +45,7 @@ namespace uav{
     Polytope fs = sFormation_.convexHull;
     double radius = sFormation_.radius;
     double minDis = sFormation_.minInterDis;
+    double pref = sFormation_.pref;
 
     // t
     double xx0 = x[0] - sG_(0);
@@ -65,31 +66,33 @@ namespace uav{
     // functions
     if ( *needF > 0 ) {
       //obj function
-      F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + sFormation_.pref;
+      F[0] = sWT_ * ttSquare + sWS_ * ssSquare + sWQ_ * qqSquare + pref;
 
       //constraints
       //C1
       for(int i=0; i<fs.size(); ++i){
-        Eigen::Vector3d _t;
-        double _s;
-        Eigen::Vector4d _q;
-        Eigen::Vector3d _f;
-        _t << x[0], x[1], x[2];
-        _s = x[3];
-        _q << x[4], x[5], x[6], x[7];
-        _f = fs[i];
-        Eigen::Vector3d _x = _t + _s * drake::math::quatRotateVec(_q, _f);
-        Eigen::Vector4d _x4d(_x(0), _x(1), _x(2), sTimeInterval_);
-        Eigen::MatrixXd _c1 = sA_ * _x4d;
-        for(int j=0; j<rowsA; ++j){
-          F[1+i*rowsA+j] = _c1(j);
+        if(rowsA>0){
+          Eigen::Vector3d _t;
+          double _s;
+          Eigen::Vector4d _q;
+          Eigen::Vector3d _f;
+          _t << x[0], x[1], x[2];
+          _s = x[3];
+          _q << x[4], x[5], x[6], x[7];
+          _f = fs[i];
+          Eigen::Vector3d _x = _t + _s * drake::math::quatRotateVec(_q, _f);
+          Eigen::Vector4d _x4d(_x(0), _x(1), _x(2), sTimeInterval_);
+          Eigen::MatrixXd _c1 = sA_ * _x4d;
+          for(int j=0; j<rowsA; ++j){
+            F[1+i*rowsA+j] = _c1(j);
+          }
         }
       }
 
       //C2
       F[1+fs.size()*rowsA] = (-1.0) * x[3] * minDis;
       //C3
-      F[1+fs.size()*rowsA+1] = x[4] * x[4] + x[5] * x[5] + x[6] * x[6] + x[7] * x[7];
+      F[1+fs.size()*rowsA+1] = (x[4]*x[4] + x[5]*x[5] + x[6]*x[6] + x[7]*x[7]);
 
     }
 
@@ -109,31 +112,33 @@ namespace uav{
       //derivative of constraints
       //C1
       for(int i=0; i<fs.size(); ++i){
-        double _s;
-        Eigen::Vector4d _q;
-        Eigen::Vector3d _f;
-        _s = x[3];
-        _q << x[4], x[5], x[6], x[7];
-        _f = fs[i];
-        // jacobian of T
-        Eigen::MatrixXd diffMatT = sA_.block(0,0,rowsA,colsA-1);
-        // jacobian of S
-        Eigen::Vector4d rot_0;
-        rot_0 << drake::math::quatRotateVec(_q, _f), 0;
-        Eigen::MatrixXd diffMatS = sA_ * rot_0;
-        // jacobian of Q
-        Eigen::MatrixXd drot = quatRotateVecDiff(_q, _f);
-        drot = drot.block(0,0,drot.rows(),4);
-        Eigen::MatrixXd auxMat(4,4);
-        auxMat << drot, Eigen::MatrixXd::Zero(1,4);
-        Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
-        // jacobian
-        Eigen::MatrixXd diffMat(rowsA, 8);
-        diffMat << diffMatT, diffMatS, diffMatQ;
-        // assign
-        for(int j=0; j<rowsA; ++j){
-          for(int z=0; z<8; ++z){
-            G[8+(i*rowsA+j)*8+z] = diffMat(j,z);
+        if(rowsA>0){
+          double _s;
+          Eigen::Vector4d _q;
+          Eigen::Vector3d _f;
+          _s = x[3];
+          _q << x[4], x[5], x[6], x[7];
+          _f = fs[i];
+          // jacobian of T
+          Eigen::MatrixXd diffMatT = sA_.block(0,0,rowsA,3);
+          // jacobian of S
+          Eigen::Vector4d rot_0;
+          rot_0 << drake::math::quatRotateVec(_q, _f), 0;
+          Eigen::MatrixXd diffMatS = sA_ * rot_0;
+          // jacobian of Q
+          Eigen::MatrixXd drot = quatRotateVecDiff(_q, _f);
+          drot = drot.block(0,0,3,4);
+          Eigen::MatrixXd auxMat(4,4);
+          auxMat << drot, Eigen::MatrixXd::Zero(1,4);
+          Eigen::MatrixXd diffMatQ = sS_ * sA_ * auxMat;
+          // jacobian
+          Eigen::MatrixXd diffMat(rowsA, 8);
+          diffMat << diffMatT, diffMatS, diffMatQ;
+          // assign
+          for(int j=0; j<rowsA; ++j){
+            for(int z=0; z<8; ++z){
+              G[8+(i*rowsA+j)*8+z] = diffMat(j,z);
+            }
           }
         }
       }
@@ -142,7 +147,7 @@ namespace uav{
       int base = (1 + fs.size()*rowsA) * 8;
       for(int i=0; i<8; ++i){
         if(i==3){
-          G[base+i] = minDis;
+          G[base+i] = -minDis;
         }
         else{
           G[base+i] = 0;
@@ -212,7 +217,7 @@ namespace uav{
 
     // set the upper and lower bounds of x
     for(int i=0; i<n; ++i){
-      x[i] = 1;
+      x[i] = 0.1;
       xlow[i] = -INFI;
       xupp[i] = INFI;
       xstate[i] = 0;
@@ -223,19 +228,26 @@ namespace uav{
     // [1-#v*#rows]: C1
     // [#v*#rows+1]: C2
     // [#v*#rows+2]: C3
+    // obj func
     Flow[0] = -INFI;
     Fupp[0] = INFI;
+    Fmul[0] = 0;
+    // C1
     for(int i=0; i<fs.size(); ++i){
       for(int j=0; j<rowsA; ++j){
-        Flow[i*rowsA+j+1] = -INFI;
-        Fupp[i*rowsA+j+1] = sB_(j);
-        Fmul[i*rowsA+j+1] = 0;
+        Flow[1+i*rowsA+j] = -INFI;
+        Fupp[1+i*rowsA+j] = sB_(j);
+        Fmul[1+i*rowsA+j] = 0;
       }
     }
-    Flow[fs.size()*rowsA+1] = -INFI;
-    Fupp[fs.size()*rowsA+1] = (-2.0) * radius;
-    Flow[fs.size()*rowsA+2] = 1.0;
-    Fupp[fs.size()*rowsA+2] = 1.0;
+    // C2
+    Flow[1+fs.size()*rowsA] = -INFI;
+    Fupp[1+fs.size()*rowsA] = (-2.0) * radius;
+    Fmul[1+fs.size()*rowsA] = 0;
+    // C3
+    Flow[1+fs.size()*rowsA+1] = 1.0;
+    Fupp[1+fs.size()*rowsA+1] = 1.0;
+    Fmul[1+fs.size()*rowsA+1] = 0;
 
     // set the indicator of G
     for(int i=0; i<neF; ++i){
@@ -259,6 +271,7 @@ namespace uav{
     ToyProb.setIntParameter( "Derivative option", 1 );
     ToyProb.setIntParameter( "Major Iteration limit", 250 );
     ToyProb.setIntParameter( "Verify level ", 3 );
+    //ToyProb.setIntParameter( "Verify level ", 0 );
     ToyProb.solve          ( Cold );
 
     Vector8d res;
@@ -272,6 +285,13 @@ namespace uav{
     for (int i = 0; i < neF; i++ ){
       cout << "F = " << F[i] << " Fstate = " << Fstate[i] << endl;
     }
+
+    cout << "sd: " << x[3] * sFormation_.minInterDis << endl;
+    cout << "2r: " << 2 * sFormation_.radius << endl;
+    cout << "A: " << endl << sA_ << endl;
+    cout << "B: " << endl << sB_ << endl;
+    cout << "n: " << n << endl;
+    cout << "neF: " << neF << endl;
 
     delete []iGfun;  delete []jGvar;
 
