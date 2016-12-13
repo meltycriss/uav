@@ -107,6 +107,7 @@ namespace uav{
       std::vector<trajectory> dynamicObstaclesTrajectories_; //relative velocity
 
     private:
+    //public:
       //return (O+V)x[0,TimeInterval] U Union(U(D+V)xt)
       std::vector<Polytope4d> getObstacleBar();
 

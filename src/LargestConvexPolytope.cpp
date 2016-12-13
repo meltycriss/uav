@@ -124,7 +124,7 @@ namespace uav{
     // option require_containment
     iris::IRISOptions options;
     if(in.size()>0) {
-      //    options.require_containment = true;
+      options.require_containment = true;
       vector<Point4d> requiredPoints = in;
       vector<Eigen::VectorXd> requiredPointsVxd;
       for(int i=0; i<requiredPoints.size(); ++i){
