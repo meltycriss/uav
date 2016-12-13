@@ -92,8 +92,8 @@ int main(){
   p << -3,1,0;
   uav.push_back(p);
 
-  gDir << -1,-2,0; 
-  //gDir << 0.1,-1,0; //test scale
+  //gDir << -1,-2,0; 
+  gDir << 0.1,-1,0; //test scale
 
   vector<Point4d> vecPoint4d;
   Point4d point4d;
