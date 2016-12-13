@@ -2,6 +2,7 @@
 #include "util.h"
 #include <cmath>
 #include "drake/math/quaternion.h"
+#include <exception>
 using namespace std;
 
 namespace uav{
@@ -153,7 +154,7 @@ namespace uav{
     Eigen::MatrixXd dv1 = dq1.block(1,0,dq1.rows()-1,dq1.cols());
     //dv2
     Eigen::MatrixXd dv2 = dq2.block(1,0,dq2.rows()-1,dq2.cols());
-    
+
     //dw3
     Eigen::MatrixXd dw3 = w2*dw1 + w1*dw2 - v2.transpose()*dv1 - v1.transpose()*dv2;
     //dv3
@@ -183,7 +184,50 @@ namespace uav{
     return lhs-rhs;
   }
 
+  void reducePolyDim(Eigen::MatrixXd &A, Eigen::VectorXd &b, int dim){
+    removeColumn(A, dim);
+    for(int i=0; i<A.rows(); ++i){
+      bool allZero = true;
+      for(int j=0; j<A.cols(); ++j){
+        if(A(i,j)!=0){
+          allZero = false;
+          break;
+        }
+      }
+      if(allZero){
+        removeRow(A, i);
+        removeRow(b, i);
+        --i;
+      }
+    }
+  }
 
+  void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove){
+    unsigned int numRows = matrix.rows()-1;
+    unsigned int numCols = matrix.cols();
+
+    if( rowToRemove < numRows )
+      matrix.block(rowToRemove,0,numRows-rowToRemove,numCols) = matrix.block(rowToRemove+1,0,numRows-rowToRemove,numCols);
+
+    matrix.conservativeResize(numRows,numCols);
+  }
+
+  void removeRow(Eigen::VectorXd& vec, unsigned int rowToRemove){
+    for(int i=rowToRemove; i<vec.rows()-1; ++i){
+      vec(i) = vec(i+1);
+    }
+    vec.conservativeResize(vec.rows()-1,1);
+  }
+
+  void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove){
+    unsigned int numRows = matrix.rows();
+    unsigned int numCols = matrix.cols()-1;
+
+    if( colToRemove < numCols )
+      matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
+
+    matrix.conservativeResize(numRows,numCols);
+  }
 
 }
 

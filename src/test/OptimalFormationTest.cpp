@@ -2,6 +2,9 @@
 #include "OptimalFormation.h"
 #include <iostream>
 #include <string>
+#include "drake/math/quaternion.h"
+#include "util.h"
+#include "iris/geometry.h"
 using namespace std;
 using namespace uav;
 
@@ -122,27 +125,49 @@ int main(){
   Eigen::MatrixXd A;
   Eigen::VectorXd B;
   lcp.getLargestConvexPolytope(A, B);
-  cout << "A" << endl
-    << A.format(np_array) << endl;
-  cout << "B" << endl
-    << B.format(np_array) << endl;
 
-  //test OptimalFormation::optimalDeviation()
-  cout << "-----------------optimalDeviation()-----------------" << endl;
-  OptimalFormation of;
-  //Formation formation(uavs, uav, 1);
-  Formation formation(uavs, vector<Point>(1, Point(1,3,5)), 1);
-  cout << formation.minInterDis << endl;
-  cout << formation.radius << endl;
-  vector<Formation> formations;
-  formations.push_back(formation);
-  of.setFormations(formations);
-  OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
-  Vector8d param;
-  int index = of.optimalFormation(param);
-  cout << "index: " << index << endl;
-  cout << "param: " << endl << param << endl;
+  Eigen::MatrixXd disp_A = A;
+  Eigen::VectorXd disp_B = B;
+  reducePolyDim(disp_A, disp_B, 2);
+  cout << "a = "
+    << disp_A.format(np_array) << endl;
+  cout << "b = "
+    << disp_B.format(np_array) << endl;
+  cout << "INFI = " << INFI << endl;
   
+  iris::Polyhedron poly(A,B);
+  cout << "poly contains gDir: "<< poly.contains(Eigen::Vector4d(gDir(0),gDir(1),gDir(2),timeInterval), 0) << endl;
+
+
+
+// //test OptimalFormation::optimalDeviation()
+// cout << "-----------------optimalDeviation()-----------------" << endl;
+// OptimalFormation of;
+// Formation formation(uavs, uav, 1);
+// //Formation formation(uavs, vector<Point>(1, Point(1,3,5)), 1);
+// cout << formation.minInterDis << endl;
+// cout << formation.radius << endl;
+// vector<Formation> formations;
+// formations.push_back(formation);
+// of.setFormations(formations);
+// OptimalFormation::init(A, B, gDir, 1, Eigen::MatrixXd::Identity(4,1), 1, 1, 1, timeInterval);
+// Vector8d param;
+// int index = of.optimalFormation(param);
+// cout << "index: " << index << endl;
+// cout << "param: " << endl << param << endl;
+// cout << "formation: " << endl;
+// Eigen::Vector3d t(param(0), param(1), param(2));
+// double s = param(3);
+// Eigen::Vector4d q(param(4), param(5), param(6), param(7));
+// Eigen::Vector3d centroid = getCentroid(uav);
+// cout << "centroid after transformation:" << endl << t + s * drake::math::quatRotateVec(q, Eigen::Vector3d(0,0,0)) << endl;
+// for(int i=0; i<formation.convexHull.size(); ++i){
+//   Point p = formation.convexHull[i];
+//   cout << "before: " << endl << p << endl;
+//   cout << "after: " << endl << t + s * drake::math::quatRotateVec(q, p) << endl;
+// }
+//
+//  
 
 
   return 0;

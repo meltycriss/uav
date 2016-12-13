@@ -14,8 +14,8 @@ namespace uav{
   typedef std::vector<Point4d> Polytope4d;
   typedef Eigen::Matrix<double,8,1> Vector8d;
 
-  const int INFI = INT_MAX;
-  //const int INFI = 5; //for visualization
+  //const int INFI = 1e+6; // INFI too big will induce problem with iris
+  const int INFI = 1e+2; //for visualization
   
   class Formation{
     public:

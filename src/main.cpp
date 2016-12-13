@@ -92,7 +92,7 @@ int main(){
   vector<Point> uav;
   Point gDir;
 
-//  Point p;
+  //  Point p;
   p << -1,1,0;
   uav.push_back(p);
   p << -1,-1,0;
@@ -102,7 +102,7 @@ int main(){
   p << -3,1,0;
   uav.push_back(p);
 
-  gDir << -1,-2,0; 
+  gDir << -1,-2,0;
 
   vector<Point4d> vecPoint4d;
   Point4d point4d;
@@ -117,9 +117,9 @@ int main(){
 
   //iris::IRISRegion region;
   //if(lcp.directedLargestConvexRegionInFreeSpace(region, vecPoint4d, vecPoly4d)){
-  //  cout << "A" << endl 
+  //  cout << "A" << endl
   //    << region.polyhedron.getA() << endl;
-  //  cout << "B" << endl 
+  //  cout << "B" << endl
   //    << region.polyhedron.getB() << endl;
   //}
   //else{

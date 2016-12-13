@@ -36,6 +36,15 @@ namespace uav{
 
   Eigen::MatrixXd dcross(const Eigen::Vector3d &v1, const Eigen::Vector3d &v2, Eigen::MatrixXd &dv1, Eigen::MatrixXd &dv2);
 
+  //IRIS result visualization helper
+  void reducePolyDim(Eigen::MatrixXd &A, Eigen::VectorXd &b, int dim);
+
+  void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove);
+
+  void removeRow(Eigen::VectorXd& vec, unsigned int rowToRemove);
+
+  void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove);
+
 }
 
 #endif
