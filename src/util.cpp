@@ -231,7 +231,7 @@ namespace uav{
   }
 
   vector<int> hungarian(const Eigen::MatrixXd &matCost){
-    
+
     //must be square matrix
     if(matCost.rows()!=matCost.cols()){
       throw exception();
@@ -245,55 +245,94 @@ namespace uav{
     //number of assigend rows
     int numAssigned = 0;
 
-    while(numAssigned!=rows){
-      //row reduction
-      for(int i=0; i<rows; ++i){
-        int minEleIdx = minOfVec(cost.row(i));
-        double minEle = cost(i, minEleIdx);
-        cost.row(i) = vecAdd(cost.row(i), -minEle);
-      }
-      //col reduction
-      for(int i=0; i<cols; ++i){
-        int minEleIdx = minOfVec(cost.col(i));
-        double minEle = cost(minEleIdx, i);
-        cost.col(i) = vecAdd(cost.col(i), -minEle);
-      }
+    //row reduction
+    for(int i=0; i<rows; ++i){
+      int minEleIdx = minOfVec(cost.row(i));
+      double minEle = cost(i, minEleIdx);
+      cost.row(i) = vecAdd(cost.row(i), -minEle);
+    }
+    //col reduction
+    for(int i=0; i<cols; ++i){
+      int minEleIdx = minOfVec(cost.col(i));
+      double minEle = cost(minEleIdx, i);
+      cost.col(i) = vecAdd(cost.col(i), -minEle);
+    }
+    while(true){
+      res = vector<int>(rows, -1);
+      numAssigned = 0;
       set<int> deletedRows, deletedCols;
       //row scanning
       for(int i=0; i<rows; ++i){
         vector<int> zeroColIdx;
         for(int j=0; j<cols; ++j){
-          if(cost(i,j)==0){
+          if(cost(i,j)==0 && deletedRows.count(i)==0 && deletedCols.count(j)==0){
             zeroColIdx.push_back(j);
           }
         }
         if(zeroColIdx.size()==1){
-          deletedCols.push_back(zeroColIdx[0]);
+          //line
+          deletedCols.insert(zeroColIdx[0]);
+          //marked
+          res[i] = zeroColIdx[0];
+          ++numAssigned;
         }
       }
       //col scanning
       for(int i=0; i<cols; ++i){
         vector<int> zeroRowIdx;
         for(int j=0; j<rows; ++j){
-          //may already deleted in row scanning
-          if(cost(j,i)==0 && deletedCols.count(i)==0){
+          if(cost(j,i)==0 && deletedRows.count(j)==0 && deletedCols.count(i)==0){
             zeroRowIdx.push_back(j);
           }
         }
         if(zeroRowIdx.size()==1){
-          deletedRows.push_back(zeroROwIdx[0]);
+          //line
+          deletedRows.insert(zeroRowIdx[0]);
+          //marked
+          res[zeroRowIdx[0]] = i;
+          ++numAssigned;
         }
       }
-      
-
-      
-      
+      //case 1
+      if(numAssigned==rows){
+        break;
+      }
+      //case 2
+      //find min undeleted
+      double minUndeleted = INFI;
+      for(int i=0; i<rows; ++i){
+        for(int j=0; j<cols; ++j){
+          //undeleted
+          if(deletedRows.count(i)==0 && deletedCols.count(j)==0){
+            //min
+            if(cost(i,j) < minUndeleted){
+              minUndeleted = cost(i,j);
+            }
+          }
+        }
+      }
+      //update cost matrix
+      for(int i=0; i<rows; ++i){
+        for(int j=0; j<cols; ++j){
+          //intersecion
+          if(deletedRows.count(i)>0 && deletedCols.count(j)>0){
+            cost(i,j) += minUndeleted;
+          }
+          //undeleted
+          if(deletedRows.count(i)==0 && deletedCols.count(j)==0){
+            cost(i,j) -= minUndeleted;
+          }
+        }
+      }
 
     }
-    
-    
 
-    
+    cout << cost << endl;
+
+    for(int i=0; i<res.size(); ++i){
+      cout << res[i] << endl;
+    }
+
     return res;
   }
 

@@ -28,11 +28,12 @@ Point traj1(Point p, double t){
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
-  Eigen::MatrixXd mat(3,3);
-  mat << 1,2,3,
-      4,5,6,
-      7,8,9;
-  mat.row(0) = vecAdd(mat.row(1), mat(1, minOfVec(mat.row(1))));
-  cout << mat << endl;
+  Eigen::MatrixXd mat(5,5);
+  mat << 9.5,11.5,14.5,11.5,7.5,
+      6.5,15.5,13.5,13.5,10.5,
+      12.5,13.5,6.5,8.5,8.5,
+      11.5,9.5,10.5,12.5,9.5,
+      7.5,12.5,14.5,10.5,14.5;
+  hungarian(mat);
   return 0;
 }
