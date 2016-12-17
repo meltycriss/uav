@@ -3,6 +3,7 @@
 #include <cmath>
 #include "drake/math/quaternion.h"
 #include <exception>
+#include <set>
 using namespace std;
 
 namespace uav{
@@ -227,6 +228,93 @@ namespace uav{
       matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
 
     matrix.conservativeResize(numRows,numCols);
+  }
+
+  vector<int> hungarian(const Eigen::MatrixXd &matCost){
+    
+    //must be square matrix
+    if(matCost.rows()!=matCost.cols()){
+      throw exception();
+    }
+    Eigen::MatrixXd cost = matCost;
+    int rows = cost.rows();
+    int cols = cost.cols();
+
+    //res[i]=j indicate row i is assigned to col j
+    vector<int> res(rows, -1);
+    //number of assigend rows
+    int numAssigned = 0;
+
+    while(numAssigned!=rows){
+      //row reduction
+      for(int i=0; i<rows; ++i){
+        int minEleIdx = minOfVec(cost.row(i));
+        double minEle = cost(i, minEleIdx);
+        cost.row(i) = vecAdd(cost.row(i), -minEle);
+      }
+      //col reduction
+      for(int i=0; i<cols; ++i){
+        int minEleIdx = minOfVec(cost.col(i));
+        double minEle = cost(minEleIdx, i);
+        cost.col(i) = vecAdd(cost.col(i), -minEle);
+      }
+      set<int> deletedRows, deletedCols;
+      //row scanning
+      for(int i=0; i<rows; ++i){
+        vector<int> zeroColIdx;
+        for(int j=0; j<cols; ++j){
+          if(cost(i,j)==0){
+            zeroColIdx.push_back(j);
+          }
+        }
+        if(zeroColIdx.size()==1){
+          deletedCols.push_back(zeroColIdx[0]);
+        }
+      }
+      //col scanning
+      for(int i=0; i<cols; ++i){
+        vector<int> zeroRowIdx;
+        for(int j=0; j<rows; ++j){
+          //may already deleted in row scanning
+          if(cost(j,i)==0 && deletedCols.count(i)==0){
+            zeroRowIdx.push_back(j);
+          }
+        }
+        if(zeroRowIdx.size()==1){
+          deletedRows.push_back(zeroROwIdx[0]);
+        }
+      }
+      
+
+      
+      
+
+    }
+    
+    
+
+    
+    return res;
+  }
+
+  int minOfVec(const Eigen::VectorXd &vec){
+    int res;
+    double min = INFI;
+    for(int i=0; i<vec.size(); ++i){
+      if(vec(i)<min){
+        min = vec(i);
+        res = i;
+      }
+    }
+    return res;
+  }
+
+  Eigen::VectorXd vecAdd(const Eigen::VectorXd &vec, double x){
+    Eigen::VectorXd res = vec;
+    for(int i=0; i<vec.size(); ++i){
+      res(i) += x;
+    }
+    return res;
   }
 
 }

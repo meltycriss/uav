@@ -45,6 +45,16 @@ namespace uav{
 
   void removeColumn(Eigen::MatrixXd& matrix, unsigned int colToRemove);
 
+  //The hungarian method for assignment method
+  //return rows belong to cols
+  std::vector<int> hungarian(const Eigen::MatrixXd &matCost);
+
+  //return index of min element in a vector
+  int minOfVec(const Eigen::VectorXd &vec);
+
+  //return vec element wise add x
+  Eigen::VectorXd vecAdd(const Eigen::VectorXd &vec, double x);
+  
 }
 
 #endif
