@@ -57,11 +57,11 @@ namespace uav{
   }
 
   Point getCentroid(const Polytope &uav){
-    Point res(0,0,0);
+    Point res(0.0,0.0,0.0);
     for(int i=0; i<uav.size(); ++i){
-      res += uav[i];
+      res = res + uav[i];
     }
-    res /= uav.size();
+    res = res / uav.size();
     return res;
   }
 
@@ -73,6 +73,7 @@ namespace uav{
       Point p = getCentroid(uav);
       centroids.push_back(p);
     }
+
 
     // compute min distance between centroids
     double res = INT_MAX;

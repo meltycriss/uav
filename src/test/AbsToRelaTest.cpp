@@ -29,24 +29,29 @@ int main(){
   Point gDir;
   gDir << 14,10,0;
   gDir << 3.5,10,0;
+  gDir << 0,10,0;
 
   //uavs
   vector<Polytope> uavs;
   Polytope uav;
   //uav0
   p << -2,2,0;
+  uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
   //uav1
   p << 2,2,0;
+  uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
   //uav2
   p << 2,-2,0;
+  uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
   //uav3
   p << -2,-2,0;
+  uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
 
@@ -143,7 +148,7 @@ int main(){
   bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
   //whether collision free lcp exists
   if(shouldFormation){
-    //debug info
+    //largest convex polytope debug info
     Eigen::MatrixXd disp_A = lcpA;
     Eigen::VectorXd disp_B = lcpB;
     reducePolyDim(disp_A, disp_B, 2);
@@ -155,18 +160,24 @@ int main(){
     iris::Polyhedron poly(lcpA,lcpB);
     cout << "poly contains gDir: "<< poly.contains(Eigen::Vector4d(gDir(0),gDir(1),gDir(2),timeInterval), 0) << endl;
 
+
+    cout << "interDis: " << formation.minInterDis << endl;
+    cout << "radius: " << formation.radius << endl;
+
+
     //optimal deviation
     OptimalFormation of(formations);
     OptimalFormation::init(lcpA, lcpB, gDir, sPref, qPref, wT, wS, wQ, timeInterval);
-    Vector8d param;
-    int index = of.optimalFormation(param);
+    Vector8d optimalParam;
+    int index = of.optimalFormation(optimalParam);
 
+    //optimal formation debug info
     cout << "index: " << index << endl;
-    cout << "param: " << endl << param << endl;
+    cout << "optimalParam: " << endl << optimalParam << endl;
     cout << "formation: " << endl;
-    Eigen::Vector3d t(param(0), param(1), param(2));
-    double s = param(3);
-    Eigen::Vector4d q(param(4), param(5), param(6), param(7));
+    Eigen::Vector3d t(optimalParam(0), optimalParam(1), optimalParam(2));
+    double s = optimalParam(3);
+    Eigen::Vector4d q(optimalParam(4), optimalParam(5), optimalParam(6), optimalParam(7));
     Eigen::Vector3d centroid = getCentroid(uav);
     cout << "centroid after transformation:" << endl << t + s * drake::math::quatRotateVec(q, Eigen::Vector3d(0,0,0)) << endl;
     for(int i=0; i<formation.convexHull.size(); ++i){
@@ -176,19 +187,10 @@ int main(){
     }
 
 
-
-
   }
   else{
     cout << "no CA formation" << endl;
   }
-
-
-
-  //Formation formation(uavs, vector<Point>(1, Point(1,3,5)), 1);
-
-
-
 
   return 0;
 }
