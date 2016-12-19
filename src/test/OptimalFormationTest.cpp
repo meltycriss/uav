@@ -148,7 +148,7 @@ int main(){
  //test OptimalFormation::optimalDeviation()
  cout << "-----------------optimalDeviation()-----------------" << endl;
  OptimalFormation of;
- Formation formation(uavs, uav, 1);
+ Formation formation(uavs, uavShapes, uav, 1);
  //Formation formation(uavs, vector<Point>(1, Point(1,3,5)), 1);
  cout << formation.minInterDis << endl;
  cout << formation.radius << endl;

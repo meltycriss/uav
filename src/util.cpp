@@ -324,13 +324,6 @@ namespace uav{
           }
         }
       }
-
-    }
-
-    cout << cost << endl;
-
-    for(int i=0; i<res.size(); ++i){
-      cout << res[i] << endl;
     }
 
     return res;
