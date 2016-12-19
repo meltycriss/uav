@@ -57,6 +57,17 @@ TARGET_LINK_LIBRARIES(optimalFormationTest
 target_compile_features(optimalFormationTest PRIVATE cxx_range_for)
 
 
+ADD_EXECUTABLE(absToRelaTest ./AbsToRelaTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
+TARGET_LINK_LIBRARIES(absToRelaTest
+  ${IRIS_LIB}
+  ${IRIS_GEOMETRY_LIB}
+  ${SNOPT7_CPP_LIB}
+  ${SNOPT7_LIB}
+  ${DRAKE_MATH_LIB}
+  )
+
+target_compile_features(absToRelaTest PRIVATE cxx_range_for)
+
 #MESSAGE(STATUS "libsnopt7.so: " ${SNOPT7_LIB})
 #MESSAGE(STATUS "libsnopt7_cpp.so: " ${SNOPT7_CPP_LIB})
 
