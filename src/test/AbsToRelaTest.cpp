@@ -139,12 +139,23 @@ int main(){
   Eigen::Vector4d qPref = Eigen::Vector4d(1,0,0,0);
 
   //looping
-  while(true){
+  while(currTime<3){
     //translating absolute coordinates to relative coordinates
     Point gDirRela = gDir - currCentroid;
     vector<Polytope> uavsRela = absToRela(uavs, currCentroid);
     vector<Polytope> staticObstaclesRela = absToRela(staticObstacles, currCentroid);
     //relative coordinates of dynamicObstacles is handled by its trajectory funciton
+
+    if(currTime == 2){
+      for(int i=0; i<uavsRela.size(); ++i){
+        Polytope poly = uavsRela[i];
+        cout << "uavRela" << i << endl;
+        for(int j=0; j<poly.size(); ++j){
+          cout << poly[j] << endl;
+        }
+      }
+      return 0;
+    }
 
     //solving the problem under relative coordinates
 
@@ -212,15 +223,27 @@ int main(){
       uavs = relaToAbs(uavsRela, currCentroid);
       //matching
 
+      for(int i=0; i<uavs.size(); ++i){
+        Polytope poly = uavs[i];
+        cout << "uav" << i << endl;
+        for(int j=0; j<poly.size(); ++j){
+          cout << poly[j] << endl;
+        }
+      }
+
       //update currCentroid
       currCentroid = Point(0,0,0);
       for(int i=0; i<uavs.size(); ++i){
         currCentroid += getCentroid(uavs[i]);
       }
       currCentroid /= uavs.size();
+
+      cout << "currCentroid: " << currCentroid << endl;
+      gDir << 6,10,0;
     }
     else{
       cout << "no CA formation" << endl;
+      ++currTime;
     }
 
   }
