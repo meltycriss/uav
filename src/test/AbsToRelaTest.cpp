@@ -127,7 +127,7 @@ int main(){
   double timeInterval = 1;
 
   //currTime
-  double currTime = 0;
+  double currTime = 7;
 
   //weight of optimization cost
   double wT = 1;
@@ -139,7 +139,7 @@ int main(){
   Eigen::Vector4d qPref = Eigen::Vector4d(1,0,0,0);
 
   //looping
-  while(currTime<2){
+  while(currTime<9){
     //translating absolute coordinates to relative coordinates
     Point gDirRela = gDir - currCentroid;
     vector<Polytope> uavsRela = absToRela(uavs, currCentroid);
