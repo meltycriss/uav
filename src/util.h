@@ -54,6 +54,18 @@ namespace uav{
 
   //return vec element wise add x
   Eigen::VectorXd vecAdd(const Eigen::VectorXd &vec, double x);
+
+  //absolute coordinates to relative coordinates respect to centroid
+  std::vector<Polytope> absToRela(const std::vector<Polytope> &abs, const Point &centroid);
+
+  //relative coordinates to absolute coordinates respect to centroid
+  std::vector<Polytope> relaToAbs(const std::vector<Polytope> &rela, const Point &centroid);
+
+  //move polys with tsq param
+  std::vector<Polytope> tsqTransPolyVec(const std::vector<Polytope> &polys, const Vector8d &tsq);
+
+  //move a point with tsq param
+  Point tsqTransPoint(const Point &p, const Vector8d &tsq);
   
 }
 

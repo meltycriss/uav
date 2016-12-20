@@ -350,5 +350,53 @@ namespace uav{
     return res;
   }
 
-}
+  //abs coordinates to relative coordinates respect to centroid
+  vector<Polytope> absToRela(const vector<Polytope> &abs, const Point &centroid){
+    vector<Polytope> res(abs.size());
+    for(int i=0; i<abs.size(); ++i){
+      Polytope poly = abs[i];
+      for(int j=0; j<poly.size(); ++j){
+        poly[j] -= centroid;
+      }
+      res[i] = poly;
+    }
+    return res;
+  }
 
+  //relative coordinates to absolute coordinates respect to centroid
+  vector<Polytope> relaToAbs(const vector<Polytope> &rela, const Point &centroid){
+    vector<Polytope> res(rela.size());
+    for(int i=0; i<rela.size(); ++i){
+      Polytope poly = rela[i];
+      for(int j=0; j<poly.size(); ++j){
+        poly[j] += centroid;
+      }
+      res[i] = poly;
+    }
+    return res;
+  }
+
+  //move polys with tsq param
+  vector<Polytope> tsqTransPolyVec(const vector<Polytope> &polys, const Vector8d &tsq){
+    vector<Polytope> res(polys.size());
+    for(int i=0; i<polys.size(); ++i){
+      Polytope poly = polys[i];
+      for(int j=0; j<poly.size(); ++j){
+        poly[j] = tsqTransPoint(poly[j], tsq);
+      }
+      res[i] = poly;
+    }
+    return res;
+  }
+
+  //move a point with tsq param
+  Point tsqTransPoint(const Point &p, const Vector8d &tsq){
+    Point res;
+    Eigen::Vector3d t(tsq(0), tsq(1), tsq(2));
+    double s = tsq(3);
+    Eigen::Vector4d q(tsq(4), tsq(5), tsq(6), tsq(7));
+    res = t + s * drake::math::quatRotateVec(q, p);
+    return res;
+  }
+
+}
