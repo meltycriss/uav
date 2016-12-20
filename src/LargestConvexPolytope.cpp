@@ -95,7 +95,7 @@ namespace uav{
       problem.addObstacle(obs);
 #ifdef DEBUG
       if(i==0) cout << "obstacles:" << endl;
-      cout << obs << endl;
+      cout << obs.format(np_array) << endl;
 #endif
     }
 

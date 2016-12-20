@@ -139,26 +139,14 @@ int main(){
   Eigen::Vector4d qPref = Eigen::Vector4d(1,0,0,0);
 
   //looping
-  while(currTime<3){
+  while(currTime<2){
     //translating absolute coordinates to relative coordinates
     Point gDirRela = gDir - currCentroid;
     vector<Polytope> uavsRela = absToRela(uavs, currCentroid);
     vector<Polytope> staticObstaclesRela = absToRela(staticObstacles, currCentroid);
     //relative coordinates of dynamicObstacles is handled by its trajectory funciton
 
-    if(currTime == 2){
-      for(int i=0; i<uavsRela.size(); ++i){
-        Polytope poly = uavsRela[i];
-        cout << "uavRela" << i << endl;
-        for(int j=0; j<poly.size(); ++j){
-          cout << poly[j] << endl;
-        }
-      }
-      return 0;
-    }
-
     //solving the problem under relative coordinates
-
     //get lcp
     LargestConvexPolytope lcp(
         gDirRela,
@@ -173,59 +161,51 @@ int main(){
     Eigen::MatrixXd lcpA;
     Eigen::VectorXd lcpB;
     bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
+
     //whether collision free lcp exists
     if(shouldFormation){
       //largest convex polytope debug info
       Eigen::MatrixXd disp_A = lcpA;
       Eigen::VectorXd disp_B = lcpB;
       reducePolyDim(disp_A, disp_B, 2);
-      cout << "a = "
-        << disp_A.format(np_array) << endl;
-      cout << "b = "
-        << disp_B.format(np_array) << endl;
+      cout << "a = " << disp_A.format(np_array) << endl;
+      cout << "b = " << disp_B.format(np_array) << endl;
       cout << "INFI = " << INFI << endl;
-      iris::Polyhedron poly(lcpA,lcpB);
-      cout << "poly contains gDir: "<< poly.contains(Eigen::Vector4d(gDir(0),gDir(1),gDir(2),timeInterval), 0) << endl;
-
-
-      cout << "interDis: " << formation.minInterDis << endl;
-      cout << "radius: " << formation.radius << endl;
-
 
       //optimal deviation
       OptimalFormation of(formations);
       OptimalFormation::init(lcpA, lcpB, gDirRela, sPref, qPref, wT, wS, wQ, timeInterval);
       Vector8d optimalParam;
       int index = of.optimalFormation(optimalParam);
-      Eigen::Vector3d t(optimalParam(0), optimalParam(1), optimalParam(2));
-      double s = optimalParam(3);
-      Eigen::Vector4d q(optimalParam(4), optimalParam(5), optimalParam(6), optimalParam(7));
-
-      //optimal formation debug info
-      cout << "index: " << index << endl;
-      cout << "optimalParam: " << endl << optimalParam << endl;
-      cout << "formation: " << endl;
-      Eigen::Vector3d centroid = getCentroid(uav);
-      cout << "centroid after transformation:" << endl << t + s * drake::math::quatRotateVec(q, Eigen::Vector3d(0,0,0)) << endl;
-      for(int i=0; i<formation.convexHull.size(); ++i){
-        Point p = formation.convexHull[i];
-        cout << "before: " << endl << p << endl;
-        cout << "after: " << endl << t + s * drake::math::quatRotateVec(q, p) << endl;
-      }
 
       //update absolute coordinate according to optimal deviation
+      
+      cout << "-----------------------------------------------------------" << endl;
+      cout << "gDir: " << endl << gDirRela + currCentroid << endl;
 
-      //timer
-      ++currTime;
+      cout << "-----------------------------------------------------------" << endl;
+      cout << "centroidBefore:" << endl << currCentroid << endl;
+      cout << "-----------------------------------------------------------" << endl;
+      for(int i=0; i<uavs.size(); ++i){
+        Polytope poly = uavs[i];
+        cout << "uavBefore" << i << endl;
+        for(int j=0; j<poly.size(); ++j){
+          cout << poly[j] << endl;
+        }
+      }
 
       //uavs
       uavsRela = tsqTransPolyVec(formations[index].uavs, optimalParam);
       uavs = relaToAbs(uavsRela, currCentroid);
       //matching
+      
 
+      cout << "-----------------------------------------------------------" << endl;
+      cout << "centroidAfter:" << endl << tsqTransPoint(currCentroid, optimalParam) << endl;
+      cout << "-----------------------------------------------------------" << endl;
       for(int i=0; i<uavs.size(); ++i){
         Polytope poly = uavs[i];
-        cout << "uav" << i << endl;
+        cout << "uavAfter" << i << endl;
         for(int j=0; j<poly.size(); ++j){
           cout << poly[j] << endl;
         }
@@ -238,8 +218,10 @@ int main(){
       }
       currCentroid /= uavs.size();
 
-      cout << "currCentroid: " << currCentroid << endl;
-      gDir << 6,10,0;
+      //timer
+      ++currTime;
+
+      gDir << 3,10,0;
     }
     else{
       cout << "no CA formation" << endl;
