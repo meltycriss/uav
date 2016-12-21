@@ -399,4 +399,20 @@ namespace uav{
     return res;
   }
 
+  //return centroid distance matrix
+  Eigen::MatrixXd getDisMat(const vector<Polytope> &lhs, const vector<Polytope> &rhs){
+    Eigen::MatrixXd res(lhs.size(), rhs.size());
+    for(int i=0; i<res.rows(); ++i){
+      Polytope lhsPoly = lhs[i];
+      Point lhsCentroid = getCentroid(lhsPoly);
+      for(int j=0; j<res.cols(); ++j){
+        Polytope rhsPoly = rhs[j];
+        Point rhsCentroid = getCentroid(rhsPoly);
+        res(i,j) = (lhsCentroid - rhsCentroid).transpose() * (lhsCentroid - rhsCentroid);
+        res(i,j) = sqrt(res(i,j));
+      }
+    }
+    return res;
+  }
+
 }

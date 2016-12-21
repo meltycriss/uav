@@ -66,6 +66,9 @@ namespace uav{
 
   //move a point with tsq param
   Point tsqTransPoint(const Point &p, const Vector8d &tsq);
+
+  //return centroid distance matrix
+  Eigen::MatrixXd getDisMat(const std::vector<Polytope> &lhs, const std::vector<Polytope> &rhs);
   
 }
 
