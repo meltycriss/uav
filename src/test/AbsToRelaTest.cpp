@@ -191,19 +191,19 @@ int main(){
       //      cout << "b = " << disp_B.format(np_array) << endl;
       //      cout << "INFI = " << INFI << endl;
       //
-//      cout << "-----------------------------------------------------------" << endl;
-//      cout << "gDir: " << endl << gDirRela + currCentroid << endl;
-//
-//      cout << "-----------------------------------------------------------" << endl;
-//      cout << "centroidBefore:" << endl << currCentroid << endl;
-//      cout << "-----------------------------------------------------------" << endl;
-//      for(int i=0; i<uavs.size(); ++i){
-//        Polytope poly = uavs[i];
-//        cout << "uavBefore" << i << endl;
-//        for(int j=0; j<poly.size(); ++j){
-//          cout << poly[j] << endl;
-//        }
-//      }
+      //      cout << "-----------------------------------------------------------" << endl;
+      //      cout << "gDir: " << endl << gDirRela + currCentroid << endl;
+      //
+      //      cout << "-----------------------------------------------------------" << endl;
+      //      cout << "centroidBefore:" << endl << currCentroid << endl;
+      //      cout << "-----------------------------------------------------------" << endl;
+      //      for(int i=0; i<uavs.size(); ++i){
+      //        Polytope poly = uavs[i];
+      //        cout << "uavBefore" << i << endl;
+      //        for(int j=0; j<poly.size(); ++j){
+      //          cout << poly[j] << endl;
+      //        }
+      //      }
 
       //optimal deviation
       OptimalFormation of(formations);
@@ -226,13 +226,13 @@ int main(){
         uavsDir[i] = getCentroid(formationUavs[assignedIdx]);
       }
 
-//      cout << "-----------------------------------------------------------" << endl;
-//      cout << "distance matrix" << endl << matCost << endl;
-//      cout << "-----------------------------------------------------------" << endl;
-//      cout << "matching result:" << endl;
-//      for(int i=0; i<vecAssign.size(); ++i){
-//        cout << "uav" << i << " is assigend to formation uav" << vecAssign[i] << endl;
-//      }
+      //      cout << "-----------------------------------------------------------" << endl;
+      //      cout << "distance matrix" << endl << matCost << endl;
+      //      cout << "-----------------------------------------------------------" << endl;
+      //      cout << "matching result:" << endl;
+      //      for(int i=0; i<vecAssign.size(); ++i){
+      //        cout << "uav" << i << " is assigend to formation uav" << vecAssign[i] << endl;
+      //      }
 
       //update uav position
       for(int i=0; i<vecAssign.size(); ++i){
@@ -264,16 +264,16 @@ int main(){
     }
     currCentroid /= uavs.size();
 
-//    cout << "-----------------------------------------------------------" << endl;
-//    cout << "centroidAfter:" << endl << currCentroid << endl;
-//    cout << "-----------------------------------------------------------" << endl;
-//    for(int i=0; i<uavs.size(); ++i){
-//      Polytope poly = uavs[i];
-//      cout << "uavAfter" << i << endl;
-//      for(int j=0; j<poly.size(); ++j){
-//        cout << poly[j] << endl;
-//      }
-//    }
+    //    cout << "-----------------------------------------------------------" << endl;
+    //    cout << "centroidAfter:" << endl << currCentroid << endl;
+    //    cout << "-----------------------------------------------------------" << endl;
+    //    for(int i=0; i<uavs.size(); ++i){
+    //      Polytope poly = uavs[i];
+    //      cout << "uavAfter" << i << endl;
+    //      for(int j=0; j<poly.size(); ++j){
+    //        cout << poly[j] << endl;
+    //      }
+    //    }
 
     //----------------------------------------------------------------------------
     //  update timer

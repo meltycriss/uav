@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES("../../include/snopt")
 INCLUDE_DIRECTORIES("../../include/iris/eigen3")
 INCLUDE_DIRECTORIES("..")
 INCLUDE_DIRECTORIES("../../include/drake")
+INCLUDE_DIRECTORIES("../../include/orca")
 
 IF(DEBUG)
   ADD_DEFINITIONS(-DDEBUG)
@@ -67,6 +68,12 @@ TARGET_LINK_LIBRARIES(absToRelaTest
   )
 
 target_compile_features(absToRelaTest PRIVATE cxx_range_for)
+
+ADD_EXECUTABLE(Sphere ./Sphere.cpp)
+FIND_LIBRARY(RVO_LIB RVO HINTS "../../lib/orca")
+TARGET_LINK_LIBRARIES(Sphere ${RVO_LIB})
+
+target_compile_features(Sphere PRIVATE cxx_range_for)
 
 #MESSAGE(STATUS "libsnopt7.so: " ${SNOPT7_LIB})
 #MESSAGE(STATUS "libsnopt7_cpp.so: " ${SNOPT7_CPP_LIB})
