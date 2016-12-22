@@ -21,7 +21,7 @@ namespace uav{
       OptimalFormation(){}
 
       OptimalFormation(
-          std::vector<Formation> _formations
+          const std::vector<Formation> &_formations
           ):
         formations_(_formations)
     {
@@ -36,7 +36,7 @@ namespace uav{
       }
 
       // setter
-      void setFormations(std::vector<Formation> _formations){
+      void setFormations(const std::vector<Formation> &_formations){
         formations_ = _formations;
       }
 
@@ -49,13 +49,13 @@ namespace uav{
 
       // return minimal loss
       // the optimal param is passed through param
-      double optimalDeviation(const Formation& formation, Vector8d &param);
+      double optimalDeviation(const Formation &formation, Vector8d &param);
 
       // for snopt
       static void init(const Eigen::MatrixXd &_A, const Eigen::VectorXd &_b,
-          const Point &_gPref, double _sPref, Eigen::Vector4d _qPref,
-          double _wT, double _wS, double _wQ,
-          double _timeInterval){
+          const Point &_gPref, const double &_sPref, const Eigen::Vector4d &_qPref,
+          const double &_wT, const double &_wS, const double &_wQ,
+          const double &_timeInterval){
         sA_ = _A;
         sB_ = _b;
         sG_ = _gPref;

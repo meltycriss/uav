@@ -17,14 +17,14 @@ namespace uav{
       LargestConvexPolytope(){}
 
       LargestConvexPolytope(
-          Point _gDir,
-          std::vector<Polytope> _uavs,
-          std::vector<Polytope> _uavShapes, //for dilated volume
-          std::vector<Polytope> _staticObstacles,
-          std::vector<Polytope> _dynamicObstacles,
-          double _timeInterval,
-          double _currTime,
-          std::vector<trajectory> _dynamicObstaclesTrajectories
+          const Point &_gDir,
+          const std::vector<Polytope> &_uavs,
+          const std::vector<Polytope> &_uavShapes, //for dilated volume
+          const std::vector<Polytope> &_staticObstacles,
+          const std::vector<Polytope> &_dynamicObstacles,
+          const double &_timeInterval,
+          const double &_currTime,
+          const std::vector<trajectory> &_dynamicObstaclesTrajectories
           ):
         gDir_(_gDir),
         uavs_(_uavs),
@@ -69,28 +69,28 @@ namespace uav{
       }
 
       //setter
-      void setGDir(Point _gDir){
+      void setGDir(const Point &_gDir){
         gDir_ = _gDir;
       }
-      void setUavs(std::vector<Polytope> _uavs){
+      void setUavs(const std::vector<Polytope> &_uavs){
         uavs_ = _uavs;
       }
-      void setUavShapes(std::vector<Polytope> _uavShapes){
+      void setUavShapes(const std::vector<Polytope> &_uavShapes){
         uavShapes_ = _uavShapes;
       }
-      void setStaticObstacles(std::vector<Polytope> _staticObstacles){
+      void setStaticObstacles(const std::vector<Polytope> &_staticObstacles){
         staticObstacles_ = _staticObstacles;
       }
-      void setDynamicObstacles(std::vector<Polytope> _dynamicObstacles){
+      void setDynamicObstacles(const std::vector<Polytope> &_dynamicObstacles){
         dynamicObstacles_ = _dynamicObstacles;
       }
-      void setTimeInterval(double _timeInterval){
+      void setTimeInterval(const double _timeInterval){
         timeInterval_ = _timeInterval;
       }
-      void setCurrTime(double _currTime){
+      void setCurrTime(const double _currTime){
         currTime_ = _currTime;
       }
-      void setDynamicObstaclesTrajectories(std::vector<trajectory> _dynamicObstaclesTrajectories){
+      void setDynamicObstaclesTrajectories(const std::vector<trajectory> &_dynamicObstaclesTrajectories){
         dynamicObstaclesTrajectories_ = _dynamicObstaclesTrajectories;
       }
 
