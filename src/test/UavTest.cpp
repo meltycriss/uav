@@ -123,8 +123,6 @@ bool getFormationGoal(
   }
 }
 
-
-
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
@@ -232,7 +230,7 @@ int main(){
   double timeInterval = 1;
 
   //currTime
-  double currTime = 7;
+  double currTime = 0;
 
   //weight of optimization cost
   double wT = 1;
@@ -247,7 +245,7 @@ int main(){
   vector<Point> uavsDir(uavs.size());
 
   //looping
-  while(currTime<9){
+  while(currTime<2){
     //----------------------------------------------------------------------------
     //  translating absolute coordinates to relative coordinates
     //----------------------------------------------------------------------------
