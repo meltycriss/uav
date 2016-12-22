@@ -61,6 +61,9 @@ namespace uav{
   //relative coordinates to absolute coordinates respect to centroid
   std::vector<Polytope> relaToAbs(const std::vector<Polytope> &rela, const Point &centroid);
 
+  //relative coordinates to absolute coordinates respect to centroid
+  std::vector<Point> relaToAbs(const std::vector<Point> &rela, const Point &centroid);
+
   //move polys with tsq param
   std::vector<Polytope> tsqTransPolyVec(const std::vector<Polytope> &polys, const Vector8d &tsq);
 
@@ -70,6 +73,12 @@ namespace uav{
   //return centroid distance matrix
   Eigen::MatrixXd getDisMat(const std::vector<Polytope> &lhs, const std::vector<Polytope> &rhs);
   
+  //return centroid distance matrix
+  Eigen::MatrixXd getDisMat(const std::vector<Polytope> &lhs, const std::vector<Point> &rhs);
+
+  //move uavs centered with centroid to uavs centered with goal
+  Polytope uavMoveTo(const Point &goal, const Polytope &uav);
+
 }
 
 #endif

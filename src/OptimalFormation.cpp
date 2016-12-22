@@ -280,6 +280,9 @@ namespace uav{
     ToyProb.setIntParameter( "Derivative option", 1 );
     ToyProb.setIntParameter( "Major Iteration limit", 250 );
     ToyProb.setIntParameter( "Verify level ", 3 );
+    //suppress output
+//    ToyProb.setIntParameter( "Major print level ", 0 );
+    ToyProb.setIntParameter( "Summary file ", 0 );
     //ToyProb.setIntParameter( "Verify level ", 0 ); // implement of quatRotation gradient is not accurate
     ToyProb.solve          ( Cold );
 
@@ -288,12 +291,14 @@ namespace uav{
       param(i) = x[i];
     }
 
-    for (int i = 0; i < n; i++ ){
-      cout << "x = " << x[i] << " xstate = " << xstate[i] << endl;
-    }
-    for (int i = 0; i < neF; i++ ){
-      cout << "F = " << F[i] << " Fstate = " << Fstate[i] << endl;
-    }
+//    for (int i = 0; i < n; i++ ){
+//      cout << "x = " << x[i] << " xstate = " << xstate[i] << endl;
+//    }
+//    for (int i = 0; i < neF; i++ ){
+//      cout << "F = " << F[i] << " Fstate = " << Fstate[i] << endl;
+//    }
+    cout << "C2: " << F[neF-1-1] << endl;
+    cout << "C3: " << F[neF-1] << endl;
 
 
 

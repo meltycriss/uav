@@ -46,34 +46,45 @@ FIND_LIBRARY(DRAKE_MATH_LIB drakeMath HINTS "../../lib/drake")
 #  ${IRIS_GEOMETRY_LIB})
 #target_compile_features(largestConvexPolytopeTest PRIVATE cxx_range_for)
 
-ADD_EXECUTABLE(optimalFormationTest ./OptimalFormationTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
-TARGET_LINK_LIBRARIES(optimalFormationTest
-  ${IRIS_LIB}
-  ${IRIS_GEOMETRY_LIB}
-  ${SNOPT7_CPP_LIB}
-  ${SNOPT7_LIB}
-  ${DRAKE_MATH_LIB}
-  )
+#ADD_EXECUTABLE(optimalFormationTest ./OptimalFormationTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
+#TARGET_LINK_LIBRARIES(optimalFormationTest
+#  ${IRIS_LIB}
+#  ${IRIS_GEOMETRY_LIB}
+#  ${SNOPT7_CPP_LIB}
+#  ${SNOPT7_LIB}
+#  ${DRAKE_MATH_LIB}
+#  )
+#
+#target_compile_features(optimalFormationTest PRIVATE cxx_range_for)
 
-target_compile_features(optimalFormationTest PRIVATE cxx_range_for)
 
-
-ADD_EXECUTABLE(absToRelaTest ./AbsToRelaTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
-TARGET_LINK_LIBRARIES(absToRelaTest
-  ${IRIS_LIB}
-  ${IRIS_GEOMETRY_LIB}
-  ${SNOPT7_CPP_LIB}
-  ${SNOPT7_LIB}
-  ${DRAKE_MATH_LIB}
-  )
-
-target_compile_features(absToRelaTest PRIVATE cxx_range_for)
+#ADD_EXECUTABLE(absToRelaTest ./AbsToRelaTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
+#TARGET_LINK_LIBRARIES(absToRelaTest
+#  ${IRIS_LIB}
+#  ${IRIS_GEOMETRY_LIB}
+#  ${SNOPT7_CPP_LIB}
+#  ${SNOPT7_LIB}
+#  ${DRAKE_MATH_LIB}
+#  )
+#
+#target_compile_features(absToRelaTest PRIVATE cxx_range_for)
 
 ADD_EXECUTABLE(Sphere ./Sphere.cpp)
 FIND_LIBRARY(RVO_LIB RVO HINTS "../../lib/orca")
 TARGET_LINK_LIBRARIES(Sphere ${RVO_LIB})
 
 target_compile_features(Sphere PRIVATE cxx_range_for)
+
+ADD_EXECUTABLE(uavTest ./UavTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
+TARGET_LINK_LIBRARIES(uavTest
+  ${IRIS_LIB}
+  ${IRIS_GEOMETRY_LIB}
+  ${SNOPT7_CPP_LIB}
+  ${SNOPT7_LIB}
+  ${DRAKE_MATH_LIB}
+  )
+
+target_compile_features(uavTest PRIVATE cxx_range_for)
 
 #MESSAGE(STATUS "libsnopt7.so: " ${SNOPT7_LIB})
 #MESSAGE(STATUS "libsnopt7_cpp.so: " ${SNOPT7_CPP_LIB})
