@@ -24,7 +24,12 @@ Point traj1(Point p, double t){
   return res;
 }
 
-bool updateUavDirs(
+// \return  true  if CA formation, formation pos is set
+//          false if no CA formation, all uavs' goal are set to gDir
+// \caution both input and output are in relative coordinates
+bool getFormationGoal(
+    //result
+    vector<Point> &rFormationGoal
     //lcp
     const Point &_gDir,
     const std::vector<Polytope> &_uavs,
@@ -36,15 +41,87 @@ bool updateUavDirs(
     const std::vector<trajectory> &_dynamicObstaclesTrajectories,
     //of
     const std::vector<Formation> &_formations,
-    const Eigen::MatrixXd &_A,
-    const Eigen::VectorXd &_b,
-    const Point &_gPref,
     const double &_sPref,
     const Eigen::Vector4d &_qPref,
     const double &_wT,
     const double &_wS,
     const double &_wQ
-)
+    ){
+
+  //----------------------------------------------------------------------------
+  //  solving the problem under relative coordinates
+  //----------------------------------------------------------------------------
+
+  //get lcp
+  LargestConvexPolytope lcp(
+      _gDir,
+      _uavs,
+      _uavShapes,
+      _staticObstacles,
+      _dynamicObstacles,
+      _timeInterval,
+      _currTime,
+      _dynamicObstaclesTrajectories);
+
+  Eigen::MatrixXd lcpA;
+  Eigen::VectorXd lcpB;
+  bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
+
+  //----------------------------------------------------------------------------
+  //  assign goal for each uav
+  //----------------------------------------------------------------------------
+
+  //CA formation exists
+  if(shouldFormation){
+    //      //largest convex polytope debug info
+    //      Eigen::MatrixXd disp_A = lcpA;
+    //      Eigen::VectorXd disp_B = lcpB;
+    //      reducePolyDim(disp_A, disp_B, 2);
+    //      cout << "a = " << disp_A.format(np_array) << endl;
+    //      cout << "b = " << disp_B.format(np_array) << endl;
+    //      cout << "INFI = " << INFI << endl;
+    //
+    //      cout << "-----------------------------------------------------------" << endl;
+    //      cout << "gDir: " << endl << _gDir + currCentroid << endl;
+    //
+    //      cout << "-----------------------------------------------------------" << endl;
+    //      cout << "centroidBefore:" << endl << currCentroid << endl;
+    //      cout << "-----------------------------------------------------------" << endl;
+    //      for(int i=0; i<uavs.size(); ++i){
+    //        Polytope poly = uavs[i];
+    //        cout << "uavBefore" << i << endl;
+    //        for(int j=0; j<poly.size(); ++j){
+    //          cout << poly[j] << endl;
+    //        }
+    //      }
+
+    //optimal deviation
+    OptimalFormation of(_formations);
+    OptimalFormation::init(lcpA, lcpB, _gDir, _sPref, _qPref, _wT, _wS, _wQ, _timeInterval);
+    Vector8d optimalParam;
+    int index = of.optimalFormation(optimalParam);
+
+
+    vector<Polytope> formationUavs = tsqTransPolyVec(_formations[index].uavs, optimalParam);
+
+    rFormationGoal.resize(formationUavs.size());
+    for(int i=0; i<rFormationGoal.size(); ++i){
+      rFormationGoal[i] = getCentroid(formationUavs[i]);
+    }
+
+    return true;
+
+  }
+  //no CA formation
+  else{
+    //assign goal for each uav (local planner)
+    rFormationGoal.resize(_uavs.size());
+    for(int i=0; i<rFormationGoal.size(); ++i){
+      rFormationGoal[i] = gDir;
+    }
+    return false;
+  }
+}
 
 
 
@@ -184,94 +261,38 @@ int main(){
     //  solving the problem under relative coordinates
     //----------------------------------------------------------------------------
 
-    //get lcp
-    LargestConvexPolytope lcp(
-        gDirRela,
-        uavsRela,
-        uavShapes,
-        staticObstaclesRela,
-        dynamicObstacles,
-        timeInterval,
-        currTime,
-        dynamicObstaclesTrajectories);
-
-    Eigen::MatrixXd lcpA;
-    Eigen::VectorXd lcpB;
-    bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
+    vector<Point> formationGoalRela;
+    bool isFormationCA = getFormationGoal(
+        //result
+        vector<Point> &formationGoalRela
+        //lcp
+        const Point &_gDirRela,
+        const std::vector<Polytope> &_uavsRela,
+        const std::vector<Polytope> &_uavShapes,
+        const std::vector<Polytope> &_staticObstaclesRela,
+        const std::vector<Polytope> &_dynamicObstacles,
+        const double &_timeInterval,
+        const double &_currTime,
+        const std::vector<trajectory> &_dynamicObstaclesTrajectories,
+        //of
+        const std::vector<Formation> &_formations,
+        const double &_sPref,
+        const Eigen::Vector4d &_qPref,
+        const double &_wT,
+        const double &_wS,
+        const double &_wQ
+        );
 
     //----------------------------------------------------------------------------
-    //  assign goal for each uav
+    //  translating relative coordinates to absolute coordinates
     //----------------------------------------------------------------------------
 
-    //CA formation exists
-    if(shouldFormation){
-      //      //largest convex polytope debug info
-      //      Eigen::MatrixXd disp_A = lcpA;
-      //      Eigen::VectorXd disp_B = lcpB;
-      //      reducePolyDim(disp_A, disp_B, 2);
-      //      cout << "a = " << disp_A.format(np_array) << endl;
-      //      cout << "b = " << disp_B.format(np_array) << endl;
-      //      cout << "INFI = " << INFI << endl;
-      //
-      //      cout << "-----------------------------------------------------------" << endl;
-      //      cout << "gDir: " << endl << gDirRela + currCentroid << endl;
-      //
-      //      cout << "-----------------------------------------------------------" << endl;
-      //      cout << "centroidBefore:" << endl << currCentroid << endl;
-      //      cout << "-----------------------------------------------------------" << endl;
-      //      for(int i=0; i<uavs.size(); ++i){
-      //        Polytope poly = uavs[i];
-      //        cout << "uavBefore" << i << endl;
-      //        for(int j=0; j<poly.size(); ++j){
-      //          cout << poly[j] << endl;
-      //        }
-      //      }
-
-      //optimal deviation
-      OptimalFormation of(formations);
-      OptimalFormation::init(lcpA, lcpB, gDirRela, sPref, qPref, wT, wS, wQ, timeInterval);
-      Vector8d optimalParam;
-      int index = of.optimalFormation(optimalParam);
+    //uavs in absolute coordinates
+    vector<Polytope> formationUavs = relaToAbs(uavsRela, currCentroid);
 
 
-      //uavs in relative coordinates
-      uavsRela = tsqTransPolyVec(formations[index].uavs, optimalParam);
-      //uavs in absolute coordinates
-      vector<Polytope> formationUavs = relaToAbs(uavsRela, currCentroid);
 
-      //matching with respect to distance
-      Eigen::MatrixXd matCost = getDisMat(uavs, formationUavs);
-      vector<int> vecAssign = hungarian(matCost);
-      //assign goal for each uav (formation)
-      for(int i=0; i<vecAssign.size(); ++i){
-        int assignedIdx = vecAssign[i];
-        uavsDir[i] = getCentroid(formationUavs[assignedIdx]);
-      }
 
-      //      cout << "-----------------------------------------------------------" << endl;
-      //      cout << "distance matrix" << endl << matCost << endl;
-      //      cout << "-----------------------------------------------------------" << endl;
-      //      cout << "matching result:" << endl;
-      //      for(int i=0; i<vecAssign.size(); ++i){
-      //        cout << "uav" << i << " is assigend to formation uav" << vecAssign[i] << endl;
-      //      }
-
-      //update uav position
-      for(int i=0; i<vecAssign.size(); ++i){
-        int assignedIdx = vecAssign[i];
-        uavs[i] = formationUavs[assignedIdx];
-      }
-
-    }
-    //no CA formation
-    else{
-      //assign goal for each uav (local planner)
-      for(int i=0; i<uavsDir.size(); ++i){
-        uavsDir[i] = gDir;
-      }
-
-      cout << "no CA formation" << endl;
-    }
 
 
     //----------------------------------------------------------------------------
@@ -309,4 +330,100 @@ int main(){
   }
 
   return 0;
+}
+
+
+
+
+//----------------------------------------------------------------------------
+//  solving the problem under relative coordinates
+//----------------------------------------------------------------------------
+
+//get lcp
+LargestConvexPolytope lcp(
+    gDirRela,
+    uavsRela,
+    uavShapes,
+    staticObstaclesRela,
+    dynamicObstacles,
+    timeInterval,
+    currTime,
+    dynamicObstaclesTrajectories);
+
+Eigen::MatrixXd lcpA;
+Eigen::VectorXd lcpB;
+bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
+
+//----------------------------------------------------------------------------
+//  assign goal for each uav
+//----------------------------------------------------------------------------
+
+//CA formation exists
+if(shouldFormation){
+  //      //largest convex polytope debug info
+  //      Eigen::MatrixXd disp_A = lcpA;
+  //      Eigen::VectorXd disp_B = lcpB;
+  //      reducePolyDim(disp_A, disp_B, 2);
+  //      cout << "a = " << disp_A.format(np_array) << endl;
+  //      cout << "b = " << disp_B.format(np_array) << endl;
+  //      cout << "INFI = " << INFI << endl;
+  //
+  //      cout << "-----------------------------------------------------------" << endl;
+  //      cout << "gDir: " << endl << gDirRela + currCentroid << endl;
+  //
+  //      cout << "-----------------------------------------------------------" << endl;
+  //      cout << "centroidBefore:" << endl << currCentroid << endl;
+  //      cout << "-----------------------------------------------------------" << endl;
+  //      for(int i=0; i<uavs.size(); ++i){
+  //        Polytope poly = uavs[i];
+  //        cout << "uavBefore" << i << endl;
+  //        for(int j=0; j<poly.size(); ++j){
+  //          cout << poly[j] << endl;
+  //        }
+  //      }
+
+  //optimal deviation
+  OptimalFormation of(formations);
+  OptimalFormation::init(lcpA, lcpB, gDirRela, sPref, qPref, wT, wS, wQ, timeInterval);
+  Vector8d optimalParam;
+  int index = of.optimalFormation(optimalParam);
+
+
+  //uavs in relative coordinates
+  uavsRela = tsqTransPolyVec(formations[index].uavs, optimalParam);
+  //uavs in absolute coordinates
+  vector<Polytope> formationUavs = relaToAbs(uavsRela, currCentroid);
+
+  //matching with respect to distance
+  Eigen::MatrixXd matCost = getDisMat(uavs, formationUavs);
+  vector<int> vecAssign = hungarian(matCost);
+  //assign goal for each uav (formation)
+  for(int i=0; i<vecAssign.size(); ++i){
+    int assignedIdx = vecAssign[i];
+    uavsDir[i] = getCentroid(formationUavs[assignedIdx]);
+  }
+
+  //      cout << "-----------------------------------------------------------" << endl;
+  //      cout << "distance matrix" << endl << matCost << endl;
+  //      cout << "-----------------------------------------------------------" << endl;
+  //      cout << "matching result:" << endl;
+  //      for(int i=0; i<vecAssign.size(); ++i){
+  //        cout << "uav" << i << " is assigend to formation uav" << vecAssign[i] << endl;
+  //      }
+
+  //update uav position
+  for(int i=0; i<vecAssign.size(); ++i){
+    int assignedIdx = vecAssign[i];
+    uavs[i] = formationUavs[assignedIdx];
+  }
+
+}
+//no CA formation
+else{
+  //assign goal for each uav (local planner)
+  for(int i=0; i<uavsDir.size(); ++i){
+    uavsDir[i] = gDir;
+  }
+
+  cout << "no CA formation" << endl;
 }
