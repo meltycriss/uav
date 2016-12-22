@@ -123,6 +123,114 @@ bool getFormationGoal(
   }
 }
 
+#ifndef RVO_OUTPUT_TIME_AND_POSITIONS
+#define RVO_OUTPUT_TIME_AND_POSITIONS 1
+#endif
+
+#ifndef RVO_SEED_RANDOM_NUMBER_GENERATOR
+#define RVO_SEED_RANDOM_NUMBER_GENERATOR 1
+#endif
+
+#include <cmath>
+#include <cstdlib>
+
+#include <vector>
+
+#if RVO_OUTPUT_TIME_AND_POSITIONS
+#include <iostream>
+#endif
+
+#if RVO_SEED_RANDOM_NUMBER_GENERATOR
+#include <ctime>
+#endif
+
+#if _OPENMP
+#include <omp.h>
+#endif
+
+#include <RVO.h>
+
+#ifndef M_PI
+const float M_PI = 3.14159265358979323846f;
+#endif
+
+/* Store the goals of the agents. */
+std::vector<RVO::Vector2> goals;
+
+void setupScenario(RVO::RVOSimulator *sim,
+    const double &_currTime,
+    const vector<RVO::Vector2> &_uavs,
+    const vector<RVO::Vector2> &_goals,
+    const vector<vector<RVO::Vector2> > &_obstacles){
+
+  /* Specify the global time step of the simulation. */
+  sim->setTimeStep(_currTime);
+
+  /* Specify the default parameters for agents that are subsequently added. */
+  sim->setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f);
+
+  /*
+   * Add agents, specifying their start position, and store their goals on the
+   * opposite side of the environment.
+   */
+  for(int i=0; i<_uavs.size(); ++i){
+    sim->addAgent(_uavs[i]);
+    goals.push_back(_goals[i]);
+  }
+
+  /*
+   * Add (polygonal) obstacles, specifying their vertices in counterclockwise
+   * order.
+   */
+  for(int i=0; i<_obstacles.size(); ++i){
+    vector<RVO::Vector2> obs = _obstacles[i];
+    sim->addObstacle(obs);
+  }
+
+  /* Process the obstacles so that they are accounted for in the simulation. */
+  sim->processObstacles();
+}
+
+void setPreferredVelocities(RVO::RVOSimulator *sim)
+{
+  /*
+   * Set the preferred velocity to be a vector of unit magnitude (speed) in the
+   * direction of the goal.
+   */
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+  for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) {
+    RVO::Vector2 goalVector = goals[i] - sim->getAgentPosition(i);
+
+    if (RVO::absSq(goalVector) > 1.0f) {
+      goalVector = RVO::normalize(goalVector);
+    }
+
+    sim->setAgentPrefVelocity(i, goalVector);
+
+    /*
+     * Perturb a little to avoid deadlocks due to perfect symmetry.
+     */
+    float angle = std::rand() * 2.0f * M_PI / RAND_MAX;
+    float dist = std::rand() * 0.0001f / RAND_MAX;
+
+    sim->setAgentPrefVelocity(i, sim->getAgentPrefVelocity(i) +
+        dist * RVO::Vector2(std::cos(angle), std::sin(angle)));
+  }
+}
+
+bool reachedGoal(RVO::RVOSimulator *sim)
+{
+  /* Check if all agents have reached their goals. */
+  for (size_t i = 0; i < sim->getNumAgents(); ++i) {
+    if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > 20.0f * 20.0f) {
+      return false;
+    }
+  }
+  return true;
+}
+
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
@@ -169,11 +277,11 @@ int main(){
   //us0
   p << -1,1,0;
   uavShape.push_back(p);
-  p << 1,1,0;
+  p << -1,-1,0;
   uavShape.push_back(p);
   p << 1,-1,0;
   uavShape.push_back(p);
-  p << -1,-1,0;
+  p << 1,1,0;
   uavShape.push_back(p);
   uavShapes.push_back(uavShape);
 
@@ -181,11 +289,11 @@ int main(){
   Polytope convexHull;
   p << -3,3,0;
   convexHull.push_back(p);
-  p << 3,3,0;
+  p << -3,-3,0;
   convexHull.push_back(p);
   p << 3,-3,0;
   convexHull.push_back(p);
-  p << -3,-3,0;
+  p << 3,3,0;
   convexHull.push_back(p);
 
   //template formation
@@ -200,11 +308,11 @@ int main(){
   //so0
   p << 5,4,0;
   staticObstacle.push_back(p);
-  p << 8,4,0;
+  p << 5,1,0;
   staticObstacle.push_back(p);
   p << 8,1,0;
   staticObstacle.push_back(p);
-  p << 5,1,0;
+  p << 8,4,0;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 
@@ -216,11 +324,11 @@ int main(){
   trajectory dynamicObstaclesTrajectory;
   p << 10,10,0;
   dynamicObstacle.push_back(p);
-  p << 11,10,0;
+  p << 10,9,0;
   dynamicObstacle.push_back(p);
   p << 11,9,0;
   dynamicObstacle.push_back(p);
-  p << 10,9,0;
+  p << 11,10,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
   dynamicObstacles.push_back(dynamicObstacle);
@@ -245,7 +353,7 @@ int main(){
   vector<Point> uavsDir(uavs.size());
 
   //looping
-  while(currTime<2){
+  while(currTime<1){
     //----------------------------------------------------------------------------
     //  translating absolute coordinates to relative coordinates
     //----------------------------------------------------------------------------
@@ -305,11 +413,82 @@ int main(){
     //  navigate to goal with ORCA
     //----------------------------------------------------------------------------
 
+
+    //----------------------------------------------------------------------------
+    //  adapt to RVO data structure
+    //----------------------------------------------------------------------------
+
+    //uavs
+    vector<RVO::Vector2> uavsRVO;
+    for(int i=0; i<uavs.size(); ++i){
+      Point uavCentroid = getCentroid(uavs[i]);
+      RVO::Vector2 uavRVO(uavCentroid(0), uavCentroid(1));
+      uavsRVO.push_back(uavRVO);
+    }
+    //uavsDir
+    vector<RVO::Vector2> goalsRVO;
+    for(int i=0; i<uavsDir.size(); ++i){
+      Point uavDir = uavsDir[i];
+      RVO::Vector2 goalRVO(uavDir(0), uavDir(1));
+      goalsRVO.push_back(goalRVO);
+    }
+    //obstacles
+    vector<vector<RVO::Vector2> > obstaclesRVO;
+    //so
+    for(int i=0; i<staticObstacles.size(); ++i){
+      Polytope obs = staticObstacles[i];
+      vector<RVO::Vector2> obsRVO;
+      for(int j=0; j<obs.size(); ++j){
+        Point p = obs[j];
+        RVO::Vector2 pRVO(p(0), p(1));
+        obsRVO.push_back(pRVO);
+      }
+      obstaclesRVO.push_back(obsRVO);
+    }
+    //do
+    for(int i=0; i<dynamicObstacles.size(); ++i){
+      Polytope obs = dynamicObstacles[i];
+      vector<RVO::Vector2> obsRVO;
+      for(int j=0; j<obs.size(); ++j){
+        Point p = obs[j];
+        p = dynamicObstaclesTrajectories[i](p, currTime+timeInterval) + currCentroid; //rela to abs
+        RVO::Vector2 pRVO(p(0), p(1));
+        obsRVO.push_back(pRVO);
+      }
+      obstaclesRVO.push_back(obsRVO);
+    }
+
+    /* Create a new simulator instance. */
+    RVO::RVOSimulator *sim = new RVO::RVOSimulator();
+
+    /* Set up the scenario. */
+    setupScenario(sim, currTime, uavsRVO, goalsRVO, obstaclesRVO);
+
+    /* Perform (and manipulate) the simulation. */
+    do {
+//#if RVO_OUTPUT_TIME_AND_POSITIONS
+//      updateVisualization(sim);
+//#endif
+      setPreferredVelocities(sim);
+      sim->doStep();
+    }
+    while (!reachedGoal(sim));
+
     //update uav position
     for(int i=0; i<uavsDir.size(); ++i){
-      Point goal = uavsDir[i];
-      uavs[i] = uavMoveTo(goal, uavs[i]);
+      RVO::Vector2 pRVO = sim->getAgentPosition(i);
+      Point p(pRVO.x(), pRVO.y(), 0);
+      uavs[i] = uavMoveTo(p, uavs[i]);
     }
+
+    //delete simulator instance
+    delete sim;
+
+//    //update uav position
+//    for(int i=0; i<uavsDir.size(); ++i){
+//      Point goal = uavsDir[i];
+//      uavs[i] = uavMoveTo(goal, uavs[i]);
+//    }
 
     //update currCentroid
     currCentroid = Point(0,0,0);
@@ -324,6 +503,9 @@ int main(){
     for(int i=0; i<uavs.size(); ++i){
       Polytope poly = uavs[i];
       cout << "uavAfter" << i << endl;
+      cout << "goal" << endl;
+      cout << uavsDir[i] << endl;
+      cout << "actual" << endl;
       for(int j=0; j<poly.size(); ++j){
         cout << poly[j] << endl;
       }
@@ -342,4 +524,23 @@ int main(){
 
   return 0;
 }
+
+
+
+
+//#if RVO_OUTPUT_TIME_AND_POSITIONS
+//void updateVisualization(RVO::RVOSimulator *sim)
+//{
+//  /* Output the current global time. */
+//  std::cout << sim->getGlobalTime();
+//
+//  /* Output the current position of all the agents. */
+//  for (size_t i = 0; i < sim->getNumAgents(); ++i) {
+//    std::cout << " " << sim->getAgentPosition(i);
+//  }
+//
+//  std::cout << std::endl;
+//}
+//#endif
+
 
