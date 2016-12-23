@@ -16,6 +16,8 @@ using namespace uav;
 const float M_PI = 3.14159265358979323846f;
 #endif
 
+const double DELTA = 1.0;
+
 //current uavs centroid
 Point currCentroid = Point(0,0,0);
 
@@ -31,8 +33,8 @@ Point traj1(Point p, double t){
   return res;
 }
 
-// \return  formationIdx  if CA formation, formation pos is set
-//          -1 if no CA formation, all uavs' goal are set to gDir
+// \return  formationIdx:    if CA formation, formation pos is set
+//                    -1:    if no CA formation, all uavs' goal are set to gDir
 // \caution both input and output are in relative coordinates
 int getFormationGoal(
     //result
@@ -129,8 +131,6 @@ int getFormationGoal(
   }
 }
 
-
-
 /* Store the goals of the agents. */
 std::vector<RVO::Vector2> goals;
 
@@ -186,9 +186,6 @@ void setPreferredVelocities(RVO::RVOSimulator *sim)
    * Set the preferred velocity to be a vector of unit magnitude (speed) in the
    * direction of the goal.
    */
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
   for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) {
     RVO::Vector2 goalVector = goals[i] - sim->getAgentPosition(i);
 
@@ -213,7 +210,7 @@ bool reachedGoal(RVO::RVOSimulator *sim)
 {
   /* Check if all agents have reached their goals. */
   for (size_t i = 0; i < sim->getNumAgents(); ++i) {
-    if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > 2.0f * 2.0f) {
+    if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > DELTA) {
       return false;
     }
   }
@@ -234,7 +231,6 @@ void updateVisualization(RVO::RVOSimulator *sim)
 }
 
 
-double timeStep = 0.25;
 
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
@@ -357,8 +353,10 @@ int main(){
   //curr goal for each uavs
   vector<Point> uavsDir(uavs.size());
 
+  int counter = 0;
+
   //looping
-  while(currTime<1){
+  while(counter<2){
     //----------------------------------------------------------------------------
     //  translating absolute coordinates to relative coordinates
     //----------------------------------------------------------------------------
@@ -464,6 +462,18 @@ int main(){
     }
 
     //----------------------------------------------------------------------------
+    //  hyper-param for ORCA
+    //----------------------------------------------------------------------------
+    
+    double timeStep = 0.25;
+    double radiusRVO = getRadius(uavShapes[0]);
+    double neighborDistRVO = 5 * radiusRVO;
+    int maxNeighborsRVO = uavs.size();
+    double timeHorizonRVO = 5;
+    double timeHorizonObstRVO = 5;
+    double maxSpeedRVO = 2;
+
+    //----------------------------------------------------------------------------
     //  ORCA
     //----------------------------------------------------------------------------
 
@@ -473,7 +483,8 @@ int main(){
     // to do: set param
     /* Set up the scenario. */
     setupScenario(sim, timeStep, uavsRVO, goalsRVO, obstaclesRVO,
-        _neighborDist, _maxNeighbors, _timeHorizon, _timeHorizonObst, _radius, _maxSpeed);
+        neighborDistRVO, maxNeighborsRVO, timeHorizonRVO, 
+        timeHorizonObstRVO, radiusRVO, maxSpeedRVO);
 
     //int count = 0;
     /* Perform (and manipulate) the simulation. */
@@ -530,6 +541,7 @@ int main(){
     //update gDir
     gDir << 3,10,0;
 
+    ++counter;
   }
 
   return 0;
