@@ -6,8 +6,15 @@
 #include "util.h"
 #include "iris/geometry.h"
 #include <cmath>
+#include <cstdlib>
+#include <vector>
+#include <RVO.h>
 using namespace std;
 using namespace uav;
+
+#ifndef M_PI
+const float M_PI = 3.14159265358979323846f;
+#endif
 
 //current uavs centroid
 Point currCentroid = Point(0,0,0);
@@ -24,10 +31,10 @@ Point traj1(Point p, double t){
   return res;
 }
 
-// \return  true  if CA formation, formation pos is set
-//          false if no CA formation, all uavs' goal are set to gDir
+// \return  formationIdx  if CA formation, formation pos is set
+//          -1 if no CA formation, all uavs' goal are set to gDir
 // \caution both input and output are in relative coordinates
-bool getFormationGoal(
+int getFormationGoal(
     //result
     vector<Point> &rFormationGoal,
     //lcp
@@ -108,8 +115,7 @@ bool getFormationGoal(
     for(int i=0; i<rFormationGoal.size(); ++i){
       rFormationGoal[i] = getCentroid(formationUavs[i]);
     }
-
-    return true;
+    return index;
 
   }
   //no CA formation
@@ -119,64 +125,47 @@ bool getFormationGoal(
     for(int i=0; i<rFormationGoal.size(); ++i){
       rFormationGoal[i] = _gDir;
     }
-    return false;
+    return -1;
   }
 }
 
-#ifndef RVO_OUTPUT_TIME_AND_POSITIONS
-#define RVO_OUTPUT_TIME_AND_POSITIONS 1
-#endif
 
-#ifndef RVO_SEED_RANDOM_NUMBER_GENERATOR
-#define RVO_SEED_RANDOM_NUMBER_GENERATOR 1
-#endif
-
-#include <cmath>
-#include <cstdlib>
-
-#include <vector>
-
-#if RVO_OUTPUT_TIME_AND_POSITIONS
-#include <iostream>
-#endif
-
-#if RVO_SEED_RANDOM_NUMBER_GENERATOR
-#include <ctime>
-#endif
-
-#if _OPENMP
-#include <omp.h>
-#endif
-
-#include <RVO.h>
-
-#ifndef M_PI
-const float M_PI = 3.14159265358979323846f;
-#endif
 
 /* Store the goals of the agents. */
 std::vector<RVO::Vector2> goals;
 
 void setupScenario(RVO::RVOSimulator *sim,
-    const double &_currTime,
+    const double &_timeStep,
     const vector<RVO::Vector2> &_uavs,
     const vector<RVO::Vector2> &_goals,
-    const vector<vector<RVO::Vector2> > &_obstacles){
-
+    const vector<vector<RVO::Vector2> > &_obstacles,
+    float _neighborDist, size_t _maxNeighbors,
+    float _timeHorizon, float _timeHorizonObst,
+    float _radius, float _maxSpeed,
+    const RVO::Vector2 &_velocity = RVO::Vector2()
+    ){
   /* Specify the global time step of the simulation. */
-  sim->setTimeStep(_currTime);
+  sim->setTimeStep(_timeStep);
+
+  //void setAgentDefaults(float neighborDist, size_t maxNeighbors,
+  //                float timeHorizon, float timeHorizonObst,
+  //                float radius, float maxSpeed,
+  //                const Vector2 &velocity = Vector2());
 
   /* Specify the default parameters for agents that are subsequently added. */
-  sim->setAgentDefaults(15.0f, 10, 5.0f, 5.0f, 2.0f, 2.0f);
+  //sim->setAgentDefaults(5.0f, 10, 5.0f, 5.0f, 1.0f, 2.0f);
+  sim->setAgentDefaults(_neighborDist, _maxNeighbors, _timeHorizon, _timeHorizonObst, _radius, _maxSpeed);
 
   /*
    * Add agents, specifying their start position, and store their goals on the
    * opposite side of the environment.
    */
+  goals.resize(_uavs.size());
   for(int i=0; i<_uavs.size(); ++i){
     sim->addAgent(_uavs[i]);
-    goals.push_back(_goals[i]);
+    goals[i] = _goals[i];
   }
+
 
   /*
    * Add (polygonal) obstacles, specifying their vertices in counterclockwise
@@ -224,12 +213,28 @@ bool reachedGoal(RVO::RVOSimulator *sim)
 {
   /* Check if all agents have reached their goals. */
   for (size_t i = 0; i < sim->getNumAgents(); ++i) {
-    if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > 20.0f * 20.0f) {
+    if (RVO::absSq(sim->getAgentPosition(i) - goals[i]) > 2.0f * 2.0f) {
       return false;
     }
   }
   return true;
 }
+
+void updateVisualization(RVO::RVOSimulator *sim)
+{
+  /* Output the current global time. */
+  std::cout << sim->getGlobalTime();
+
+  /* Output the current position of all the agents. */
+  for (size_t i = 0; i < sim->getNumAgents(); ++i) {
+    std::cout << " " << sim->getAgentPosition(i);
+  }
+
+  std::cout << std::endl;
+}
+
+
+double timeStep = 0.25;
 
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
@@ -368,7 +373,7 @@ int main(){
     //----------------------------------------------------------------------------
 
     vector<Point> formationGoalRela;
-    bool isFormationCA = getFormationGoal(
+    int formationIdx = getFormationGoal(
         //result
         formationGoalRela,
         //lcp
@@ -458,21 +463,33 @@ int main(){
       obstaclesRVO.push_back(obsRVO);
     }
 
+    //----------------------------------------------------------------------------
+    //  ORCA
+    //----------------------------------------------------------------------------
+
     /* Create a new simulator instance. */
     RVO::RVOSimulator *sim = new RVO::RVOSimulator();
 
+    // to do: set param
     /* Set up the scenario. */
-    setupScenario(sim, currTime, uavsRVO, goalsRVO, obstaclesRVO);
+    setupScenario(sim, timeStep, uavsRVO, goalsRVO, obstaclesRVO,
+        _neighborDist, _maxNeighbors, _timeHorizon, _timeHorizonObst, _radius, _maxSpeed);
 
+    //int count = 0;
     /* Perform (and manipulate) the simulation. */
     do {
-//#if RVO_OUTPUT_TIME_AND_POSITIONS
-//      updateVisualization(sim);
-//#endif
+      // if(count%5==0){
+      //   updateVisualization(sim);
+      // }
       setPreferredVelocities(sim);
       sim->doStep();
+      //++count;
     }
     while (!reachedGoal(sim));
+
+    //----------------------------------------------------------------------------
+    //  update pos info
+    //----------------------------------------------------------------------------
 
     //update uav position
     for(int i=0; i<uavsDir.size(); ++i){
@@ -481,15 +498,6 @@ int main(){
       uavs[i] = uavMoveTo(p, uavs[i]);
     }
 
-    //delete simulator instance
-    delete sim;
-
-//    //update uav position
-//    for(int i=0; i<uavsDir.size(); ++i){
-//      Point goal = uavsDir[i];
-//      uavs[i] = uavMoveTo(goal, uavs[i]);
-//    }
-
     //update currCentroid
     currCentroid = Point(0,0,0);
     for(int i=0; i<uavs.size(); ++i){
@@ -497,8 +505,13 @@ int main(){
     }
     currCentroid /= uavs.size();
 
+    //timer
+    currTime += sim->getGlobalTime();
+
     cout << "-----------------------------------------------------------" << endl;
-    cout << "centroidAfter:" << endl << currCentroid << endl;
+    cout << "centroidAfter:" << endl;
+    cout << "goal" << endl << getCentroid(uavsDir) << endl;
+    cout << "actual" << endl << currCentroid << endl;
     cout << "-----------------------------------------------------------" << endl;
     for(int i=0; i<uavs.size(); ++i){
       Polytope poly = uavs[i];
@@ -511,36 +524,17 @@ int main(){
       }
     }
 
-    //----------------------------------------------------------------------------
-    //  update timer
-    //----------------------------------------------------------------------------
-
-    //timer
-    ++currTime;
+    //delete simulator instance
+    delete sim;
 
     //update gDir
     gDir << 3,10,0;
+
   }
 
   return 0;
 }
 
 
-
-
-//#if RVO_OUTPUT_TIME_AND_POSITIONS
-//void updateVisualization(RVO::RVOSimulator *sim)
-//{
-//  /* Output the current global time. */
-//  std::cout << sim->getGlobalTime();
-//
-//  /* Output the current position of all the agents. */
-//  for (size_t i = 0; i < sim->getNumAgents(); ++i) {
-//    std::cout << " " << sim->getAgentPosition(i);
-//  }
-//
-//  std::cout << std::endl;
-//}
-//#endif
 
 
