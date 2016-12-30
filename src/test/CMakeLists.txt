@@ -94,6 +94,7 @@ TARGET_LINK_LIBRARIES(uavTest
   ${SNOPT7_LIB}
   ${DRAKE_MATH_LIB}
   ${RVO2D_LIB}
+  proto
   )
 
 target_compile_features(uavTest PRIVATE cxx_range_for)

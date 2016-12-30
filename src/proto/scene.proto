@@ -1,0 +1,57 @@
+package scene;
+
+message Point {
+  required double x = 1;
+  required double y = 2;
+}
+
+message Uav{
+  required double x = 1;
+  required double y = 2;
+}
+
+message Polytope {
+  repeated Point point = 1;
+}
+
+message Uavs{
+  repeated Uav uav = 1;
+}
+
+message DynamicObstacles{
+  repeated Polytope do = 1;
+}
+
+message StaticObstacles{
+  repeated Polytope so = 1;
+}
+
+message UavsDir{
+  repeated Point uavDir = 1;
+}
+
+message GDir{
+  required double x = 1;
+  required double y = 2;
+}
+
+message A{
+  required int32 row = 1;
+  required int32 col = 2;
+  repeated double data = 3;
+}
+
+message B{
+  required int32 row = 1;
+  repeated double data = 2;
+}
+
+message Scene{
+  required Uavs uavs = 1;
+  required DynamicObstacles dos = 2;
+  required StaticObstacles sos = 3;
+  required UavsDir uavsDir = 4;
+  required GDir gDir = 5;
+  required A a = 6;
+  required B b = 7;
+}

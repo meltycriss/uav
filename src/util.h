@@ -39,6 +39,10 @@ namespace uav{
   //IRIS result visualization helper
   void reducePolyDim(Eigen::MatrixXd &A, Eigen::VectorXd &b, int dim);
 
+  //IRIS result visualization helper
+  //plug A[*][dim] = val to slice
+  void reducePolyDim(Eigen::MatrixXd &A, Eigen::VectorXd &b, int dim, double val);
+
   void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove);
 
   void removeRow(Eigen::VectorXd& vec, unsigned int rowToRemove);

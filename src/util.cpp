@@ -204,6 +204,25 @@ namespace uav{
     }
   }
 
+  void reducePolyDim(Eigen::MatrixXd &A, Eigen::VectorXd &b, int dim, double val){
+    b = b - val * A.col(dim);
+    removeColumn(A, dim);
+    for(int i=0; i<A.rows(); ++i){
+      bool allZero = true;
+      for(int j=0; j<A.cols(); ++j){
+        if(A(i,j)!=0){
+          allZero = false;
+          break;
+        }
+      }
+      if(allZero){
+        removeRow(A, i);
+        removeRow(b, i);
+        --i;
+      }
+    }
+  }
+
   void removeRow(Eigen::MatrixXd& matrix, unsigned int rowToRemove){
     unsigned int numRows = matrix.rows()-1;
     unsigned int numCols = matrix.cols();

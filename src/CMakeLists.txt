@@ -1,3 +1,6 @@
+ADD_SUBDIRECTORY(test test)
+ADD_SUBDIRECTORY(proto)
+
 INCLUDE_DIRECTORIES("../include/iris")
 INCLUDE_DIRECTORIES("../include/snopt")
 INCLUDE_DIRECTORIES("../include/iris/eigen3")
@@ -51,5 +54,4 @@ target_compile_features(main PRIVATE cxx_range_for)
 #MESSAGE(STATUS "libsnopt7.so: " ${SNOPT7_LIB})
 #MESSAGE(STATUS "libsnopt7_cpp.so: " ${SNOPT7_CPP_LIB})
 
-ADD_SUBDIRECTORY(test test)
 

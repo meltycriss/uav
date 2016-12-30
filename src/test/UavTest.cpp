@@ -9,8 +9,20 @@
 #include <cstdlib>
 #include <vector>
 #include <RVO.h>
+#include "scene.pb.h"
+#include <fstream>
 using namespace std;
 using namespace uav;
+
+//visualization helper
+scene::Scene scn;
+scene::Uavs *scnUavs;
+scene::UavsDir *scnUavsDir;
+scene::StaticObstacles *scnSos;
+scene::DynamicObstacles *scnDos;
+scene::GDir *scnGDir;
+scene::A *scnA;
+scene::B *scnB;
 
 #ifndef M_PI
 const float M_PI = 3.14159265358979323846f;
@@ -18,8 +30,23 @@ const float M_PI = 3.14159265358979323846f;
 
 const double DELTA = 1.0;
 
+//for display
+Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
+
 //current uavs centroid
 Point currCentroid = Point(0,0,0);
+
+void printScene(ostream &stm){
+  string str;
+  scn.SerializeToString(&str);
+  stm << str << endl << "###" << endl;
+
+//  stm << "gDir: " << scn.gdir().x() << " " << scn.gdir().y() << endl;
+//  stm << "A: " << scn.a().row() << " " << scn.a().col() << endl;
+//  stm << "scnA: " << scnA.row() << " " << scnA.col() << endl;
+
+}
+
 
 Point traj1(Point p, double t){
   Point res = p;
@@ -80,15 +107,38 @@ int getFormationGoal(
   //  assign goal for each uav
   //----------------------------------------------------------------------------
 
+  //for visualize
+
   //CA formation exists
   if(shouldFormation){
-    //      //largest convex polytope debug info
-    //      Eigen::MatrixXd disp_A = lcpA;
-    //      Eigen::VectorXd disp_B = lcpB;
-    //      reducePolyDim(disp_A, disp_B, 2);
-    //      cout << "a = " << disp_A.format(np_array) << endl;
-    //      cout << "b = " << disp_B.format(np_array) << endl;
-    //      cout << "INFI = " << INFI << endl;
+    //largest convex polytope debug info
+    Eigen::MatrixXd disp_A = lcpA;
+    Eigen::VectorXd disp_B = lcpB;
+    reducePolyDim(disp_A, disp_B, 2, 0);
+    reducePolyDim(disp_A, disp_B, 2, _timeInterval);
+
+    //for visualize
+    scnA = new scene::A();
+    scnA->set_row(disp_A.rows());
+    scnA->set_col(disp_A.cols());
+    for(int i=0; i<disp_A.rows(); ++i){
+      for(int j=0; j<disp_A.cols(); ++j){
+        scnA->add_data(disp_A(i,j));
+      }
+    }
+    scn.set_allocated_a(scnA);
+
+    scnB = new scene::B();
+    scnB->set_row(disp_B.rows());
+    for(int i=0; i<disp_B.rows(); ++i){
+      scnB->add_data(disp_B(i));
+    }
+    scn.set_allocated_b(scnB);
+
+    cout << "a = " << lcpA.format(np_array) << endl;
+    cout << "b = " << lcpB.format(np_array) << endl;
+    cout << "a = " << disp_A.format(np_array) << endl;
+    cout << "b = " << disp_B.format(np_array) << endl; cout << "INFI = " << INFI << endl;
     //
     cout << "-----------------------------------------------------------" << endl;
     cout << "gDir: " << endl << _gDir + currCentroid << endl;
@@ -233,7 +283,8 @@ void updateVisualization(RVO::RVOSimulator *sim)
 
 
 int main(){
-  Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
+
+  fstream fd("scenes.txt", ios::out);
 
   //----------------------------------------------------------------------------
   //  initialization of scenerio under absolute coordinates
@@ -464,7 +515,7 @@ int main(){
     //----------------------------------------------------------------------------
     //  hyper-param for ORCA
     //----------------------------------------------------------------------------
-    
+
     double timeStep = 0.25;
     double radiusRVO = getRadius(uavShapes[0]);
     double neighborDistRVO = 5 * radiusRVO;
@@ -483,7 +534,7 @@ int main(){
     // to do: set param
     /* Set up the scenario. */
     setupScenario(sim, timeStep, uavsRVO, goalsRVO, obstaclesRVO,
-        neighborDistRVO, maxNeighborsRVO, timeHorizonRVO, 
+        neighborDistRVO, maxNeighborsRVO, timeHorizonRVO,
         timeHorizonObstRVO, radiusRVO, maxSpeedRVO);
 
     //int count = 0;
@@ -497,6 +548,76 @@ int main(){
       //++count;
     }
     while (!reachedGoal(sim));
+
+
+    //----------------------------------------------------------------------------
+    //  update scene::Scene scn for visualization
+    //----------------------------------------------------------------------------
+    //
+    //
+    //
+
+    scnUavs = new scene::Uavs();
+    scene::Uav *scnUav;
+    for(int i=0; i<uavsRVO.size(); ++i){
+      scnUav = scnUavs->add_uav();
+      RVO::Vector2 pRVO = uavsRVO[i];
+      scnUav->set_x(pRVO.x());
+      scnUav->set_y(pRVO.y());
+    }
+    scn.set_allocated_uavs(scnUavs);
+
+    scnUavsDir = new scene::UavsDir();
+    scene::Point *scnPoint;
+    for(int i=0; i<goalsRVO.size(); ++i){
+      scnPoint = scnUavsDir->add_uavdir();
+      RVO::Vector2 pRVO = goalsRVO[i];
+      scnPoint->set_x(pRVO.x());
+      scnPoint->set_y(pRVO.y());
+    }
+    scn.set_allocated_uavsdir(scnUavsDir);
+
+    //order-sensitive
+    scnSos = new scene::StaticObstacles();
+    scene::Polytope *scnPoly;
+    for(int i=0; i<staticObstacles.size(); ++i){
+      vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
+      scnPoly = scnSos->add_so();
+      for(int j=0; j<polyRVO.size(); ++j){
+        RVO::Vector2 pRVO = polyRVO[j];
+        scnPoint = scnPoly->add_point();
+        scnPoint->set_x(pRVO.x());
+        scnPoint->set_y(pRVO.y());
+      }
+    }
+    scn.set_allocated_sos(scnSos);
+
+    scnDos = new scene::DynamicObstacles();
+    for(int i=staticObstacles.size(); i<obstaclesRVO.size(); ++i){
+      vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
+      scnPoly = scnDos->add_do_();
+      for(int j=0; j<polyRVO.size(); ++j){
+        RVO::Vector2 pRVO = polyRVO[j];
+        scnPoint = scnPoly->add_point();
+        scnPoint->set_x(pRVO.x());
+        scnPoint->set_y(pRVO.y());
+      }
+    }
+    scn.set_allocated_dos(scnDos);
+
+    scnGDir = new scene::GDir();
+    scnGDir->set_x(gDir(0));
+    scnGDir->set_y(gDir(1));
+    scn.set_allocated_gdir(scnGDir);
+    //scnA and scnB are set in function
+    
+    cout << "-----------------------------------------------------------" << endl;
+    cout << "testing Protobuf" << endl;
+
+    printScene(fd);
+    printScene(cout);
+
+    scn.Clear();
 
     //----------------------------------------------------------------------------
     //  update pos info
@@ -535,6 +656,8 @@ int main(){
       }
     }
 
+
+
     //delete simulator instance
     delete sim;
 
@@ -544,9 +667,8 @@ int main(){
     ++counter;
   }
 
+  fd.close();
+
   return 0;
 }
-
-
-
 
