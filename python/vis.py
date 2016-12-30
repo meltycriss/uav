@@ -27,6 +27,7 @@ uavsDir = np.array([
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
+import scene_pb2
 
 fig = plt.figure(figsize=(8,8), dpi=80)
 
@@ -76,11 +77,29 @@ patchDos = ax.add_patch(polygon)
 #scat = ax.scatter(uavs[:,0], uavs[:,1], s=100, lw = 0.5,
  #                 edgecolors = C, facecolors='None')
 
+f = open('./scenes.txt', 'r')
+
     
 def update(frame):
     global dos
 #    print(dos)
-    dos = patchDos.get_xy()
+
+    s = ''
+    for line in f:
+        if(line[:-1]=='###'):
+            scene = scene_pb2.Scene()
+            scene.ParseFromString(s[:-1])
+            do = scene.dos.do[0]
+            dos = np.zeros((len(do.point), 2))
+            for i, point in enumerate(do.point):
+                dos[i,0] = point.x
+                dos[i,1] = point.y
+#            dos = dos.T
+            break;
+        else:
+            s += line
+
+#    dos = patchDos.get_xy()
     temp_dos = dos
     print( "temp dos = ")
     print(temp_dos)
@@ -102,6 +121,7 @@ import matplotlib.animation as animation
 animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frames=range(10))
 # animation.save('rain.gif', writer='imagemagick', fps=30, dpi=40)
     
+f.close()
     
 # Show result on screen
 plt.show()
