@@ -72,57 +72,80 @@ dos = np.array([
 polygon = Polygon(dos.T, True, color='y')
 patchDos = ax.add_patch(polygon)
 
-
-# Scatter plot
-#scat = ax.scatter(uavs[:,0], uavs[:,1], s=100, lw = 0.5,
- #                 edgecolors = C, facecolors='None')
-
 f = open('./scenes.txt', 'r')
 
+DIM = 2
     
 def update(frame):
-    global dos
-#    print(dos)
+    global uavs, dos, sos, uavsDir, gDir
 
     s = ''
     for line in f:
         if(line[:-1]=='###'):
             scene = scene_pb2.Scene()
             scene.ParseFromString(s[:-1])
+            #uavs
+            uavsPb = scene.uavs.uav
+            uavs = np.ones((len(uavsPb), DIM))
+            for i, uavPb in enumerate(uavsPb):
+                uavs[i, 0] = uavPb.x
+                uavs[i, 1] = uavPb.y
+            #dos
+            dosPb = scene.dos.do
+            dos = []
+            for doPb in dosPb:
+                do_temp = np.ones((len(doPb.point), DIM))
+                for i, pPb in enumerate(doPb.point):
+                    do_temp[i, 0] = pPb.x
+                    do_temp[i, 1] = pPb.y
+                dos.append(do_temp)
+            #sos
+            sosPb = scene.sos.so
+            sos = []
+            for soPb in sosPb:
+                so_temp = np.ones((len(soPb.point), DIM))
+                for i, pPb in enumerate(soPb.point):
+                    so_temp[i, 0] = pPb.x
+                    so_temp[i, 1] = pPb.y
+                sos.append(so_temp)
+            #uavsDir
+            uavsDirPb = scene.uavsDir.uavDir
+            uavsDir = np.ones((len(uavsDirPb), DIM))
+            for i, pPb in enumerate(uavsDirPb):
+                uavsDir[i, 0] = pPb.x
+                uavsDir[i, 1] = pPb.y
+            #gDir
+            gDirPb = scene.gDir
+            gDir = np.ones(DIM)
+            gDir[0] = gDirPb.x
+            gDir[1] = gDirPb.y
+
+            #a
+            #b
+
+
             do = scene.dos.do[0]
             dos = np.zeros((len(do.point), 2))
             for i, point in enumerate(do.point):
                 dos[i,0] = point.x
                 dos[i,1] = point.y
-#            dos = dos.T
             break;
         else:
             s += line
 
-#    dos = patchDos.get_xy()
-    temp_dos = dos
-    print( "temp dos = ")
-    print(temp_dos)
-    temp_dos = temp_dos[:1] - (frame % 10)
-    dos[:,1] = dos[:,1] - 1
     patchDos.set_xy(dos)
 
     for i, uavAx in enumerate(uavsAx):
         uavAx.center = uavs[i] + (frame % 5)
-    #uavsAx[0].center = uavs[0] + (frame % 5)
 
     # Return the modified object
     return patchDos, uavsAx,
-
-def init():
-    pass
 
 import matplotlib.animation as animation
 animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frames=range(10))
 # animation.save('rain.gif', writer='imagemagick', fps=30, dpi=40)
     
-f.close()
-    
 # Show result on screen
 plt.show()
 
+f.close()
