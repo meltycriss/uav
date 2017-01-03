@@ -1,56 +1,4 @@
 import numpy as np
-
-# num * dim
-uavs = np.array([
-        [-2. ,  2.],
-        [-2. , -2.],
-        [ 2. , -2.],
-        [ 2. ,  2.]
-    ])
-# num * dim
-sos = [np.array([
-        [5., 4.],
-        [5., 1.],
-        [8., 1.],
-        [8., 4.]
-    ])]
-dos = [np.array([
-        [10., 10.],
-        [10., 9. ],
-        [11., 9. ],
-        [11., 10.]
-    ])]
-# num * dim
-uavsDir = np.array([
-        [-2. , 12.],
-        [-2. ,  8.],
-        [ 2. ,  8.],
-        [ 2. , 12.]
-    ])
-# a
-a = np.array([[          1, 2.02739e-05],
-  [          1,           0],
-  [          0,           1],
-  [         -1,          -0],
-  [         -0,          -1],
-  [   0.994616,   -0.103633],
-  [          1,           0],
-  [          0,           1],
-  [         -1,          -0],
-  [         -0,          -1]])
-# b
-b = np.array([[3.99996],
-  [  10000],
-  [  10000],
-  [  10000],
-  [  10000],
-  [3.46031],
-  [  10000],
-  [  10000],
-  [  10000],
-  [  10000]])
-
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 import scene_pb2
@@ -67,52 +15,32 @@ ax.spines['bottom'].set_position('zero')
 ax.yaxis.set_ticks_position('left')
 ax.spines['left'].set_position(('data',0))
 
-x_min = -4
-x_max = 14
-y_min = -4
-y_max = 14
+x_min = -8
+x_max = 28
+y_min = -8
+y_max = 28
 ax.set_xlim(x_min,x_max), ax.set_xticks(np.linspace(x_min,x_max,x_max-x_min+1,endpoint=True))
 ax.set_ylim(y_min,y_max), ax.set_yticks(np.linspace(y_min,y_max,y_max-y_min+1,endpoint=True))
 
-# uavs
 uavRadius = 1
-uavsAx = []
-for pos in uavs:
-    circle = plt.Circle(pos, uavRadius, color='r')
-    uavsAx.append(circle)
-    ax.add_artist(circle)
-# uavsDir
+uavsDirRadius = 0.2
 gDirRadius = 0.2
+uavsAx = []
 uavsDirAx = []
-for pos in uavsDir:
-    circle = plt.Circle(pos, gDirRadius, color='g')
-    uavsDirAx.append(circle)
-    ax.add_artist(circle)
-# sos
 sosAx = []
-for so in sos:
-    polygon = Polygon(so, True, color='b')    
-    patchSo = ax.add_patch(polygon)
-    sosAx.append(patchSo)
-# dos
 dosAx = []
-for do in dos:
-    polygon = Polygon(do, True, color='y')
-    patchDo = ax.add_patch(polygon)
-    dosAx.append(patchDo)
-# lcp
-lcp = irispy.Polyhedron(a, b)
-lcpPoints = lcp.getDrawingVertices()
-lcpHull = scipy.spatial.ConvexHull(lcpPoints)
-polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
-lcpAx = ax.add_patch(polygon)
+gDirAx = None
+lcpAx = None
 
 f = open('./scenes.txt', 'r')
 
 DIM = 2
+count = 0
     
 def update(frame):
+    global count, DIM
     global uavs, dos, sos, uavsDir, gDir, a, b
+    global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
 
     # update data
     s = ''
@@ -172,6 +100,37 @@ def update(frame):
             break;
         else:
             s += line
+    
+    if(count==0):
+        # uavs
+        for pos in uavs:
+            circle = plt.Circle(pos, uavRadius, color='r')
+            uavAx = ax.add_artist(circle)
+            uavsAx.append(uavAx)
+        # uavsDir
+        for pos in uavsDir:
+            circle = plt.Circle(pos, uavsDirRadius, color='g')
+            uavDirAx = ax.add_artist(circle)
+            uavsDirAx.append(uavDirAx)
+        # gDir
+        circle = plt.Circle(gDir, gDirRadius, color='r')
+        gDirAx = ax.add_artist(circle)
+        # sos
+        for so in sos:
+            polygon = Polygon(so, True, color='b')    
+            patchSo = ax.add_patch(polygon)
+            sosAx.append(patchSo)
+        # dos
+        for do in dos:
+            polygon = Polygon(do, True, color='y')
+            patchDo = ax.add_patch(polygon)
+            dosAx.append(patchDo)
+        # lcp
+        lcp = irispy.Polyhedron(a, b)
+        lcpPoints = lcp.getDrawingVertices()
+        lcpHull = scipy.spatial.ConvexHull(lcpPoints)
+        polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
+        lcpAx = ax.add_patch(polygon)
 
     #dos
     for i, doAx in enumerate(dosAx):
@@ -190,9 +149,13 @@ def update(frame):
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
     lcpAx.set_xy(lcpPoints[lcpHull.vertices])
+    #gDirAx
+    gDirAx.center = gDir
 
+    count += 1
+    print(count)
     # Return the modified object
-    return dosAx, sosAx, uavsAx, uavsDirAx, lcpAx
+    return dosAx, sosAx, uavsAx, uavsDirAx, lcpAx, gDirAx
 
 import matplotlib.animation as animation
 animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frames=range(10))
