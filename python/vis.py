@@ -54,8 +54,10 @@ for pos in uavs:
     ax.add_artist(circle)
 
 gDirRadius = 0.2
+uavsDirAx = []
 for pos in uavsDir:
     circle = plt.Circle(pos, gDirRadius, color='g')
+    uavsDirAx.append(circle)
     ax.add_artist(circle)
 
 sos = np.array([
@@ -121,7 +123,17 @@ def update(frame):
             gDir[1] = gDirPb.y
 
             #a
+            aPb = scene.a
+            a = np.ones(aPb.row * aPb.col)
+            for i, dataPb in enumerate(aPb.data):
+                a[i] = dataPb
+            a.resize((aPb.row, aPb.col))
             #b
+            bPb = scene.b
+            b = np.ones(bPb.row)
+            for i, dataPb in enumerate(bPb.data):
+                b[i] = dataPb
+            b.resize((bPb.row, 1))
 
 
             do = scene.dos.do[0]
