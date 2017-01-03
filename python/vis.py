@@ -48,7 +48,7 @@ fd = open('./scenes.txt', 'r')
 
 DIM = 2
 
-def updateScene():
+def updateData():
     global fd
     global DIM
     global uavs, uavsDir, gDir, a, b, dos, sos
@@ -169,12 +169,11 @@ count = 0 # to specify intialization
 def update(frame):
     global count
     global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
-    updateScene()
+    updateData()
     if(count == 0):
         initVar()
     updateVar()
     count += 1
-    print(count)
     # Return the modified object
     return uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx 
 
@@ -185,5 +184,3 @@ animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frame
 plt.show()
 
 fd.close()
-
-print ('stopped')

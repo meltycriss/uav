@@ -81,7 +81,7 @@ FIND_LIBRARY(DRAKE_MATH_LIB drakeMath HINTS "../../lib/drake")
 #target_compile_features(Sphere PRIVATE cxx_range_for)
 
 #ADD_EXECUTABLE(Blocks ./Blocks.cpp)
-#FIND_LIBRARY(RVO2D_LIB RVO HINTS "../../lib/orca2d")
+FIND_LIBRARY(RVO2D_LIB RVO HINTS "../../lib/orca2d")
 #TARGET_LINK_LIBRARIES(Blocks ${RVO2D_LIB})
 #
 #target_compile_features(Blocks PRIVATE cxx_range_for)
