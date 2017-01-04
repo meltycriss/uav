@@ -29,7 +29,8 @@ scene::CurrCentroid *scnCurrCentroid;
 const float M_PI = 3.14159265358979323846f;
 #endif
 
-const double DELTA = 1.0;
+//determine reachedGoal
+const double DELTA = 0.1;
 
 //for display
 Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
@@ -41,13 +42,7 @@ void printScene(ostream &stm){
   string str;
   scn.SerializeToString(&str);
   stm << str << endl << "###" << endl;
-
-//  stm << "gDir: " << scn.gdir().x() << " " << scn.gdir().y() << endl;
-//  stm << "A: " << scn.a().row() << " " << scn.a().col() << endl;
-//  stm << "scnA: " << scnA.row() << " " << scnA.col() << endl;
-
 }
-
 
 Point traj1(Point p, double t){
   Point res = p;
@@ -88,39 +83,6 @@ int getFormationGoal(
   //----------------------------------------------------------------------------
   //  solving the problem under relative coordinates
   //----------------------------------------------------------------------------
-  
-//  cout << "gDir: " << endl << _gDir+currCentroid << endl;
-//  cout << "uavs: " << endl;
-//  for(int i=0; i<_uavs.size(); ++i){
-//    Polytope poly = _uavs[i];
-//    for(int j=0; j<poly.size(); ++j){
-//      cout << poly[j]+currCentroid << endl;
-//    }
-//  }
-//  cout << "uavShapes: " << endl;
-//  for(int i=0; i<_uavShapes.size(); ++i){
-//    Polytope poly = _uavShapes[i];
-//    for(int j=0; j<poly.size(); ++j){
-//      cout << poly[j] << endl;
-//    }
-//  }
-//  cout << "staticObstacles: " << endl;
-//  for(int i=0; i<_staticObstacles.size(); ++i){
-//    Polytope poly = _staticObstacles[i];
-//    for(int j=0; j<poly.size(); ++j){
-//      cout << poly[j]+currCentroid << endl;
-//    }
-//  }
-//  cout << "dynamicObstacles: " << endl;
-//  for(int i=0; i<_dynamicObstacles.size(); ++i){
-//    Polytope poly = _dynamicObstacles[i];
-//    for(int j=0; j<poly.size(); ++j){
-//      cout << poly[j] << endl;
-//    }
-//  }
-//  cout << "timeInterval: " << _timeInterval << endl;
-//  cout << "currTime: " << _currTime << endl;
-
 
   //get lcp
   LargestConvexPolytope lcp(
@@ -181,7 +143,7 @@ int getFormationGoal(
     cout << "b = " << lcpB.format(np_array) << endl;
     cout << "a = " << disp_A.format(np_array) << endl;
     cout << "b = " << disp_B.format(np_array) << endl; cout << "INFI = " << INFI << endl;
-    //
+
     cout << "-----------------------------------------------------------" << endl;
     cout << "gDir: " << endl << _gDir + currCentroid << endl;
 
@@ -309,6 +271,10 @@ bool reachedGoal(RVO::RVOSimulator *sim)
   return true;
 }
 
+bool reachedTime(RVO::RVOSimulator *sim){
+  return sim->getGlobalTime() >= 2.0;
+}
+
 void updateVisualization(RVO::RVOSimulator *sim)
 {
   /* Output the current global time. */
@@ -336,21 +302,21 @@ int main(){
   Point p;
 
   //gDir
+  vector<Point> path;
   Point gDir;
-  gDir << 14,10,0;
-  gDir << 3.5,10,0;
   gDir << 0,10,0;
+  path.push_back(gDir);
+  gDir << 7,10,0;
+  path.push_back(gDir);
+  gDir << 10,0,0;
+  path.push_back(gDir);
+  gDir = path[0];
 
   //uavs
   vector<Polytope> uavs;
   Polytope uav;
   //uav0
-  p << -2,2,0;
-  uav.clear();
-  uav.push_back(p);
-  uavs.push_back(uav);
-  //uav1
-  p << 2,2,0;
+  p << 0,2,0;
   uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
@@ -364,6 +330,27 @@ int main(){
   uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
+
+//  //uav0
+//  p << -2,2,0;
+//  uav.clear();
+//  uav.push_back(p);
+//  uavs.push_back(uav);
+//  //uav1
+//  p << 2,2,0;
+//  uav.clear();
+//  uav.push_back(p);
+//  uavs.push_back(uav);
+//  //uav2
+//  p << 2,-2,0;
+//  uav.clear();
+//  uav.push_back(p);
+//  uavs.push_back(uav);
+//  //uav3
+//  p << -2,-2,0;
+//  uav.clear();
+//  uav.push_back(p);
+//  uavs.push_back(uav);
 
   //uavShapes
   vector<Polytope> uavShapes;
@@ -381,14 +368,29 @@ int main(){
 
   //convex hull of formation
   Polytope convexHull;
-  p << -3,3,0;
+  p << -1,3,0;
   convexHull.push_back(p);
-  p << -3,-3,0;
+  p << 1,3,0;
+  convexHull.push_back(p);
+  p << 3,-1,0;
   convexHull.push_back(p);
   p << 3,-3,0;
   convexHull.push_back(p);
-  p << 3,3,0;
+  p << -3,-3,0;
   convexHull.push_back(p);
+  p << -3,-1,0;
+  convexHull.push_back(p);
+
+
+
+//  p << -3,3,0;
+//  convexHull.push_back(p);
+//  p << -3,-3,0;
+//  convexHull.push_back(p);
+//  p << 3,-3,0;
+//  convexHull.push_back(p);
+//  p << 3,3,0;
+//  convexHull.push_back(p);
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
@@ -449,7 +451,9 @@ int main(){
   int counter = 0;
 
   //looping
-  while(counter<2){
+  while(counter<3){
+    gDir = path[counter];
+
     //----------------------------------------------------------------------------
     //  translating absolute coordinates to relative coordinates
     //----------------------------------------------------------------------------
@@ -505,203 +509,212 @@ int main(){
       uavsDir[i] = formationGoal[assignedIdx];
     }
 
+    cout << "testing matching" << endl;
+    for(int i=0; i<uavs.size(); ++i){
+      cout << "uav pos" << endl;
+      cout << uavs[i][0] << endl;
+      cout << "assigned goal" << endl;
+      cout << uavsDir[i] << endl;
+    }
+
     //----------------------------------------------------------------------------
     //  navigate to goal with ORCA
     //----------------------------------------------------------------------------
 
+    int orcaCounter = 0;
+    while(orcaCounter<10){
 
-    //----------------------------------------------------------------------------
-    //  adapt to RVO data structure
-    //----------------------------------------------------------------------------
+      //----------------------------------------------------------------------------
+      //  adapt to RVO data structure
+      //----------------------------------------------------------------------------
 
-    //uavs
-    vector<RVO::Vector2> uavsRVO;
-    for(int i=0; i<uavs.size(); ++i){
-      Point uavCentroid = getCentroid(uavs[i]);
-      RVO::Vector2 uavRVO(uavCentroid(0), uavCentroid(1));
-      uavsRVO.push_back(uavRVO);
-    }
-    //uavsDir
-    vector<RVO::Vector2> goalsRVO;
-    for(int i=0; i<uavsDir.size(); ++i){
-      Point uavDir = uavsDir[i];
-      RVO::Vector2 goalRVO(uavDir(0), uavDir(1));
-      goalsRVO.push_back(goalRVO);
-    }
-    //obstacles
-    vector<vector<RVO::Vector2> > obstaclesRVO;
-    //so
-    for(int i=0; i<staticObstacles.size(); ++i){
-      Polytope obs = staticObstacles[i];
-      vector<RVO::Vector2> obsRVO;
-      for(int j=0; j<obs.size(); ++j){
-        Point p = obs[j];
-        RVO::Vector2 pRVO(p(0), p(1));
-        obsRVO.push_back(pRVO);
+      //uavs
+      vector<RVO::Vector2> uavsRVO;
+      for(int i=0; i<uavs.size(); ++i){
+        Point uavCentroid = getCentroid(uavs[i]);
+        RVO::Vector2 uavRVO(uavCentroid(0), uavCentroid(1));
+        uavsRVO.push_back(uavRVO);
       }
-      obstaclesRVO.push_back(obsRVO);
-    }
-    //do
-    for(int i=0; i<dynamicObstacles.size(); ++i){
-      Polytope obs = dynamicObstacles[i];
-      vector<RVO::Vector2> obsRVO;
-      for(int j=0; j<obs.size(); ++j){
-        Point p = obs[j];
-        p = dynamicObstaclesTrajectories[i](p, currTime+timeInterval) + currCentroid; //rela to abs
-        RVO::Vector2 pRVO(p(0), p(1));
-        obsRVO.push_back(pRVO);
+      //uavsDir
+      vector<RVO::Vector2> goalsRVO;
+      for(int i=0; i<uavsDir.size(); ++i){
+        Point uavDir = uavsDir[i];
+        RVO::Vector2 goalRVO(uavDir(0), uavDir(1));
+        goalsRVO.push_back(goalRVO);
       }
-      obstaclesRVO.push_back(obsRVO);
-    }
+      //obstacles
+      vector<vector<RVO::Vector2> > obstaclesRVO;
+      //so
+      for(int i=0; i<staticObstacles.size(); ++i){
+        Polytope obs = staticObstacles[i];
+        vector<RVO::Vector2> obsRVO;
+        for(int j=0; j<obs.size(); ++j){
+          Point p = obs[j];
+          RVO::Vector2 pRVO(p(0), p(1));
+          obsRVO.push_back(pRVO);
+        }
+        obstaclesRVO.push_back(obsRVO);
+      }
+      //do
+      for(int i=0; i<dynamicObstacles.size(); ++i){
+        Polytope obs = dynamicObstacles[i];
+        vector<RVO::Vector2> obsRVO;
+        for(int j=0; j<obs.size(); ++j){
+          Point p = obs[j];
+          p = dynamicObstaclesTrajectories[i](p, currTime+timeInterval) + currCentroid; //rela to abs
+          RVO::Vector2 pRVO(p(0), p(1));
+          obsRVO.push_back(pRVO);
+        }
+        obstaclesRVO.push_back(obsRVO);
+      }
 
-    //----------------------------------------------------------------------------
-    //  hyper-param for ORCA
-    //----------------------------------------------------------------------------
+      //----------------------------------------------------------------------------
+      //  hyper-param for ORCA
+      //----------------------------------------------------------------------------
 
-    double timeStep = 0.25;
-    double radiusRVO = getRadius(uavShapes[0]);
-    double neighborDistRVO = 5 * radiusRVO;
-    int maxNeighborsRVO = uavs.size();
-    double timeHorizonRVO = 5;
-    double timeHorizonObstRVO = 5;
-    double maxSpeedRVO = 2;
+      double timeStep = 0.25;
+      double radiusRVO = getRadius(uavShapes[0]);
+      double neighborDistRVO = 5 * radiusRVO;
+      int maxNeighborsRVO = uavs.size();
+      double timeHorizonRVO = 5;
+      double timeHorizonObstRVO = 5;
+      double maxSpeedRVO = 0.5;
 
-    //----------------------------------------------------------------------------
-    //  ORCA
-    //----------------------------------------------------------------------------
+      //----------------------------------------------------------------------------
+      //  ORCA
+      //----------------------------------------------------------------------------
 
-    /* Create a new simulator instance. */
-    RVO::RVOSimulator *sim = new RVO::RVOSimulator();
+      /* Create a new simulator instance. */
+      RVO::RVOSimulator *sim = new RVO::RVOSimulator();
 
-    // to do: set param
-    /* Set up the scenario. */
-    setupScenario(sim, timeStep, uavsRVO, goalsRVO, obstaclesRVO,
-        neighborDistRVO, maxNeighborsRVO, timeHorizonRVO,
-        timeHorizonObstRVO, radiusRVO, maxSpeedRVO);
+      // to do: set param
+      /* Set up the scenario. */
+      setupScenario(sim, timeStep, uavsRVO, goalsRVO, obstaclesRVO,
+          neighborDistRVO, maxNeighborsRVO, timeHorizonRVO,
+          timeHorizonObstRVO, radiusRVO, maxSpeedRVO);
 
-    //int count = 0;
-    /* Perform (and manipulate) the simulation. */
-    do {
-      // if(count%5==0){
-      //   updateVisualization(sim);
-      // }
-      setPreferredVelocities(sim);
-      sim->doStep();
-      //++count;
-    }
-    while (!reachedGoal(sim));
+      //int count = 0;
+      /* Perform (and manipulate) the simulation. */
+      do {
+        // if(count%5==0){
+        //   updateVisualization(sim);
+        // }
+        setPreferredVelocities(sim);
+        sim->doStep();
+        //++count;
+      }
+      while ((!reachedGoal(sim)) && (!reachedTime(sim)));
+//      while ((!reachedGoal(sim)));
 
+      //----------------------------------------------------------------------------
+      //  update scene::Scene scn for visualization
+      //----------------------------------------------------------------------------
 
-    //----------------------------------------------------------------------------
-    //  update scene::Scene scn for visualization
-    //----------------------------------------------------------------------------
+      //uavs
+      scnUavs = new scene::Uavs();
+      scene::Uav *scnUav;
+      for(int i=0; i<uavsRVO.size(); ++i){
+        scnUav = scnUavs->add_uav();
+        RVO::Vector2 pRVO = uavsRVO[i];
+        scnUav->set_x(pRVO.x());
+        scnUav->set_y(pRVO.y());
+      }
+      scn.set_allocated_uavs(scnUavs);
 
-    scnUavs = new scene::Uavs();
-    scene::Uav *scnUav;
-    for(int i=0; i<uavsRVO.size(); ++i){
-      scnUav = scnUavs->add_uav();
-      RVO::Vector2 pRVO = uavsRVO[i];
-      scnUav->set_x(pRVO.x());
-      scnUav->set_y(pRVO.y());
-    }
-    scn.set_allocated_uavs(scnUavs);
-
-    scnUavsDir = new scene::UavsDir();
-    scene::Point *scnPoint;
-    for(int i=0; i<goalsRVO.size(); ++i){
-      scnPoint = scnUavsDir->add_uavdir();
-      RVO::Vector2 pRVO = goalsRVO[i];
-      scnPoint->set_x(pRVO.x());
-      scnPoint->set_y(pRVO.y());
-    }
-    scn.set_allocated_uavsdir(scnUavsDir);
-
-    //order-sensitive
-    scnSos = new scene::StaticObstacles();
-    scene::Polytope *scnPoly;
-    for(int i=0; i<staticObstacles.size(); ++i){
-      vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
-      scnPoly = scnSos->add_so();
-      for(int j=0; j<polyRVO.size(); ++j){
-        RVO::Vector2 pRVO = polyRVO[j];
-        scnPoint = scnPoly->add_point();
+      //uavsDir
+      scnUavsDir = new scene::UavsDir();
+      scene::Point *scnPoint;
+      for(int i=0; i<goalsRVO.size(); ++i){
+        scnPoint = scnUavsDir->add_uavdir();
+        RVO::Vector2 pRVO = goalsRVO[i];
         scnPoint->set_x(pRVO.x());
         scnPoint->set_y(pRVO.y());
       }
-    }
-    scn.set_allocated_sos(scnSos);
+      scn.set_allocated_uavsdir(scnUavsDir);
 
-    scnDos = new scene::DynamicObstacles();
-    for(int i=staticObstacles.size(); i<obstaclesRVO.size(); ++i){
-      vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
-      scnPoly = scnDos->add_do_();
-      for(int j=0; j<polyRVO.size(); ++j){
-        RVO::Vector2 pRVO = polyRVO[j];
-        scnPoint = scnPoly->add_point();
-        scnPoint->set_x(pRVO.x());
-        scnPoint->set_y(pRVO.y());
+      //obstacles are order-sensitive
+      //sos
+      scnSos = new scene::StaticObstacles();
+      scene::Polytope *scnPoly;
+      for(int i=0; i<staticObstacles.size(); ++i){
+        vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
+        scnPoly = scnSos->add_so();
+        for(int j=0; j<polyRVO.size(); ++j){
+          RVO::Vector2 pRVO = polyRVO[j];
+          scnPoint = scnPoly->add_point();
+          scnPoint->set_x(pRVO.x());
+          scnPoint->set_y(pRVO.y());
+        }
       }
-    }
-    scn.set_allocated_dos(scnDos);
-
-    scnGDir = new scene::GDir();
-    scnGDir->set_x(gDir(0));
-    scnGDir->set_y(gDir(1));
-    scn.set_allocated_gdir(scnGDir);
-    //scnA and scnB are set in function
-    
-    cout << "-----------------------------------------------------------" << endl;
-    cout << "testing Protobuf" << endl;
-
-    printScene(fd);
-    printScene(cout);
-
-    scn.Clear();
-
-    //----------------------------------------------------------------------------
-    //  update pos info
-    //----------------------------------------------------------------------------
-
-    //update uav position
-    for(int i=0; i<uavsDir.size(); ++i){
-      RVO::Vector2 pRVO = sim->getAgentPosition(i);
-      Point p(pRVO.x(), pRVO.y(), 0);
-      uavs[i] = uavMoveTo(p, uavs[i]);
-    }
-
-    //update currCentroid
-    currCentroid = Point(0,0,0);
-    for(int i=0; i<uavs.size(); ++i){
-      currCentroid += getCentroid(uavs[i]);
-    }
-    currCentroid /= uavs.size();
-
-    //timer
-    currTime += sim->getGlobalTime();
-
-    cout << "-----------------------------------------------------------" << endl;
-    cout << "centroidAfter:" << endl;
-    cout << "goal" << endl << getCentroid(uavsDir) << endl;
-    cout << "actual" << endl << currCentroid << endl;
-    cout << "-----------------------------------------------------------" << endl;
-    for(int i=0; i<uavs.size(); ++i){
-      Polytope poly = uavs[i];
-      cout << "uavAfter" << i << endl;
-      cout << "goal" << endl;
-      cout << uavsDir[i] << endl;
-      cout << "actual" << endl;
-      for(int j=0; j<poly.size(); ++j){
-        cout << poly[j] << endl;
+      scn.set_allocated_sos(scnSos);
+      //dos
+      scnDos = new scene::DynamicObstacles();
+      for(int i=staticObstacles.size(); i<obstaclesRVO.size(); ++i){
+        vector<RVO::Vector2> polyRVO = obstaclesRVO[i];
+        scnPoly = scnDos->add_do_();
+        for(int j=0; j<polyRVO.size(); ++j){
+          RVO::Vector2 pRVO = polyRVO[j];
+          scnPoint = scnPoly->add_point();
+          scnPoint->set_x(pRVO.x());
+          scnPoint->set_y(pRVO.y());
+        }
       }
+      scn.set_allocated_dos(scnDos);
+      //gDir
+      scnGDir = new scene::GDir();
+      scnGDir->set_x(gDir(0));
+      scnGDir->set_y(gDir(1));
+      scn.set_allocated_gdir(scnGDir);
+      //lcpRelated(scnA, scnB, currCentroid) are set in function
+
+      printScene(fd);
+
+      //scn.Clear();
+
+      //----------------------------------------------------------------------------
+      //  update pos info
+      //----------------------------------------------------------------------------
+
+      //update uav position
+      for(int i=0; i<uavsDir.size(); ++i){
+        RVO::Vector2 pRVO = sim->getAgentPosition(i);
+        Point p(pRVO.x(), pRVO.y(), 0);
+        uavs[i] = uavMoveTo(p, uavs[i]);
+      }
+
+      //update currCentroid
+      currCentroid = Point(0,0,0);
+      for(int i=0; i<uavs.size(); ++i){
+        currCentroid += getCentroid(uavs[i]);
+      }
+      currCentroid /= uavs.size();
+
+      //timer
+      currTime += sim->getGlobalTime();
+
+      cout << "-----------------------------------------------------------" << endl;
+      cout << "centroidAfter:" << endl;
+      cout << "goal" << endl << getCentroid(uavsDir) << endl;
+      cout << "actual" << endl << currCentroid << endl;
+      cout << "-----------------------------------------------------------" << endl;
+      for(int i=0; i<uavs.size(); ++i){
+        Polytope poly = uavs[i];
+        cout << "uavAfter" << i << endl;
+        cout << "goal" << endl;
+        cout << uavsDir[i] << endl;
+        cout << "actual" << endl;
+        for(int j=0; j<poly.size(); ++j){
+          cout << poly[j] << endl;
+        }
+      }
+
+      //delete simulator instance
+      delete sim;
+
+
+      ++orcaCounter;
     }
 
-
-
-    //delete simulator instance
-    delete sim;
-
-    //update gDir
-    gDir << 3,10,0;
 
     ++counter;
   }
