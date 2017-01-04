@@ -260,6 +260,8 @@ namespace uav{
     int rows = cost.rows();
     int cols = cost.cols();
 
+    cout << cost << endl;
+
     //res[i]=j indicate row i is assigned to col j
     vector<int> res(rows, -1);
     //number of assigend rows
@@ -277,6 +279,7 @@ namespace uav{
       double minEle = cost(minEleIdx, i);
       cost.col(i) = vecAdd(cost.col(i), -minEle);
     }
+    cout << cost << endl;
     while(true){
       res = vector<int>(rows, -1);
       numAssigned = 0;

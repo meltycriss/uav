@@ -331,26 +331,26 @@ int main(){
   uav.push_back(p);
   uavs.push_back(uav);
 
-//  //uav0
-//  p << -2,2,0;
-//  uav.clear();
-//  uav.push_back(p);
-//  uavs.push_back(uav);
-//  //uav1
-//  p << 2,2,0;
-//  uav.clear();
-//  uav.push_back(p);
-//  uavs.push_back(uav);
-//  //uav2
-//  p << 2,-2,0;
-//  uav.clear();
-//  uav.push_back(p);
-//  uavs.push_back(uav);
-//  //uav3
-//  p << -2,-2,0;
-//  uav.clear();
-//  uav.push_back(p);
-//  uavs.push_back(uav);
+  //  //uav0
+  //  p << -2,2,0;
+  //  uav.clear();
+  //  uav.push_back(p);
+  //  uavs.push_back(uav);
+  //  //uav1
+  //  p << 2,2,0;
+  //  uav.clear();
+  //  uav.push_back(p);
+  //  uavs.push_back(uav);
+  //  //uav2
+  //  p << 2,-2,0;
+  //  uav.clear();
+  //  uav.push_back(p);
+  //  uavs.push_back(uav);
+  //  //uav3
+  //  p << -2,-2,0;
+  //  uav.clear();
+  //  uav.push_back(p);
+  //  uavs.push_back(uav);
 
   //uavShapes
   vector<Polytope> uavShapes;
@@ -383,14 +383,14 @@ int main(){
 
 
 
-//  p << -3,3,0;
-//  convexHull.push_back(p);
-//  p << -3,-3,0;
-//  convexHull.push_back(p);
-//  p << 3,-3,0;
-//  convexHull.push_back(p);
-//  p << 3,3,0;
-//  convexHull.push_back(p);
+  //  p << -3,3,0;
+  //  convexHull.push_back(p);
+  //  p << -3,-3,0;
+  //  convexHull.push_back(p);
+  //  p << 3,-3,0;
+  //  convexHull.push_back(p);
+  //  p << 3,3,0;
+  //  convexHull.push_back(p);
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
@@ -449,10 +449,11 @@ int main(){
   vector<Point> uavsDir(uavs.size());
 
   int counter = 0;
+  int currDirIdx = 0;
 
   //looping
-  while(counter<3){
-    gDir = path[counter];
+  while(counter<10){
+    gDir = path[currDirIdx];
 
     //----------------------------------------------------------------------------
     //  translating absolute coordinates to relative coordinates
@@ -495,27 +496,44 @@ int main(){
 
     //formation goal in absolute coordinates
     vector<Point> formationGoal = relaToAbs(formationGoalRela, currCentroid);
+    //default assignment
+    vector<int> vecAssign;
+    for(int i=0; i<uavsDir.size(); ++i){
+      vecAssign.push_back(i);
+    }
 
-    //----------------------------------------------------------------------------
-    //  matching and assigning
-    //----------------------------------------------------------------------------
+    //formation navigation
+    if(formationIdx >= 0){
 
-    //matching with respect to distance
-    Eigen::MatrixXd matCost = getDisMat(uavs, formationGoal);
-    vector<int> vecAssign = hungarian(matCost);
+      //----------------------------------------------------------------------------
+      //  matching and assigning
+      //----------------------------------------------------------------------------
+
+      cout << "testing matching" << endl;
+      for(int i=0; i<uavs.size(); ++i){
+        cout << "uav pos" << endl;
+        cout << uavs[i][0] << endl;
+        cout << "formation goal" << endl;
+        cout << formationGoal[i] << endl;
+      }
+
+      if(counter!=0){
+        printScene(fd);
+      }
+
+      //matching with respect to distance
+      Eigen::MatrixXd matCost = getDisMat(uavs, formationGoal);
+      vecAssign = hungarian(matCost);
+      cout << "testing" << endl;
+
+    }
+
     //assign goal for each uav (formation)
     for(int i=0; i<vecAssign.size(); ++i){
       int assignedIdx = vecAssign[i];
       uavsDir[i] = formationGoal[assignedIdx];
     }
 
-    cout << "testing matching" << endl;
-    for(int i=0; i<uavs.size(); ++i){
-      cout << "uav pos" << endl;
-      cout << uavs[i][0] << endl;
-      cout << "assigned goal" << endl;
-      cout << uavsDir[i] << endl;
-    }
 
     //----------------------------------------------------------------------------
     //  navigate to goal with ORCA
@@ -604,7 +622,7 @@ int main(){
         //++count;
       }
       while ((!reachedGoal(sim)) && (!reachedTime(sim)));
-//      while ((!reachedGoal(sim)));
+      //      while ((!reachedGoal(sim)));
 
       //----------------------------------------------------------------------------
       //  update scene::Scene scn for visualization
@@ -717,6 +735,12 @@ int main(){
 
 
     ++counter;
+    double disCentroid = (currCentroid - gDir).transpose() * (currCentroid - gDir);
+    disCentroid = sqrt(disCentroid);
+    if(disCentroid < DELTA*10){
+      ++currDirIdx;
+    }
+
   }
 
   fd.close();
