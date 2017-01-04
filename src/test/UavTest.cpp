@@ -23,6 +23,7 @@ scene::DynamicObstacles *scnDos;
 scene::GDir *scnGDir;
 scene::A *scnA;
 scene::B *scnB;
+scene::CurrCentroid *scnCurrCentroid;
 
 #ifndef M_PI
 const float M_PI = 3.14159265358979323846f;
@@ -87,6 +88,39 @@ int getFormationGoal(
   //----------------------------------------------------------------------------
   //  solving the problem under relative coordinates
   //----------------------------------------------------------------------------
+  
+//  cout << "gDir: " << endl << _gDir+currCentroid << endl;
+//  cout << "uavs: " << endl;
+//  for(int i=0; i<_uavs.size(); ++i){
+//    Polytope poly = _uavs[i];
+//    for(int j=0; j<poly.size(); ++j){
+//      cout << poly[j]+currCentroid << endl;
+//    }
+//  }
+//  cout << "uavShapes: " << endl;
+//  for(int i=0; i<_uavShapes.size(); ++i){
+//    Polytope poly = _uavShapes[i];
+//    for(int j=0; j<poly.size(); ++j){
+//      cout << poly[j] << endl;
+//    }
+//  }
+//  cout << "staticObstacles: " << endl;
+//  for(int i=0; i<_staticObstacles.size(); ++i){
+//    Polytope poly = _staticObstacles[i];
+//    for(int j=0; j<poly.size(); ++j){
+//      cout << poly[j]+currCentroid << endl;
+//    }
+//  }
+//  cout << "dynamicObstacles: " << endl;
+//  for(int i=0; i<_dynamicObstacles.size(); ++i){
+//    Polytope poly = _dynamicObstacles[i];
+//    for(int j=0; j<poly.size(); ++j){
+//      cout << poly[j] << endl;
+//    }
+//  }
+//  cout << "timeInterval: " << _timeInterval << endl;
+//  cout << "currTime: " << _currTime << endl;
+
 
   //get lcp
   LargestConvexPolytope lcp(
@@ -118,6 +152,7 @@ int getFormationGoal(
     reducePolyDim(disp_A, disp_B, 2, _timeInterval);
 
     //for visualize
+    //a
     scnA = new scene::A();
     scnA->set_row(disp_A.rows());
     scnA->set_col(disp_A.cols());
@@ -128,12 +163,19 @@ int getFormationGoal(
     }
     scn.set_allocated_a(scnA);
 
+    //b
     scnB = new scene::B();
     scnB->set_row(disp_B.rows());
     for(int i=0; i<disp_B.rows(); ++i){
       scnB->add_data(disp_B(i));
     }
     scn.set_allocated_b(scnB);
+
+    //currCentroid
+    scnCurrCentroid = new scene::CurrCentroid();
+    scnCurrCentroid->set_x(currCentroid(0));
+    scnCurrCentroid->set_y(currCentroid(1));
+    scn.set_allocated_currcentroid(scnCurrCentroid);
 
     cout << "a = " << lcpA.format(np_array) << endl;
     cout << "b = " << lcpB.format(np_array) << endl;
@@ -553,9 +595,6 @@ int main(){
     //----------------------------------------------------------------------------
     //  update scene::Scene scn for visualization
     //----------------------------------------------------------------------------
-    //
-    //
-    //
 
     scnUavs = new scene::Uavs();
     scene::Uav *scnUav;
