@@ -35,6 +35,7 @@ a = None
 b = None
 dos = None
 sos = None
+currCentroid = None
 
 # Ax Var
 uavsAx = []
@@ -51,7 +52,7 @@ DIM = 2
 def updateData():
     global fd
     global DIM
-    global uavs, uavsDir, gDir, a, b, dos, sos
+    global uavs, uavsDir, gDir, a, b, dos, sos, currCentroid
     # update data
     s = ''
     for line in fd:
@@ -106,6 +107,11 @@ def updateData():
                     do_temp[i, 0] = pPb.x
                     do_temp[i, 1] = pPb.y
                 dos.append(do_temp)
+            #currCentroid
+            currCentroidPb = scene.currCentroid
+            currCentroid = np.ones(DIM)
+            currCentroid[0] = currCentroidPb.x
+            currCentroid[1] = currCentroidPb.y
             break;
         else:
             s += line
@@ -157,7 +163,7 @@ def updateVar():
     lcp = irispy.Polyhedron(a, b)
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
-    lcpAx.set_xy(lcpPoints[lcpHull.vertices])
+    lcpAx.set_xy(lcpPoints[lcpHull.vertices] + currCentroid)
     #dos
     for i, doAx in enumerate(dosAx):
         doAx.set_xy(dos[i])
