@@ -453,6 +453,8 @@ int main(){
 
   //looping
   while(counter<10){
+
+
     gDir = path[currDirIdx];
 
     //----------------------------------------------------------------------------
@@ -489,6 +491,7 @@ int main(){
         wS,
         wQ
         );
+
 
     //----------------------------------------------------------------------------
     //  translating relative coordinates to absolute coordinates

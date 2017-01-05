@@ -52,7 +52,7 @@ namespace uav{
 
   // return true if valid convex polytope, false otherwise
   // region of directed largest convex region in free space is return through param
-  bool LargestConvexPolytope::directedLargestConvexRegionInFreeSpace(iris::IRISRegion &_region, const vector<Point4d> &in, const vector<Polytope4d> &obstacles) const {
+  bool LargestConvexPolytope::directedLargestConvexRegionInFreeSpace(iris::IRISRegion &_region, const vector<Point4d> &in, const Point4d &dir, const vector<Polytope4d> &obstacles) const {
 
     // format the output so as to visualize in jupyter conveniently
     Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
@@ -121,37 +121,67 @@ namespace uav{
       << bound.getB().format(np_array) << endl;
 #endif
 
-    // option require_containment
-    iris::IRISOptions options;
-    if(in.size()>0) {
-      options.require_containment = true;
-      vector<Point4d> requiredPoints = in;
-      vector<Eigen::VectorXd> requiredPointsVxd;
-      for(int i=0; i<requiredPoints.size(); ++i){
-        Eigen::VectorXd v(4);
-        v = requiredPoints[i];
-        requiredPointsVxd.push_back(v);
+    //centroid
+    Eigen::Vector4d centroidOfIn;
+    if(in.size()>0){
+      for(int i=0; i<in.size(); ++i){
+        centroidOfIn += in[i];
       }
-      options.set_required_containment_points(requiredPointsVxd);
-#ifdef DEBUG
-      cout << "requiredPoints:" << endl;
-      for(int i=0; i<requiredPointsVxd.size(); ++i){
-        cout << requiredPointsVxd[i] << endl;
-      }
-#endif
+      centroidOfIn /= in.size();
     }
 
-    // solve
-    iris::IRISRegion region;
-    try{
-      region = inflate_region(problem, options);
-      //stop at the begining due to containment requirement
-      if(region.polyhedron.getA().rows()==0) return false;
+    vector<Eigen::Vector4d> interpolateDirs;
+    int interpolateSize = 5; // number of points inserted
+    for(int i=interpolateSize; i>=0; --i){
+      Eigen::Vector4d itpDir = centroidOfIn + i / interpolateSize * (dir - centroidOfIn);
+      interpolateDirs.push_back(itpDir);
     }
-    catch(iris_mosek::InnerEllipsoidInfeasibleError e){
-      //no feasible solution
-      return false;
+
+    bool isFeasible = false;
+    for(int i=0; !isFeasible && i<interpolateDirs.size(); ++i){
+
+
+      // option require_containment
+      iris::IRISOptions options;
+      if(in.size()>0) {
+        options.require_containment = true;
+        vector<Point4d> requiredPoints = in;
+        Point4d currDir = interpolateDirs[i];
+        requiredPoints.push_back(currDir);
+        vector<Eigen::VectorXd> requiredPointsVxd;
+        for(int i=0; i<requiredPoints.size(); ++i){
+          Eigen::VectorXd v(4);
+          v = requiredPoints[i];
+          requiredPointsVxd.push_back(v);
+        }
+        options.set_required_containment_points(requiredPointsVxd);
+#ifdef DEBUG
+        cout << "requiredPoints:" << endl;
+        for(int i=0; i<requiredPointsVxd.size(); ++i){
+          cout << requiredPointsVxd[i] << endl;
+        }
+#endif
+      }
+
+      // solve
+      iris::IRISRegion region;
+      try{
+        region = inflate_region(problem, options);
+        //stop at the begining due to containment requirement
+        if(region.polyhedron.getA().rows()!=0){
+          isFeasible = true;
+          _region = region;
+        }
+      }
+      catch(iris_mosek::InnerEllipsoidInfeasibleError e){
+        //no feasible solution
+      }
+
+
     }
+
+
+
 #ifdef DEBUG
     std::cout << "a = " << region.polyhedron.getA().format(np_array) << std::endl;
     std::cout << "b = " << region.polyhedron.getB().format(np_array) << std::endl;
@@ -166,8 +196,7 @@ namespace uav{
       << "is in polyhedron: " << region.polyhedron.contains(vxd, 0 ) << endl;
 #endif
 
-    _region = region;
-    return true;
+    return isFeasible;
   }
 
   // return true if valid convex polytope, false otherwise
@@ -194,8 +223,9 @@ namespace uav{
     }
     //[gDir, TimeInterval]
     coor4d << gDir_, timeInterval_;
-    in.push_back(coor4d);
-    isValid_fo_g = directedLargestConvexRegionInFreeSpace(region_fo_g, in, obstacleBar);
+    //in.push_back(coor4d);
+    isValid_fo_g = directedLargestConvexRegionInFreeSpace(region_fo_g, in, coor4d, obstacleBar);
+
 
     //P_{o->g}
     in.clear();
@@ -214,8 +244,8 @@ namespace uav{
     in.push_back(coor4d);
     //[gDir, TimeInterval]
     coor4d << gDir_, timeInterval_;
-    in.push_back(coor4d);
-    isValid_o_g = directedLargestConvexRegionInFreeSpace(region_o_g, in, obstacleBar);
+    //in.push_back(coor4d);
+    isValid_o_g = directedLargestConvexRegionInFreeSpace(region_o_g, in, coor4d, obstacleBar);
 
     //satisfy both i and ii
     if(isValid_fo_g && isValid_o_g){

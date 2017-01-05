@@ -113,7 +113,7 @@ namespace uav{
 
       //return true if valid convex polytope, false otherwise
       //region of directed largest convex region in free space is return through param
-      bool directedLargestConvexRegionInFreeSpace(iris::IRISRegion &region, const std::vector<Point4d> &in, const std::vector<Polytope4d> &obstacles) const;
+      bool directedLargestConvexRegionInFreeSpace(iris::IRISRegion &region, const std::vector<Point4d> &in, const Point4d &dir, const std::vector<Polytope4d> &obstacles) const;
 
   };
 

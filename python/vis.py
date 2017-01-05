@@ -132,7 +132,8 @@ def initVar():
     circle = plt.Circle(gDir, gDirRadius, color='r')
     gDirAx = ax.add_artist(circle)
     # lcp
-    lcp = irispy.Polyhedron(a, b)
+    #lcp = irispy.Polyhedron(a, b)
+    lcp = irispy.Polyhedron(a.astype(np.float32).astype(np.float64), b.astype(np.float32).astype(np.float64))
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
     polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
@@ -160,7 +161,8 @@ def updateVar():
     #gDirAx
     gDirAx.center = gDir
     #lcp
-    lcp = irispy.Polyhedron(a, b)
+    #lcp = irispy.Polyhedron(a, b)
+    lcp = irispy.Polyhedron(a.astype(np.float32).astype(np.float64), b.astype(np.float32).astype(np.float64))
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
     lcpAx.set_xy(lcpPoints[lcpHull.vertices] + currCentroid)
