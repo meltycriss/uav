@@ -400,9 +400,9 @@ int main(){
   vector<Polytope> staticObstacles;
   Polytope staticObstacle;
   //so0
-  p << 3,10,0;
+  p << 5,10,0;
   staticObstacle.push_back(p);
-  p << 3,4,0;
+  p << 5,4,0;
   staticObstacle.push_back(p);
   p << 6,4,0;
   staticObstacle.push_back(p);
@@ -425,8 +425,8 @@ int main(){
   p << 11,10,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
-//  dynamicObstacles.push_back(dynamicObstacle);
-//  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  //  dynamicObstacles.push_back(dynamicObstacle);
+  //  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
   double timeInterval = 1;
@@ -448,9 +448,10 @@ int main(){
 
   int counter = 0;
   int currDirIdx = 0;
+  int currDirCount = 0;
 
   //looping
-  while(counter<10){
+  while(counter<5){
 
 
     gDir = path[currDirIdx];
@@ -510,9 +511,9 @@ int main(){
       //  matching and assigning
       //----------------------------------------------------------------------------
 
-//      if(counter!=0){
-//        printScene(fd);
-//      }
+      //      if(counter!=0){
+      //        printScene(fd);
+      //      }
 
       //matching with respect to distance
       Eigen::MatrixXd matCost = getDisMat(uavs, formationGoal);
@@ -720,16 +721,22 @@ int main(){
       //delete simulator instance
       delete sim;
 
-
       ++orcaCounter;
     }
 
     cout << "currDir: " << endl << path[currDirIdx] << endl;
+    cout << "count: " << counter << endl;
 
     ++counter;
+
+    ++currDirCount;
     double disCentroid = (currCentroid - gDir).transpose() * (currCentroid - gDir);
     disCentroid = sqrt(disCentroid);
-    if(disCentroid < DELTA*10){
+//    if(disCentroid < DELTA*10){
+//      ++currDirIdx;
+//    }
+    if(currDirCount>10 || disCentroid < DELTA*10){
+      currDirCount = 0;
       ++currDirIdx;
     }
 

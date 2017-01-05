@@ -130,10 +130,13 @@ namespace uav{
       centroidOfIn /= in.size();
     }
 
-    vector<Eigen::Vector4d> interpolateDirs;
+    vector<Point4d> interpolateDirs;
     int interpolateSize = 5; // number of points inserted
     for(int i=interpolateSize; i>=0; --i){
-      Eigen::Vector4d itpDir = centroidOfIn + i / interpolateSize * (dir - centroidOfIn);
+      // cast int to double to avoid precision problem
+      Point4d itpDir = centroidOfIn + double(i) / double(interpolateSize) * (dir - centroidOfIn);
+      // note that the 4th dim should not be averaged
+      itpDir(3) = dir(3);
       interpolateDirs.push_back(itpDir);
     }
 
@@ -146,6 +149,9 @@ namespace uav{
         options.require_containment = true;
         vector<Point4d> requiredPoints = in;
         Point4d currDir = interpolateDirs[i];
+
+
+
         requiredPoints.push_back(currDir);
         vector<Eigen::VectorXd> requiredPointsVxd;
         for(int i=0; i<requiredPoints.size(); ++i){
