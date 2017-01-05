@@ -381,8 +381,6 @@ int main(){
   p << -3,-1,0;
   convexHull.push_back(p);
 
-
-
   //  p << -3,3,0;
   //  convexHull.push_back(p);
   //  p << -3,-3,0;
@@ -402,13 +400,13 @@ int main(){
   vector<Polytope> staticObstacles;
   Polytope staticObstacle;
   //so0
-  p << 5,4,0;
+  p << 3,10,0;
   staticObstacle.push_back(p);
-  p << 5,1,0;
+  p << 3,4,0;
   staticObstacle.push_back(p);
-  p << 8,1,0;
+  p << 6,4,0;
   staticObstacle.push_back(p);
-  p << 8,4,0;
+  p << 6,10,0;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 
@@ -427,8 +425,8 @@ int main(){
   p << 11,10,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
-  dynamicObstacles.push_back(dynamicObstacle);
-  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+//  dynamicObstacles.push_back(dynamicObstacle);
+//  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
   double timeInterval = 1;
@@ -512,23 +510,13 @@ int main(){
       //  matching and assigning
       //----------------------------------------------------------------------------
 
-      cout << "testing matching" << endl;
-      for(int i=0; i<uavs.size(); ++i){
-        cout << "uav pos" << endl;
-        cout << uavs[i][0] << endl;
-        cout << "formation goal" << endl;
-        cout << formationGoal[i] << endl;
-      }
-
-      if(counter!=0){
-        printScene(fd);
-      }
+//      if(counter!=0){
+//        printScene(fd);
+//      }
 
       //matching with respect to distance
       Eigen::MatrixXd matCost = getDisMat(uavs, formationGoal);
       vecAssign = hungarian(matCost);
-      cout << "testing" << endl;
-
     }
 
     //assign goal for each uav (formation)
@@ -736,6 +724,7 @@ int main(){
       ++orcaCounter;
     }
 
+    cout << "currDir: " << endl << path[currDirIdx] << endl;
 
     ++counter;
     double disCentroid = (currCentroid - gDir).transpose() * (currCentroid - gDir);

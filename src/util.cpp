@@ -260,8 +260,6 @@ namespace uav{
     int rows = cost.rows();
     int cols = cost.cols();
 
-    cout << cost << endl;
-
     //res[i]=j indicate row i is assigned to col j
     vector<int> res(rows, -1);
     //number of assigend rows

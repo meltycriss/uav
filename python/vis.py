@@ -89,6 +89,15 @@ def updateData():
             for i, dataPb in enumerate(bPb.data):
                 b[i] = dataPb
             b.resize((bPb.row, 1))
+            #if top is equal with bottom, only leave one 
+            ab = np.hstack((a,b))
+            abTop = np.split(ab,2)[0]
+            abBot = np.split(ab,2)[1]
+            if (np.allclose(abTop,abBot)):
+                ab = abTop
+                ab = np.hsplit(ab, np.array([2]))
+                a = ab[0]
+                b = ab[1]
             #sos
             sosPb = scene.sos.so
             sos = []
@@ -132,8 +141,9 @@ def initVar():
     circle = plt.Circle(gDir, gDirRadius, color='r')
     gDirAx = ax.add_artist(circle)
     # lcp
-    #lcp = irispy.Polyhedron(a, b)
-    lcp = irispy.Polyhedron(a.astype(np.float32).astype(np.float64), b.astype(np.float32).astype(np.float64))
+    lcp = irispy.Polyhedron(a, b)
+    #lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64), b.astype(np.float16).astype(np.float64))
+    #lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
     polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
@@ -161,8 +171,11 @@ def updateVar():
     #gDirAx
     gDirAx.center = gDir
     #lcp
-    #lcp = irispy.Polyhedron(a, b)
-    lcp = irispy.Polyhedron(a.astype(np.float32).astype(np.float64), b.astype(np.float32).astype(np.float64))
+    lcp = irispy.Polyhedron(a, b)
+    #lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64), b.astype(np.float16).astype(np.float64))
+    #lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
+    print (lcp.getA())
+    print (lcp.getB())
     lcpPoints = lcp.getDrawingVertices()
     lcpHull = scipy.spatial.ConvexHull(lcpPoints)
     lcpAx.set_xy(lcpPoints[lcpHull.vertices] + currCentroid)
@@ -182,13 +195,67 @@ def update(frame):
         initVar()
     updateVar()
     count += 1
+    print(count)
     # Return the modified object
     return uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx 
 
-animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frames=range(10), repeat=False)
+animation = animation.FuncAnimation(fig, update, interval=500, blit=False, frames=range(1000), repeat=False)
 # animation.save('rain.gif', writer='imagemagick', fps=30, dpi=40)
     
 # Show result on screen
 plt.show()
+
+
+ta = np.array([[  1.00000000e+00  , 3.27211433e-06], 
+ [  1.00000000e+00  , 0.00000000e+00],
+ [  0.00000000e+00  , 1.00000000e+00],
+ [ -1.00000000e+00  ,-0.00000000e+00],
+ [ -0.00000000e+00  ,-1.00000000e+00],
+ [  1.00000000e+00  , 3.27211433e-06],
+ [  1.00000000e+00  , 0.00000000e+00],
+ [  0.00000000e+00  , 1.00000000e+00],
+ [ -1.00000000e+00  ,-0.00000000e+00],
+ [ -0.00000000e+00  ,-1.00000000e+00]])
+tb = np.array([[  3.03131710e+00], 
+ [  1.00000000e+04],
+ [  1.00000000e+04],
+ [  1.00000000e+04],
+ [  1.00000000e+04],
+ [  3.03131710e+00],
+ [  1.00000000e+04],
+ [  1.00000000e+04],
+ [  1.00000000e+04],
+ [  1.00000000e+04]])
+
+for i in range(21):
+    updateData()
+    if(i == 0):
+        initVar()
+    if(i == 20):
+#        print(a.shape)
+#        print(a[:a.shape[0]/2,:])
+       # print(b)
+#        lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64)[:a.shape[0]/2,:], b.astype(np.float16).astype(np.float64)[:b.shape[0]/2,:])
+#        lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
+        print(a)
+        print(b)
+        ab = np.hstack((a,b))
+        abTop = np.split(ab,2)[0]
+        abBot = np.split(ab,2)[1]
+        print(abTop)
+        print(abBot)
+        print(np.allclose(abTop,abBot))
+        if (np.allclose(abTop,abBot)):
+            ab = abTop
+            ab = np.hsplit(ab, np.array([2]))
+            a = ab[0]
+            b = ab[1]
+
+            print(a)
+            print(b)
+        
+        #lcp = irispy.Polyhedron(a, b)
+        #print(lcp.getDrawingVertices())
+
 
 fd.close()

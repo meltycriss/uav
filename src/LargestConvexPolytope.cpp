@@ -140,7 +140,6 @@ namespace uav{
     bool isFeasible = false;
     for(int i=0; !isFeasible && i<interpolateDirs.size(); ++i){
 
-
       // option require_containment
       iris::IRISOptions options;
       if(in.size()>0) {
