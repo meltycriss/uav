@@ -400,13 +400,26 @@ int main(){
   vector<Polytope> staticObstacles;
   Polytope staticObstacle;
   //so0
-  p << 5,10,0;
+  staticObstacle.clear();
+  p << 3,10,0;
   staticObstacle.push_back(p);
-  p << 5,4,0;
+  p << 3,4,0;
   staticObstacle.push_back(p);
   p << 6,4,0;
   staticObstacle.push_back(p);
   p << 6,10,0;
+  staticObstacle.push_back(p);
+  staticObstacles.push_back(staticObstacle);
+
+  //so0
+  staticObstacle.clear();
+  p << -6,10,0;
+  staticObstacle.push_back(p);
+  p << -6,4,0;
+  staticObstacle.push_back(p);
+  p << -3,4,0;
+  staticObstacle.push_back(p);
+  p << -3,10,0;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 

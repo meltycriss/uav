@@ -90,14 +90,15 @@ def updateData():
                 b[i] = dataPb
             b.resize((bPb.row, 1))
             #if top is equal with bottom, only leave one 
-            ab = np.hstack((a,b))
-            abTop = np.split(ab,2)[0]
-            abBot = np.split(ab,2)[1]
-            if (np.allclose(abTop,abBot)):
-                ab = abTop
-                ab = np.hsplit(ab, np.array([2]))
-                a = ab[0]
-                b = ab[1]
+            if(a.shape[0]%2==0):
+                ab = np.hstack((a,b))
+                abTop = np.split(ab,2)[0]
+                abBot = np.split(ab,2)[1]
+                if (np.allclose(abTop,abBot)):
+                    ab = abTop
+                    ab = np.hsplit(ab, np.array([2]))
+                    a = ab[0]
+                    b = ab[1]
             #sos
             sosPb = scene.sos.so
             sos = []
@@ -237,12 +238,17 @@ for i in range(21):
        # print(b)
 #        lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64)[:a.shape[0]/2,:], b.astype(np.float16).astype(np.float64)[:b.shape[0]/2,:])
 #        lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
-        print(a)
-        print(b)
+        #print(a)
+        #print(b)
         ab = np.hstack((a,b))
         abTop = np.split(ab,2)[0]
         abBot = np.split(ab,2)[1]
+        print('------')
         print(abTop)
+        print('------')
+        print(abBot)
+        #abBot[0,0] = 100
+        print('------')
         print(abBot)
         print(np.allclose(abTop,abBot))
         if (np.allclose(abTop,abBot)):
@@ -251,8 +257,10 @@ for i in range(21):
             a = ab[0]
             b = ab[1]
 
-            print(a)
-            print(b)
+        print('------')
+        print(a)
+        print('------')
+        print(b)
         
         #lcp = irispy.Polyhedron(a, b)
         #print(lcp.getDrawingVertices())

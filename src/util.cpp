@@ -281,6 +281,7 @@ namespace uav{
       res = vector<int>(rows, -1);
       numAssigned = 0;
       set<int> deletedRows, deletedCols;
+      //allow multi-scanning to cross all zeros
       bool deletedChanged = true;
       while(deletedChanged){
         deletedChanged = false;
