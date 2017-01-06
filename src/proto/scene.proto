@@ -60,4 +60,5 @@ message Scene{
   required A a = 6;
   required B b = 7;
   required CurrCentroid currCentroid = 8;
+  required int32 formation = 9;
 }

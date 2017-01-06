@@ -379,9 +379,11 @@ namespace uav{
     for(int i=0; i<formations_.size(); ++i){
       Vector8d currParam;
       double currLoss = optimalDeviation(formations_[i], currParam);
+
       if(currLoss < minLoss){
         res = i;
         param = currParam;
+        minLoss = currLoss;
       }
     }
     return res;

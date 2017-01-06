@@ -164,6 +164,8 @@ int getFormationGoal(
     Vector8d optimalParam;
     int index = of.optimalFormation(optimalParam);
 
+    cout << "testing optimal formation " << index << endl;
+
 
     vector<Polytope> formationUavs = tsqTransPolyVec(_formations[index].uavs, optimalParam);
 
@@ -304,6 +306,8 @@ int main(){
   //gDir
   vector<Point> path;
   Point gDir;
+  gDir << 0,4,0;
+  path.push_back(gDir);
   gDir << 0,10,0;
   path.push_back(gDir);
   gDir << 7,10,0;
@@ -331,8 +335,11 @@ int main(){
   uav.push_back(p);
   uavs.push_back(uav);
 
+  //formation0
   vector<Polytope> templateUavs;
   Polytope templateUav;
+  //templateUavs
+  templateUavs = uavs;
 
   //uavShapes
   vector<Polytope> uavShapes;
@@ -354,22 +361,92 @@ int main(){
   convexHull.clear();
   p << -1,3,0;
   convexHull.push_back(p);
-  p << 1,3,0;
-  convexHull.push_back(p);
-  p << 3,-1,0;
-  convexHull.push_back(p);
-  p << 3,-3,0;
+  p << -3,-1,0;
   convexHull.push_back(p);
   p << -3,-3,0;
   convexHull.push_back(p);
-  p << -3,-1,0;
+  p << 3,-3,0;
   convexHull.push_back(p);
+  p << 3,-1,0;
+  convexHull.push_back(p);
+  p << 1,3,0;
+  convexHull.push_back(p);
+
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
   vector<Formation> formations;
-  Formation formation(uavs, uavShapes, convexHull, 1);
-  formations.push_back(formation);
+  Formation formation0(templateUavs, uavShapes, convexHull, 1);
+  formations.push_back(formation0);
+
+  //formation1
+  templateUavs.clear();
+  //templateUav0
+  p << 0,3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav1
+  p << 0,0,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav2
+  p << 0,-3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //convex hull
+  convexHull.clear();
+  p << -1,4,0;
+  convexHull.push_back(p);
+  p << -1,-4,0;
+  convexHull.push_back(p);
+  p << 1,-4,0;
+  convexHull.push_back(p);
+  p << 1,4,0;
+  convexHull.push_back(p);
+  Formation formation1(templateUavs, uavShapes, convexHull, 1000);
+  formations.push_back(formation1);
+
+//  //formation2
+//  templateUavs.clear();
+//  //templateUav0
+//  p << 0,2,0;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+//  //templateUav1
+//  p << 2,-2,0;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+//  //templateUav2
+//  p << -2,-2,0;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+//  //convex hull
+//  convexHull.clear();
+//  p << -1,3,0;
+//  convexHull.push_back(p);
+//  p << -3,-1,0;
+//  convexHull.push_back(p);
+//  p << -3,-3,0;
+//  convexHull.push_back(p);
+//  p << 3,-3,0;
+//  convexHull.push_back(p);
+//  p << 3,-1,0;
+//  convexHull.push_back(p);
+//  p << 1,3,0;
+//  convexHull.push_back(p);
+//  Formation formation2(templateUavs, uavShapes, convexHull, 1000);
+//  formations.push_back(formation2);
+
+
+
+
+
 
   //staticObstacles
   vector<Polytope> staticObstacles;
@@ -423,7 +500,7 @@ int main(){
   double currTime = 0;
 
   //weight of optimization cost
-  double wT = 100;
+  double wT = 1;
   double wS = 1;
   double wQ = 1;
 
@@ -675,6 +752,8 @@ int main(){
       scnGDir->set_y(gDir(1));
       scn.set_allocated_gdir(scnGDir);
       //lcpRelated(scnA, scnB, currCentroid) are set in function
+      //formation
+      scn.set_formation(formationIdx);
 
       printScene(fd);
 
@@ -731,9 +810,9 @@ int main(){
     ++currDirCount;
     double disCentroid = (currCentroid - gDir).transpose() * (currCentroid - gDir);
     disCentroid = sqrt(disCentroid);
-//    if(disCentroid < DELTA*10){
-//      ++currDirIdx;
-//    }
+    //    if(disCentroid < DELTA*10){
+    //      ++currDirIdx;
+    //    }
     if(currDirCount>10 || disCentroid < DELTA*10){
       currDirCount = 0;
       ++currDirIdx;
