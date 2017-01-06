@@ -149,9 +149,6 @@ namespace uav{
         options.require_containment = true;
         vector<Point4d> requiredPoints = in;
         Point4d currDir = interpolateDirs[i];
-
-
-
         requiredPoints.push_back(currDir);
         vector<Eigen::VectorXd> requiredPointsVxd;
         for(int i=0; i<requiredPoints.size(); ++i){
@@ -166,6 +163,14 @@ namespace uav{
           cout << requiredPointsVxd[i] << endl;
         }
 #endif
+
+        // seed
+        Eigen::Vector4d seed;
+        seed << 0, 0, 0, 0;
+        seed += centroidOfIn;
+        seed += currDir;
+        seed /= 2;
+        problem.setSeedPoint(seed);
       }
 
       // solve
