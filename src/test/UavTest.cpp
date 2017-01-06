@@ -308,6 +308,14 @@ int main(){
   Point gDir;
   gDir << 0,4,0;
   path.push_back(gDir);
+  gDir << 0,5,0;
+  path.push_back(gDir);
+  gDir << 0,6,0;
+  path.push_back(gDir);
+  gDir << 0,7,0;
+  path.push_back(gDir);
+  gDir << 0,8,0;
+  path.push_back(gDir);
   gDir << 0,10,0;
   path.push_back(gDir);
   gDir << 7,10,0;
@@ -406,47 +414,8 @@ int main(){
   convexHull.push_back(p);
   p << 1,4,0;
   convexHull.push_back(p);
-  Formation formation1(templateUavs, uavShapes, convexHull, 1000);
+  Formation formation1(templateUavs, uavShapes, convexHull, 1);
   formations.push_back(formation1);
-
-//  //formation2
-//  templateUavs.clear();
-//  //templateUav0
-//  p << 0,2,0;
-//  templateUav.clear();
-//  templateUav.push_back(p);
-//  templateUavs.push_back(templateUav);
-//  //templateUav1
-//  p << 2,-2,0;
-//  templateUav.clear();
-//  templateUav.push_back(p);
-//  templateUavs.push_back(templateUav);
-//  //templateUav2
-//  p << -2,-2,0;
-//  templateUav.clear();
-//  templateUav.push_back(p);
-//  templateUavs.push_back(templateUav);
-//  //convex hull
-//  convexHull.clear();
-//  p << -1,3,0;
-//  convexHull.push_back(p);
-//  p << -3,-1,0;
-//  convexHull.push_back(p);
-//  p << -3,-3,0;
-//  convexHull.push_back(p);
-//  p << 3,-3,0;
-//  convexHull.push_back(p);
-//  p << 3,-1,0;
-//  convexHull.push_back(p);
-//  p << 1,3,0;
-//  convexHull.push_back(p);
-//  Formation formation2(templateUavs, uavShapes, convexHull, 1000);
-//  formations.push_back(formation2);
-
-
-
-
-
 
   //staticObstacles
   vector<Polytope> staticObstacles;
@@ -516,7 +485,7 @@ int main(){
   int currDirCount = 0;
 
   //looping
-  while(counter<5){
+  while(counter<50){
 
 
     gDir = path[currDirIdx];
