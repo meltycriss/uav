@@ -15,6 +15,8 @@
 #include "OptimalFormation.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include <time.h>
 using namespace std;
 using namespace uav;
 
@@ -28,12 +30,12 @@ Point traj1(Point p, double t){
 int main(){
   Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.array([", "])");
 
-  Eigen::MatrixXd mat(5,5);
-  mat << 9.5,11.5,14.5,11.5,7.5,
-      6.5,15.5,13.5,13.5,10.5,
-      12.5,13.5,6.5,8.5,8.5,
-      11.5,9.5,10.5,12.5,9.5,
-      7.5,12.5,14.5,10.5,14.5;
-  hungarian(mat);
+  Eigen::Vector4d v4d(0,0,3,4);
+  srand(time(NULL));
+  for(int i=0; i<1; ++i){
+    cout << (rand() % 4 + 1) * Eigen::MatrixXd::Ones(4,1) << endl;
+  }
+
+
   return 0;
 }

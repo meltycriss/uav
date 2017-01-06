@@ -331,30 +331,13 @@ int main(){
   uav.push_back(p);
   uavs.push_back(uav);
 
-  //  //uav0
-  //  p << -2,2,0;
-  //  uav.clear();
-  //  uav.push_back(p);
-  //  uavs.push_back(uav);
-  //  //uav1
-  //  p << 2,2,0;
-  //  uav.clear();
-  //  uav.push_back(p);
-  //  uavs.push_back(uav);
-  //  //uav2
-  //  p << 2,-2,0;
-  //  uav.clear();
-  //  uav.push_back(p);
-  //  uavs.push_back(uav);
-  //  //uav3
-  //  p << -2,-2,0;
-  //  uav.clear();
-  //  uav.push_back(p);
-  //  uavs.push_back(uav);
+  vector<Polytope> templateUavs;
+  Polytope templateUav;
 
   //uavShapes
   vector<Polytope> uavShapes;
   Polytope uavShape;
+  uavShape.clear();
   //us0
   p << -1,1,0;
   uavShape.push_back(p);
@@ -368,6 +351,7 @@ int main(){
 
   //convex hull of formation
   Polytope convexHull;
+  convexHull.clear();
   p << -1,3,0;
   convexHull.push_back(p);
   p << 1,3,0;
@@ -380,15 +364,6 @@ int main(){
   convexHull.push_back(p);
   p << -3,-1,0;
   convexHull.push_back(p);
-
-  //  p << -3,3,0;
-  //  convexHull.push_back(p);
-  //  p << -3,-3,0;
-  //  convexHull.push_back(p);
-  //  p << 3,-3,0;
-  //  convexHull.push_back(p);
-  //  p << 3,3,0;
-  //  convexHull.push_back(p);
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
@@ -538,6 +513,17 @@ int main(){
       int assignedIdx = vecAssign[i];
       uavsDir[i] = formationGoal[assignedIdx];
     }
+
+    cout << "testing Dir" << endl;
+    if(counter==0){
+      for(int i=0; i<uavs.size(); ++i){
+        cout << "uav" << i << "currPos" << endl;
+        cout << uavs[i][0];
+        cout << "currDir" << endl;
+        cout << uavsDir[i];
+      }
+    }
+
 
 
     //----------------------------------------------------------------------------

@@ -7,6 +7,8 @@
 #include "drake/math/quaternion.h"
 
 #include "iris/iris.h"
+#include <time.h>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -246,9 +248,25 @@ namespace uav{
     int *jGvar = new int[lenG];
     int neG;
 
+
+    // t
+    x[0] = sG_(0);
+    x[1] = sG_(1);
+    x[2] = sG_(2);
+    // s
+    x[3] = double(2) * radius / minDis;
+    // q
+    srand(time(NULL));
+    Eigen::Vector4d qIni = sQ_ + 0.1 * (rand() % 4 + 1) * Eigen::MatrixXd::Ones(4,1);
+    qIni /= qIni.norm();
+    x[4] = qIni(0);
+    x[5] = qIni(1);
+    x[6] = qIni(2);
+    x[7] = qIni(3);
+
     // set the upper and lower bounds of x
     for(int i=0; i<n; ++i){
-      x[i] = 0.1;
+      //x[i] = 0.1;
       xlow[i] = -INFI;
       xupp[i] = INFI;
       xstate[i] = 0;
