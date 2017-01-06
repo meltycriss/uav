@@ -257,6 +257,7 @@ namespace uav{
     // q
     srand(time(NULL));
     Eigen::Vector4d qIni = sQ_ + 0.1 * (rand() % 4 + 1) * Eigen::MatrixXd::Ones(4,1);
+    //Eigen::Vector4d qIni = sQ_;
     qIni /= qIni.norm();
     x[4] = qIni(0);
     x[5] = qIni(1);

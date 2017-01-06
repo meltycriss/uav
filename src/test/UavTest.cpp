@@ -316,11 +316,15 @@ int main(){
   path.push_back(gDir);
   gDir << 0,8,0;
   path.push_back(gDir);
+  gDir << 0,9,0;
+  path.push_back(gDir);
   gDir << 0,10,0;
   path.push_back(gDir);
-  gDir << 7,10,0;
+  gDir << 0,13,0;
   path.push_back(gDir);
-  gDir << 10,0,0;
+  gDir << 0,16,0;
+  path.push_back(gDir);
+  gDir << 0,18,0;
   path.push_back(gDir);
   gDir = path[0];
 
@@ -328,29 +332,38 @@ int main(){
   vector<Polytope> uavs;
   Polytope uav;
   //uav0
-  p << 0,2,0;
+  p << 0,0,0;
+  uav.clear();
+  uav.push_back(p);
+  uavs.push_back(uav);
+  //uav1
+  p << -2,-3,0;
   uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
   //uav2
-  p << 2,-2,0;
+  p << -4,-6,0;
   uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
   //uav3
-  p << -2,-2,0;
+  p << 4,-6,0;
+  uav.clear();
+  uav.push_back(p);
+  uavs.push_back(uav);
+  //uav4
+  p << 2,-3,0;
   uav.clear();
   uav.push_back(p);
   uavs.push_back(uav);
 
-  //formation0
+  vector<Formation> formations;
   vector<Polytope> templateUavs;
+  vector<Polytope> uavShapes;
+  Polytope convexHull;
   Polytope templateUav;
-  //templateUavs
-  templateUavs = uavs;
 
   //uavShapes
-  vector<Polytope> uavShapes;
   Polytope uavShape;
   uavShape.clear();
   //us0
@@ -364,30 +377,8 @@ int main(){
   uavShape.push_back(p);
   uavShapes.push_back(uavShape);
 
-  //convex hull of formation
-  Polytope convexHull;
-  convexHull.clear();
-  p << -1,3,0;
-  convexHull.push_back(p);
-  p << -3,-1,0;
-  convexHull.push_back(p);
-  p << -3,-3,0;
-  convexHull.push_back(p);
-  p << 3,-3,0;
-  convexHull.push_back(p);
-  p << 3,-1,0;
-  convexHull.push_back(p);
-  p << 1,3,0;
-  convexHull.push_back(p);
-
-
-  //template formation
-  //caution: uavs in formation is not necessarily the same as actual uavs
-  vector<Formation> formations;
-  Formation formation0(templateUavs, uavShapes, convexHull, 1);
-  formations.push_back(formation0);
-
-  //formation1
+  //formation0
+  //templateUavs
   templateUavs.clear();
   //templateUav0
   p << 0,3,0;
@@ -395,36 +386,153 @@ int main(){
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
   //templateUav1
-  p << 0,0,0;
+  p << -2,0,0;
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
   //templateUav2
+  p << -4,-3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav3
+  p << 4,-3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav4
+  p << 2,0,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+
+  //convex hull of formation
+  convexHull.clear();
+  p << -1,4,0;
+  convexHull.push_back(p);
+  p << -3,1,0;
+  convexHull.push_back(p);
+  p << -5,-2,0;
+  convexHull.push_back(p);
+  p << -5,-4,0;
+  convexHull.push_back(p);
+  p << 5,-4,0;
+  convexHull.push_back(p);
+  p << 5,-2,0;
+  convexHull.push_back(p);
+  p << 3,1,0;
+  convexHull.push_back(p);
+  p << 1,4,0;
+  convexHull.push_back(p);
+
+  //template formation
+  //caution: uavs in formation is not necessarily the same as actual uavs
+  Formation formation0(templateUavs, uavShapes, convexHull, 1);
+  formations.push_back(formation0);
+
+  //formation1
+  //templateUavs
+  templateUavs.clear();
+  //templateUav0
+  p << 0,3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav1
+  p << -2,0,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav2
+  p << -2,-3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav3
+  p << 2,-3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav4
+  p << 2,0,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+
+  //convex hull of formation
+  convexHull.clear();
+  p << -1,4,0;
+  convexHull.push_back(p);
+  p << -3,1,0;
+  convexHull.push_back(p);
+  p << -3,-4,0;
+  convexHull.push_back(p);
+  p << 3,-4,0;
+  convexHull.push_back(p);
+  p << 3,1,0;
+  convexHull.push_back(p);
+  p << 1,4,0;
+  convexHull.push_back(p);
+
+  //template formation
+  //caution: uavs in formation is not necessarily the same as actual uavs
+  Formation formation1(templateUavs, uavShapes, convexHull, 1.5);
+  formations.push_back(formation1);
+
+  //formation2
+  //templateUavs
+  templateUavs.clear();
+  //templateUav4
+  p << 0,6,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav3
+  p << 0,3,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav2
+  p << 0,0,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+  //templateUav1
   p << 0,-3,0;
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
-  //convex hull
+  //templateUav0
+  p << 0,-6,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
+
+  //convex hull of formation
   convexHull.clear();
-  p << -1,4,0;
+  p << -1,6,0;
   convexHull.push_back(p);
-  p << -1,-4,0;
+  p << -1,-6,0;
   convexHull.push_back(p);
-  p << 1,-4,0;
+  p << 1,-6,0;
   convexHull.push_back(p);
-  p << 1,4,0;
+  p << 1,6,0;
   convexHull.push_back(p);
-  Formation formation1(templateUavs, uavShapes, convexHull, 1);
-  formations.push_back(formation1);
+
+  //template formation
+  //caution: uavs in formation is not necessarily the same as actual uavs
+  Formation formation2(templateUavs, uavShapes, convexHull, 1);
+  //formations.push_back(formation2);
+
 
   //staticObstacles
   vector<Polytope> staticObstacles;
   Polytope staticObstacle;
   //so0
   staticObstacle.clear();
-  p << 3,10,0;
+  p << 4,10,0;
   staticObstacle.push_back(p);
-  p << 3,4,0;
+  p << 4,4,0;
   staticObstacle.push_back(p);
   p << 6,4,0;
   staticObstacle.push_back(p);
@@ -432,17 +540,41 @@ int main(){
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 
-  //so0
+  //so1
   staticObstacle.clear();
   p << -6,10,0;
   staticObstacle.push_back(p);
   p << -6,4,0;
   staticObstacle.push_back(p);
-  p << -3,4,0;
+  p << -4,4,0;
   staticObstacle.push_back(p);
-  p << -3,10,0;
+  p << -4,10,0;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
+
+//  //so2
+//  staticObstacle.clear();
+//  p << 3.5,16,0;
+//  staticObstacle.push_back(p);
+//  p << 3.5,10,0;
+//  staticObstacle.push_back(p);
+//  p << 6,10,0;
+//  staticObstacle.push_back(p);
+//  p << 6,16,0;
+//  staticObstacle.push_back(p);
+//  staticObstacles.push_back(staticObstacle);
+//
+//  //so3
+//  staticObstacle.clear();
+//  p << -6,16,0;
+//  staticObstacle.push_back(p);
+//  p << -6,10,0;
+//  staticObstacle.push_back(p);
+//  p << -3.5,10,0;
+//  staticObstacle.push_back(p);
+//  p << -3.5,16,0;
+//  staticObstacle.push_back(p);
+//  staticObstacles.push_back(staticObstacle);
 
   //dynamicObstacles and corresponding trajectory function
   vector<Polytope> dynamicObstacles;
@@ -577,7 +709,7 @@ int main(){
     //----------------------------------------------------------------------------
 
     int orcaCounter = 0;
-    while(orcaCounter<10){
+    while(orcaCounter<5){
 
       //----------------------------------------------------------------------------
       //  adapt to RVO data structure
