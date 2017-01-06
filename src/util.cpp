@@ -260,8 +260,6 @@ namespace uav{
     int rows = cost.rows();
     int cols = cost.cols();
 
-    cout << "cost matrix:" << endl << cost << endl;
-
     //res[i]=j indicate row i is assigned to col j
     vector<int> res(rows, -1);
     //number of assigend rows
@@ -279,42 +277,49 @@ namespace uav{
       double minEle = cost(minEleIdx, i);
       cost.col(i) = vecAdd(cost.col(i), -minEle);
     }
-    cout << "cost matrix after reduction: " << endl << cost << endl;
     while(true){
       res = vector<int>(rows, -1);
       numAssigned = 0;
       set<int> deletedRows, deletedCols;
-      //row scanning
-      for(int i=0; i<rows; ++i){
-        vector<int> zeroColIdx;
-        for(int j=0; j<cols; ++j){
-          if(cost(i,j)==0 && deletedRows.count(i)==0 && deletedCols.count(j)==0){
-            zeroColIdx.push_back(j);
+      bool deletedChanged = true;
+      while(deletedChanged){
+        deletedChanged = false;
+
+        //row scanning
+        for(int i=0; i<rows; ++i){
+          vector<int> zeroColIdx;
+          for(int j=0; j<cols; ++j){
+            if(cost(i,j)==0 && deletedRows.count(i)==0 && deletedCols.count(j)==0){
+              zeroColIdx.push_back(j);
+            }
+          }
+          if(zeroColIdx.size()==1){
+            //line
+            deletedCols.insert(zeroColIdx[0]);
+            //marked
+            res[i] = zeroColIdx[0];
+            ++numAssigned;
+            deletedChanged = true;
           }
         }
-        if(zeroColIdx.size()==1){
-          //line
-          deletedCols.insert(zeroColIdx[0]);
-          //marked
-          res[i] = zeroColIdx[0];
-          ++numAssigned;
-        }
-      }
-      //col scanning
-      for(int i=0; i<cols; ++i){
-        vector<int> zeroRowIdx;
-        for(int j=0; j<rows; ++j){
-          if(cost(j,i)==0 && deletedRows.count(j)==0 && deletedCols.count(i)==0){
-            zeroRowIdx.push_back(j);
+        //col scanning
+        for(int i=0; i<cols; ++i){
+          vector<int> zeroRowIdx;
+          for(int j=0; j<rows; ++j){
+            if(cost(j,i)==0 && deletedRows.count(j)==0 && deletedCols.count(i)==0){
+              zeroRowIdx.push_back(j);
+            }
+          }
+          if(zeroRowIdx.size()==1){
+            //line
+            deletedRows.insert(zeroRowIdx[0]);
+            //marked
+            res[zeroRowIdx[0]] = i;
+            ++numAssigned;
+            deletedChanged = true;
           }
         }
-        if(zeroRowIdx.size()==1){
-          //line
-          deletedRows.insert(zeroRowIdx[0]);
-          //marked
-          res[zeroRowIdx[0]] = i;
-          ++numAssigned;
-        }
+
       }
       //case 1
       if(numAssigned==rows){
