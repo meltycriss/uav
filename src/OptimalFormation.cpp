@@ -20,7 +20,7 @@ namespace uav{
   Point OptimalFormation::sG_ = Point();
   double OptimalFormation::sS_ = 1;
   Eigen::Vector4d OptimalFormation::sQ_ = Eigen::Vector4d();
-  double OptimalFormation::sWT_ = 1;
+  double OptimalFormation::sWT_ = 3;
   double OptimalFormation::sWS_ = 1;
   double OptimalFormation::sWQ_ = 1;
   double OptimalFormation::sTimeInterval_ = 0.46;
@@ -247,7 +247,6 @@ namespace uav{
     int *iGfun = new int[lenG];
     int *jGvar = new int[lenG];
     int neG;
-
 
     // t
     x[0] = sG_(0);

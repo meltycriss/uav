@@ -423,7 +423,7 @@ int main(){
   double currTime = 0;
 
   //weight of optimization cost
-  double wT = 1;
+  double wT = 100;
   double wS = 1;
   double wQ = 1;
 
@@ -518,9 +518,9 @@ int main(){
     if(counter==0){
       for(int i=0; i<uavs.size(); ++i){
         cout << "uav" << i << "currPos" << endl;
-        cout << uavs[i][0];
+        cout << uavs[i][0] << endl;
         cout << "currDir" << endl;
-        cout << uavsDir[i];
+        cout << uavsDir[i] << endl;
       }
     }
 
