@@ -326,7 +326,7 @@ namespace uav{
 
     // Load the data for ToyProb ...
     ToyProb.setProbName    ("uav");
-    ToyProb.setPrintFile   ( "uav.out" );
+    //ToyProb.setPrintFile   ( "uav.out" );
     ToyProb.setProblemSize ( n, neF );
     ToyProb.setObjective   ( ObjRow, ObjAdd );
     ToyProb.setA           ( lenA, neA, iAfun, jAvar, A ); // mush be set when providing derivative

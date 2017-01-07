@@ -273,8 +273,8 @@ bool reachedGoal(RVO::RVOSimulator *sim)
   return true;
 }
 
-bool reachedTime(RVO::RVOSimulator *sim){
-  return sim->getGlobalTime() >= 2.0;
+bool reachedTime(RVO::RVOSimulator *sim, double time){
+  return sim->getGlobalTime() >= time;
 }
 
 void updateVisualization(RVO::RVOSimulator *sim)
@@ -476,17 +476,17 @@ int main(){
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
-  Formation formation1(templateUavs, uavShapes, convexHull, 1.5);
+  Formation formation1(templateUavs, uavShapes, convexHull, 1.1);
   formations.push_back(formation1);
 
   //formation2
   //templateUavs
   templateUavs.clear();
-  //templateUav4
-  p << 0,6,0;
-  templateUav.clear();
-  templateUav.push_back(p);
-  templateUavs.push_back(templateUav);
+  //  //templateUav4
+  //  p << 0,6,0;
+  //  templateUav.clear();
+  //  templateUav.push_back(p);
+  //  templateUavs.push_back(templateUav);
   //templateUav3
   p << 0,3,0;
   templateUav.clear();
@@ -502,26 +502,26 @@ int main(){
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
-  //templateUav0
-  p << 0,-6,0;
-  templateUav.clear();
-  templateUav.push_back(p);
-  templateUavs.push_back(templateUav);
+  //  //templateUav0
+  //  p << 0,-6,0;
+  //  templateUav.clear();
+  //  templateUav.push_back(p);
+  //  templateUavs.push_back(templateUav);
 
   //convex hull of formation
   convexHull.clear();
-  p << -1,6,0;
+  p << -1,4,0;
   convexHull.push_back(p);
-  p << -1,-6,0;
+  p << -1,-4,0;
   convexHull.push_back(p);
-  p << 1,-6,0;
+  p << 1,-4,0;
   convexHull.push_back(p);
-  p << 1,6,0;
+  p << 1,4,0;
   convexHull.push_back(p);
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
-  Formation formation2(templateUavs, uavShapes, convexHull, 1);
+  Formation formation2(templateUavs, uavShapes, convexHull, 1.05);
   //formations.push_back(formation2);
 
 
@@ -552,29 +552,29 @@ int main(){
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 
-//  //so2
-//  staticObstacle.clear();
-//  p << 3.5,16,0;
-//  staticObstacle.push_back(p);
-//  p << 3.5,10,0;
-//  staticObstacle.push_back(p);
-//  p << 6,10,0;
-//  staticObstacle.push_back(p);
-//  p << 6,16,0;
-//  staticObstacle.push_back(p);
-//  staticObstacles.push_back(staticObstacle);
-//
-//  //so3
-//  staticObstacle.clear();
-//  p << -6,16,0;
-//  staticObstacle.push_back(p);
-//  p << -6,10,0;
-//  staticObstacle.push_back(p);
-//  p << -3.5,10,0;
-//  staticObstacle.push_back(p);
-//  p << -3.5,16,0;
-//  staticObstacle.push_back(p);
-//  staticObstacles.push_back(staticObstacle);
+  //  //so2
+  //  staticObstacle.clear();
+  //  p << 3.5,16,0;
+  //  staticObstacle.push_back(p);
+  //  p << 3.5,10,0;
+  //  staticObstacle.push_back(p);
+  //  p << 6,10,0;
+  //  staticObstacle.push_back(p);
+  //  p << 6,16,0;
+  //  staticObstacle.push_back(p);
+  //  staticObstacles.push_back(staticObstacle);
+  //
+  //  //so3
+  //  staticObstacle.clear();
+  //  p << -6,16,0;
+  //  staticObstacle.push_back(p);
+  //  p << -6,10,0;
+  //  staticObstacle.push_back(p);
+  //  p << -3.5,10,0;
+  //  staticObstacle.push_back(p);
+  //  p << -3.5,16,0;
+  //  staticObstacle.push_back(p);
+  //  staticObstacles.push_back(staticObstacle);
 
   //dynamicObstacles and corresponding trajectory function
   vector<Polytope> dynamicObstacles;
@@ -591,11 +591,11 @@ int main(){
   p << 11,10,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
-  //  dynamicObstacles.push_back(dynamicObstacle);
-  //  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  dynamicObstacles.push_back(dynamicObstacle);
+  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
-  double timeInterval = 1;
+  double timeInterval = 3;
 
   //currTime
   double currTime = 0;
@@ -617,7 +617,7 @@ int main(){
   int currDirCount = 0;
 
   //looping
-  while(counter<50){
+  while(counter<50 && currDirIdx < path.size()){
 
 
     gDir = path[currDirIdx];
@@ -708,8 +708,22 @@ int main(){
     //  navigate to goal with ORCA
     //----------------------------------------------------------------------------
 
+    //----------------------------------------------------------------------------
+    //  hyper-param for ORCA
+    //----------------------------------------------------------------------------
+
+    double orcaTimes = 4;
+    double eachOrcaTime = timeInterval / orcaTimes;
+    double timeStep = eachOrcaTime / 2;
+    double radiusRVO = getRadius(uavShapes[0]);
+    double neighborDistRVO = 5 * radiusRVO;
+    int maxNeighborsRVO = uavs.size();
+    double timeHorizonRVO = 5;
+    double timeHorizonObstRVO = 5;
+    double maxSpeedRVO = 10;
+
     int orcaCounter = 0;
-    while(orcaCounter<5){
+    while(orcaCounter<orcaTimes){
 
       //----------------------------------------------------------------------------
       //  adapt to RVO data structure
@@ -748,24 +762,15 @@ int main(){
         vector<RVO::Vector2> obsRVO;
         for(int j=0; j<obs.size(); ++j){
           Point p = obs[j];
-          p = dynamicObstaclesTrajectories[i](p, currTime+timeInterval) + currCentroid; //rela to abs
+          //p = dynamicObstaclesTrajectories[i](p, currTime+timeInterval) + currCentroid; //rela to abs
+          //p = dynamicObstaclesTrajectories[i](p, currTime+orcaCounter * timeStep) + currCentroid; //rela to abs
+          p = dynamicObstaclesTrajectories[i](p, currTime) + currCentroid; //rela to abs
           RVO::Vector2 pRVO(p(0), p(1));
           obsRVO.push_back(pRVO);
         }
         obstaclesRVO.push_back(obsRVO);
       }
 
-      //----------------------------------------------------------------------------
-      //  hyper-param for ORCA
-      //----------------------------------------------------------------------------
-
-      double timeStep = 0.25;
-      double radiusRVO = getRadius(uavShapes[0]);
-      double neighborDistRVO = 5 * radiusRVO;
-      int maxNeighborsRVO = uavs.size();
-      double timeHorizonRVO = 5;
-      double timeHorizonObstRVO = 5;
-      double maxSpeedRVO = 0.5;
 
       //----------------------------------------------------------------------------
       //  ORCA
@@ -790,7 +795,7 @@ int main(){
         sim->doStep();
         //++count;
       }
-      while ((!reachedGoal(sim)) && (!reachedTime(sim)));
+      while ((!reachedGoal(sim)) && (!reachedTime(sim, eachOrcaTime)));
       //      while ((!reachedGoal(sim)));
 
       //----------------------------------------------------------------------------
