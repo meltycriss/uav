@@ -12,22 +12,29 @@ input_file_name = './scenes.txt'
 if(len(sys.argv)==2):
     input_file_name = sys.argv[1]
 
-fig = plt.figure(figsize=(8,8), dpi=80)
+fig = plt.figure(figsize=(6,14), dpi=80)
 
-ax = fig.add_subplot(111)
+ax = fig.add_subplot(1, 1, 1)
 ax.spines['right'].set_color('none')
 ax.spines['top'].set_color('none')
-ax.xaxis.set_ticks_position('bottom')
+#ax.xaxis.set_ticks_position('bottom')
 ax.spines['bottom'].set_position('zero')
-ax.yaxis.set_ticks_position('left')
-ax.spines['left'].set_position(('data',0))
+ax.spines['bottom'].set_color('none')
+#ax.yaxis.set_ticks_position('left')
+#ax.spines['left'].set_position(('data',0))
+ax.spines['left'].set_position('zero')
+ax.spines['left'].set_color('none')
 
 x_min = -8
-x_max = 28
+x_max = 8
 y_min = -8
 y_max = 28
-ax.set_xlim(x_min,x_max), ax.set_xticks(np.linspace(x_min,x_max,x_max-x_min+1,endpoint=True))
-ax.set_ylim(y_min,y_max), ax.set_yticks(np.linspace(y_min,y_max,y_max-y_min+1,endpoint=True))
+ax.set_xlim(x_min,x_max)
+#ax.set_xticks(np.linspace(x_min,x_max,x_max-x_min+1,endpoint=True))
+ax.set_xticks(np.array([]))
+ax.set_ylim(y_min,y_max)
+#ax.set_yticks(np.linspace(y_min,y_max,y_max-y_min+1,endpoint=True))
+ax.set_yticks(np.array([]))
 
 uavRadius = 1
 uavsDirRadius = 0.2
@@ -42,6 +49,7 @@ b = None
 dos = None
 sos = None
 currCentroid = None
+currFormation = None
 
 # Ax Var
 uavsAx = []
@@ -49,7 +57,7 @@ uavsDirAx = []
 sosAx = []
 dosAx = []
 gDirAx = None
-lcpAx = None
+#lcpAx = None
 
 fd = open(input_file_name, 'r')
 
@@ -58,7 +66,7 @@ DIM = 2
 def updateData():
     global fd
     global DIM
-    global uavs, uavsDir, gDir, a, b, dos, sos, currCentroid
+    global uavs, uavsDir, gDir, a, b, dos, sos, currCentroid, currFormation
     # update data
     s = ''
     for line in fd:
@@ -128,12 +136,15 @@ def updateData():
             currCentroid = np.ones(DIM)
             currCentroid[0] = currCentroidPb.x
             currCentroid[1] = currCentroidPb.y
+            #currFormation
+            currFormation = scene.formation
             break;
         else:
             s += line
 
 def initVar():
-    global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    #global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    global uavsAx, uavsDirAx, gDirAx, sosAx, dosAx
     # uavs
     for pos in uavs:
         circle = plt.Circle(pos, uavRadius, color='r')
@@ -151,10 +162,10 @@ def initVar():
     lcp = irispy.Polyhedron(a, b)
     #lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64), b.astype(np.float16).astype(np.float64))
     #lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
-    lcpPoints = lcp.getDrawingVertices()
-    lcpHull = scipy.spatial.ConvexHull(lcpPoints)
-    polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
-    lcpAx = ax.add_patch(polygon)
+    #lcpPoints = lcp.getDrawingVertices()
+    #lcpHull = scipy.spatial.ConvexHull(lcpPoints)
+    #polygon = Polygon(lcpPoints[lcpHull.vertices], True, color='g', alpha=0.3)
+    #lcpAx = ax.add_patch(polygon)
     # sos
     for so in sos:
         polygon = Polygon(so, True, color='b')    
@@ -162,12 +173,13 @@ def initVar():
         sosAx.append(patchSo)
     # dos
     for do in dos:
-        polygon = Polygon(do, True, color='y')
+        polygon = Polygon(do, True, color='b')
         patchDo = ax.add_patch(polygon)
         dosAx.append(patchDo)
 
 def updateVar():
-    global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    #global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    global uavsAx, uavsDirAx, gDirAx, sosAx, dosAx
     global uavs, uavsDir, gDir, a, b, sos, dos
     #uavs
     for i, uavAx in enumerate(uavsAx):
@@ -181,11 +193,11 @@ def updateVar():
     lcp = irispy.Polyhedron(a, b)
     #lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64), b.astype(np.float16).astype(np.float64))
     #lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
-    print (lcp.getA())
-    print (lcp.getB())
-    lcpPoints = lcp.getDrawingVertices()
-    lcpHull = scipy.spatial.ConvexHull(lcpPoints)
-    lcpAx.set_xy(lcpPoints[lcpHull.vertices] + currCentroid)
+#    print (lcp.getA())
+#    print (lcp.getB())
+    #lcpPoints = lcp.getDrawingVertices()
+    #lcpHull = scipy.spatial.ConvexHull(lcpPoints)
+    #lcpAx.set_xy(lcpPoints[lcpHull.vertices] + currCentroid)
     #dos
     for i, doAx in enumerate(dosAx):
         doAx.set_xy(dos[i])
@@ -196,80 +208,61 @@ def updateVar():
 count = 0 # to specify intialization
 def update(frame):
     global count
-    global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    #global uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx
+    global uavsAx, uavsDirAx, gDirAx, sosAx, dosAx
     updateData()
     if(count == 0):
         initVar()
     updateVar()
     count += 1
     print(count)
+    print('currFormation: ' + str(currFormation))
     # Return the modified object
-    return uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx 
+    #return uavsAx, uavsDirAx, gDirAx, lcpAx, sosAx, dosAx 
+    return uavsAx, uavsDirAx, gDirAx, sosAx, dosAx 
 
-animation = animation.FuncAnimation(fig, update, interval=500, blit=False, frames=range(1000), repeat=False)
-# animation.save('rain.gif', writer='imagemagick', fps=30, dpi=40)
+animation = animation.FuncAnimation(fig, update, interval=100, blit=False, frames=range(150), repeat=False)
+#animation.save('rain.gif', writer='imagemagick', fps=8, dpi=80)
     
 # Show result on screen
 plt.show()
 
-
-ta = np.array([[  1.00000000e+00  , 3.27211433e-06], 
- [  1.00000000e+00  , 0.00000000e+00],
- [  0.00000000e+00  , 1.00000000e+00],
- [ -1.00000000e+00  ,-0.00000000e+00],
- [ -0.00000000e+00  ,-1.00000000e+00],
- [  1.00000000e+00  , 3.27211433e-06],
- [  1.00000000e+00  , 0.00000000e+00],
- [  0.00000000e+00  , 1.00000000e+00],
- [ -1.00000000e+00  ,-0.00000000e+00],
- [ -0.00000000e+00  ,-1.00000000e+00]])
-tb = np.array([[  3.03131710e+00], 
- [  1.00000000e+04],
- [  1.00000000e+04],
- [  1.00000000e+04],
- [  1.00000000e+04],
- [  3.03131710e+00],
- [  1.00000000e+04],
- [  1.00000000e+04],
- [  1.00000000e+04],
- [  1.00000000e+04]])
-
-for i in range(21):
-    updateData()
-    if(i == 0):
-        initVar()
-    if(i == 20):
-#        print(a.shape)
-#        print(a[:a.shape[0]/2,:])
-       # print(b)
-#        lcp = irispy.Polyhedron(a.astype(np.float16).astype(np.float64)[:a.shape[0]/2,:], b.astype(np.float16).astype(np.float64)[:b.shape[0]/2,:])
-#        lcp = irispy.Polyhedron(a[:a.shape[0]/2,:],b[:b.shape[0]/2,:])
-        #print(a)
-        #print(b)
-        ab = np.hstack((a,b))
-        abTop = np.split(ab,2)[0]
-        abBot = np.split(ab,2)[1]
-        print('------')
-        print(abTop)
-        print('------')
-        print(abBot)
-        #abBot[0,0] = 100
-        print('------')
-        print(abBot)
-        print(np.allclose(abTop,abBot))
-        if (np.allclose(abTop,abBot)):
-            ab = abTop
-            ab = np.hsplit(ab, np.array([2]))
-            a = ab[0]
-            b = ab[1]
-
-        print('------')
-        print(a)
-        print('------')
-        print(b)
-        
-        #lcp = irispy.Polyhedron(a, b)
-        #print(lcp.getDrawingVertices())
+#ta = np.array([[  1.00000000e+00  ,-1.30826602e-08], 
+# [ -1.00000000e+00  ,-1.29587610e-08],
+# [  1.00000000e+00  , 0.00000000e+00],
+# [  0.00000000e+00  , 1.00000000e+00],
+# [ -1.00000000e+00  ,-0.00000000e+00],
+# [ -0.00000000e+00  ,-1.00000000e+00]])
+#tb = np.array([[  1.99999073e+00], 
+# [  2.00000924e+00],
+# [  1.00000000e+04],
+# [  1.00000000e+04],
+# [  1.00000000e+04],
+# [  1.00000000e+04]])
+#
+#ta = np.array([[  1.00000000e+00  , 1.42614081e-08], 
+# [ -1.00000000e+00  ,-4.23160801e-08],
+# [  1.00000000e+00  , 0.00000000e+00],
+# [  0.00000000e+00  , 1.00000000e+00],
+# [ -1.00000000e+00  ,-0.00000000e+00],
+# [ -0.00000000e+00  ,-1.00000000e+00]])
+#tb = np.array([[  2.00000665e+00], 
+# [  1.99999317e+00],
+# [  1.00000000e+04],
+# [  1.00000000e+04],
+# [  1.00000000e+04],
+# [  1.00000000e+04]])
+#
+#for i in range(11):
+#    updateData()
+#    if(i == 0):
+#        initVar()
+#    if(i == 10):
+#        print(a)
+#        print(b)
+#        lcp = irispy.Polyhedron(ta, tb)
+#        lcp = irispy.Polyhedron(ta.astype(np.float16).astype(np.float64), tb.astype(np.float16).astype(np.float64))
+#        print(lcp.getDrawingVertices())
 
 
 fd.close()

@@ -46,7 +46,7 @@ void printScene(ostream &stm){
 
 Point traj1(Point p, double t){
   Point res = p;
-  Point dir(0, -1, 0);
+  Point dir(-1, 0, 0);
   int auxT = floor(t);
   t = t - (auxT/18)*18;
   t = t<9 ? t:18-t;
@@ -320,7 +320,9 @@ int main(){
   path.push_back(gDir);
   gDir << 0,10,0;
   path.push_back(gDir);
-  gDir << 0,13,0;
+  gDir << 0,12,0;
+  path.push_back(gDir);
+  gDir << 0,14,0;
   path.push_back(gDir);
   gDir << 0,16,0;
   path.push_back(gDir);
@@ -538,7 +540,7 @@ int main(){
   staticObstacle.push_back(p);
   p << 6,10,0;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
@@ -550,7 +552,7 @@ int main(){
   staticObstacle.push_back(p);
   p << -4,10,0;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //  //so2
   //  staticObstacle.clear();
@@ -582,13 +584,13 @@ int main(){
   //do0
   Polytope dynamicObstacle;
   trajectory dynamicObstaclesTrajectory;
-  p << 10,10,0;
-  dynamicObstacle.push_back(p);
   p << 10,9,0;
   dynamicObstacle.push_back(p);
-  p << 11,9,0;
+  p << 10,8,0;
   dynamicObstacle.push_back(p);
-  p << 11,10,0;
+  p << 11,8,0;
+  dynamicObstacle.push_back(p);
+  p << 11,9,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
   dynamicObstacles.push_back(dynamicObstacle);
