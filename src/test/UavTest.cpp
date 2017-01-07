@@ -11,6 +11,7 @@
 #include <RVO.h>
 #include "scene.pb.h"
 #include <fstream>
+#include <ctime>
 using namespace std;
 using namespace uav;
 
@@ -79,6 +80,11 @@ int getFormationGoal(
     const double &_wS,
     const double &_wQ
     ){
+
+  clock_t tBegin = clock();
+
+  //default res
+  int res = -1;
 
   //----------------------------------------------------------------------------
   //  solving the problem under relative coordinates
@@ -173,8 +179,8 @@ int getFormationGoal(
     for(int i=0; i<rFormationGoal.size(); ++i){
       rFormationGoal[i] = getCentroid(formationUavs[i]);
     }
-    return index;
-
+    res = index;
+//    return index;
   }
   //no CA formation
   else{
@@ -183,8 +189,15 @@ int getFormationGoal(
     for(int i=0; i<rFormationGoal.size(); ++i){
       rFormationGoal[i] = _gDir;
     }
-    return -1;
+    res = -1;
+//    return -1;
   }
+
+  clock_t tEnd = clock();
+  double elapsed_secs = double(tEnd-tBegin) / CLOCKS_PER_SEC;
+  cout << "formation time: " << elapsed_secs << endl;
+
+  return res;
 }
 
 /* Store the goals of the agents. */
@@ -310,14 +323,14 @@ int main(){
   path.push_back(gDir);
   gDir << 0,5,0;
   path.push_back(gDir);
-  gDir << 0,6,0;
-  path.push_back(gDir);
-  gDir << 0,7,0;
-  path.push_back(gDir);
-  gDir << 0,8,0;
-  path.push_back(gDir);
-  gDir << 0,9,0;
-  path.push_back(gDir);
+  //  gDir << 0,6,0;
+  //  path.push_back(gDir);
+  //  gDir << 0,7,0;
+  //  path.push_back(gDir);
+  //  gDir << 0,8,0;
+  //  path.push_back(gDir);
+  //  gDir << 0,9,0;
+  //  path.push_back(gDir);
   gDir << 0,10,0;
   path.push_back(gDir);
   gDir << 0,12,0;
@@ -432,7 +445,7 @@ int main(){
   Formation formation0(templateUavs, uavShapes, convexHull, 1);
   formations.push_back(formation0);
 
-  //formation1
+  //formation1 : <=
   //templateUavs
   templateUavs.clear();
   //templateUav0
@@ -479,16 +492,16 @@ int main(){
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
   Formation formation1(templateUavs, uavShapes, convexHull, 1.1);
-  formations.push_back(formation1);
+  //formations.push_back(formation1);
 
-  //formation2
+  //formation2: line
   //templateUavs
   templateUavs.clear();
-  //  //templateUav4
-  //  p << 0,6,0;
-  //  templateUav.clear();
-  //  templateUav.push_back(p);
-  //  templateUavs.push_back(templateUav);
+  //templateUav4
+  p << 0,6,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
   //templateUav3
   p << 0,3,0;
   templateUav.clear();
@@ -504,11 +517,11 @@ int main(){
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
-  //  //templateUav0
-  //  p << 0,-6,0;
-  //  templateUav.clear();
-  //  templateUav.push_back(p);
-  //  templateUavs.push_back(templateUav);
+  //templateUav0
+  p << 0,-6,0;
+  templateUav.clear();
+  templateUav.push_back(p);
+  templateUavs.push_back(templateUav);
 
   //convex hull of formation
   convexHull.clear();
@@ -524,7 +537,7 @@ int main(){
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
   Formation formation2(templateUavs, uavShapes, convexHull, 1.05);
-  //formations.push_back(formation2);
+  formations.push_back(formation2);
 
 
   //staticObstacles
@@ -532,15 +545,15 @@ int main(){
   Polytope staticObstacle;
   //so0
   staticObstacle.clear();
-  p << 4,10,0;
+  p << 3,10,0;
   staticObstacle.push_back(p);
-  p << 4,4,0;
+  p << 3,4,0;
   staticObstacle.push_back(p);
   p << 6,4,0;
   staticObstacle.push_back(p);
   p << 6,10,0;
   staticObstacle.push_back(p);
-  //staticObstacles.push_back(staticObstacle);
+  staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
@@ -548,11 +561,11 @@ int main(){
   staticObstacle.push_back(p);
   p << -6,4,0;
   staticObstacle.push_back(p);
-  p << -4,4,0;
+  p << -3,4,0;
   staticObstacle.push_back(p);
-  p << -4,10,0;
+  p << -3,10,0;
   staticObstacle.push_back(p);
-  //staticObstacles.push_back(staticObstacle);
+  staticObstacles.push_back(staticObstacle);
 
   //  //so2
   //  staticObstacle.clear();
@@ -593,8 +606,8 @@ int main(){
   p << 11,9,0;
   dynamicObstacle.push_back(p);
   dynamicObstaclesTrajectory = &traj1;
-  dynamicObstacles.push_back(dynamicObstacle);
-  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  //dynamicObstacles.push_back(dynamicObstacle);
+  //dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
   double timeInterval = 3;
