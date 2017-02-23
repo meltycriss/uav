@@ -329,7 +329,7 @@ int main(){
 //  path.push_back(gDir);
   gDir << 0,15,0;
   path.push_back(gDir);
-  gDir << 0,30,0;
+  gDir << 0,35,0;
   path.push_back(gDir);
   gDir = path[0];
 
@@ -487,41 +487,41 @@ int main(){
   Polytope staticObstacle;
   //so0
   staticObstacle.clear();
-  p << 5,12,-10;
+  p << 5,20,-10;
   staticObstacle.push_back(p);
   p << 5,8,-10;
   staticObstacle.push_back(p);
   p << 9,8,-10;
   staticObstacle.push_back(p);
-  p << 9,12,-10;
+  p << 9,20,-10;
   staticObstacle.push_back(p);
-  p << 5,12,10;
+  p << 5,20,10;
   staticObstacle.push_back(p);
   p << 5,8,10;
   staticObstacle.push_back(p);
   p << 9,8,10;
   staticObstacle.push_back(p);
-  p << 9,12,10;
+  p << 9,20,10;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
-  p << -9,12,-10;
+  p << -9,20,-10;
   staticObstacle.push_back(p);
   p << -9,8,-10;
   staticObstacle.push_back(p);
   p << -5,8,-10;
   staticObstacle.push_back(p);
-  p << -5,12,-10;
+  p << -5,20,-10;
   staticObstacle.push_back(p);
-  p << -9,12,10;
+  p << -9,20,10;
   staticObstacle.push_back(p);
   p << -9,8,10;
   staticObstacle.push_back(p);
   p << -5,8,10;
   staticObstacle.push_back(p);
-  p << -5,12,10;
+  p << -5,20,10;
   staticObstacle.push_back(p);
   staticObstacles.push_back(staticObstacle);
 

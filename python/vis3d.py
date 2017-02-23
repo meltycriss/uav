@@ -23,7 +23,7 @@ ax = a3.Axes3D(fig)
 x_min = -15
 x_max = 15
 y_min = -10
-y_max = 30
+y_max = 40
 z_min = -15
 z_max = 15
 
@@ -44,6 +44,7 @@ gDirColor = 'r'
 topPath = 'top'
 leftPath = 'left'
 frontPath = 'front'
+normalPath = 'normal'
 
 if os.path.exists(topPath):
     shutil.rmtree(topPath)
@@ -51,10 +52,13 @@ if os.path.exists(leftPath):
     shutil.rmtree(leftPath)
 if os.path.exists(frontPath):
     shutil.rmtree(frontPath)
+if os.path.exists(normalPath):
+    shutil.rmtree(normalPath)
 
 os.mkdir(topPath)
 os.mkdir(leftPath)
 os.mkdir(frontPath)
+os.mkdir(normalPath)
 
 # data Var
 uavs = None
@@ -188,11 +192,14 @@ while(updateData()):
         draw(toCube(uavsDir[i],uavDirRadius), facecolor=uavDirColor)
     draw(toCube(gDir,gDirRadius), facecolor=gDirColor)
 
+    # normal view
+    ax.view_init(20, 60)
+    plt.savefig(os.path.join(normalPath, '%06d.jpg' % counter))
     # top view
     ax.view_init(90, 90)
     plt.savefig(os.path.join(topPath, '%06d.jpg' % counter))
     # left view
-    ax.view_init(0, 180)
+    ax.view_init(0, 0)
     plt.savefig(os.path.join(leftPath, '%06d.jpg' % counter))
     # front view
     ax.view_init(0, 90)
