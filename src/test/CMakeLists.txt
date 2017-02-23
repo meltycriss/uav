@@ -3,8 +3,6 @@ INCLUDE_DIRECTORIES("../../include/snopt")
 INCLUDE_DIRECTORIES("../../include/iris/eigen3")
 INCLUDE_DIRECTORIES("..")
 INCLUDE_DIRECTORIES("../../include/drake")
-#INCLUDE_DIRECTORIES("../../include/orca")
-INCLUDE_DIRECTORIES("../../include/orca2d")
 
 IF(DEBUG)
   ADD_DEFINITIONS(-DDEBUG)
@@ -13,12 +11,6 @@ ENDIF(DEBUG)
 IF(VERSION_3D)
   ADD_DEFINITIONS(-DVERSION_3D)
 ENDIF(VERSION_3D)
-
-# -DV2D=ON: planar version
-IF(V2D)
-  ADD_DEFINITIONS(-DV2D)
-  MESSAGE(STATUS "planar version")
-ENDIF(V2D)
 
 FIND_LIBRARY(IRIS_LIB iris HINTS "../../lib/iris")
 FIND_LIBRARY(IRIS_GEOMETRY_LIB iris_geometry HINTS "../../lib/iris")
@@ -83,12 +75,18 @@ FIND_LIBRARY(DRAKE_MATH_LIB drakeMath HINTS "../../lib/drake")
 #target_compile_features(Sphere PRIVATE cxx_range_for)
 
 #ADD_EXECUTABLE(Blocks ./Blocks.cpp)
-FIND_LIBRARY(RVO2D_LIB RVO HINTS "../../lib/orca2d")
 #TARGET_LINK_LIBRARIES(Blocks ${RVO2D_LIB})
 #
 #target_compile_features(Blocks PRIVATE cxx_range_for)
 
+# -DV2D=ON: planar version
 IF(V2D)
+  ADD_DEFINITIONS(-DV2D)
+  MESSAGE(STATUS "planar version")
+
+  INCLUDE_DIRECTORIES("../../include/orca2d")
+  FIND_LIBRARY(RVO2D_LIB RVO HINTS "../../lib/orca2d")
+
   ADD_EXECUTABLE(uavTest ./UavTest.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
   TARGET_LINK_LIBRARIES(uavTest
     ${IRIS_LIB}
@@ -101,6 +99,9 @@ IF(V2D)
     )
   target_compile_features(uavTest PRIVATE cxx_range_for)
 ELSE(V2D)
+  INCLUDE_DIRECTORIES("../../include/orca")
+  FIND_LIBRARY(RVO3D_LIB RVO HINTS "../../lib/orca")
+
   ADD_EXECUTABLE(uavTest3D ./UavTest3D.cpp ../LargestConvexPolytope.cpp ../util.cpp ../OptimalFormation.cpp ../definition.cpp)
   TARGET_LINK_LIBRARIES(uavTest3D
     ${IRIS_LIB}
@@ -108,7 +109,7 @@ ELSE(V2D)
     ${SNOPT7_CPP_LIB}
     ${SNOPT7_LIB}
     ${DRAKE_MATH_LIB}
-    ${RVO2D_LIB}
+    ${RVO3D_LIB}
     proto
     )
   target_compile_features(uavTest3D PRIVATE cxx_range_for)
