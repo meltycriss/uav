@@ -10,22 +10,22 @@
 #include <vector>
 #include <RVO.h>
 #include <cstddef>
-#include "scene.pb.h"
+#include "scene3d.pb.h"
 #include <fstream>
 #include <ctime>
 using namespace std;
 using namespace uav;
 
 //visualization helper
-scene::Scene scn;
-scene::Uavs *scnUavs;
-scene::UavsDir *scnUavsDir;
-scene::StaticObstacles *scnSos;
-scene::DynamicObstacles *scnDos;
-scene::GDir *scnGDir;
-scene::A *scnA;
-scene::B *scnB;
-scene::CurrCentroid *scnCurrCentroid;
+scene3d::Scene scn;
+scene3d::Uavs *scnUavs;
+scene3d::UavsDir *scnUavsDir;
+scene3d::StaticObstacles *scnSos;
+scene3d::DynamicObstacles *scnDos;
+scene3d::GDir *scnGDir;
+scene3d::A *scnA;
+scene3d::B *scnB;
+scene3d::CurrCentroid *scnCurrCentroid;
 
 #ifndef M_PI
 const float M_PI = 3.14159265358979323846f;
@@ -122,7 +122,7 @@ int getFormationGoal(
 
     //for visualize
     //a
-    scnA = new scene::A();
+    scnA = new scene3d::A();
     scnA->set_row(disp_A.rows());
     scnA->set_col(disp_A.cols());
     for(int i=0; i<disp_A.rows(); ++i){
@@ -133,7 +133,7 @@ int getFormationGoal(
     scn.set_allocated_a(scnA);
 
     //b
-    scnB = new scene::B();
+    scnB = new scene3d::B();
     scnB->set_row(disp_B.rows());
     for(int i=0; i<disp_B.rows(); ++i){
       scnB->add_data(disp_B(i));
@@ -141,9 +141,10 @@ int getFormationGoal(
     scn.set_allocated_b(scnB);
 
     //currCentroid
-    scnCurrCentroid = new scene::CurrCentroid();
+    scnCurrCentroid = new scene3d::CurrCentroid();
     scnCurrCentroid->set_x(currCentroid(0));
     scnCurrCentroid->set_y(currCentroid(1));
+    scnCurrCentroid->set_z(currCentroid(2));
     scn.set_allocated_currcentroid(scnCurrCentroid);
 
     cout << "a = " << lcpA.format(np_array) << endl;
@@ -559,7 +560,7 @@ int main(){
   int currDirCount = 0;
 
   //looping
-  while(counter<50 && currDirIdx < path.size()){
+  while(counter<60 && currDirIdx < path.size()){
 
 
     gDir = path[currDirIdx];
@@ -741,35 +742,37 @@ int main(){
       //      while ((!reachedGoal(sim)));
 
       //----------------------------------------------------------------------------
-      //  update scene::Scene scn for visualization
+      //  update scene3d::Scene scn for visualization
       //----------------------------------------------------------------------------
 
       //uavs
-      scnUavs = new scene::Uavs();
-      scene::Uav *scnUav;
+      scnUavs = new scene3d::Uavs();
+      scene3d::Uav *scnUav;
       for(int i=0; i<uavsRVO.size(); ++i){
         scnUav = scnUavs->add_uav();
         RVO::Vector3 pRVO = uavsRVO[i];
         scnUav->set_x(pRVO.x());
         scnUav->set_y(pRVO.y());
+        scnUav->set_z(pRVO.z());
       }
       scn.set_allocated_uavs(scnUavs);
 
       //uavsDir
-      scnUavsDir = new scene::UavsDir();
-      scene::Point *scnPoint;
+      scnUavsDir = new scene3d::UavsDir();
+      scene3d::Point *scnPoint;
       for(int i=0; i<goalsRVO.size(); ++i){
         scnPoint = scnUavsDir->add_uavdir();
         RVO::Vector3 pRVO = goalsRVO[i];
         scnPoint->set_x(pRVO.x());
         scnPoint->set_y(pRVO.y());
+        scnPoint->set_z(pRVO.z());
       }
       scn.set_allocated_uavsdir(scnUavsDir);
 
       //obstacles are order-sensitive
       //sos
-      scnSos = new scene::StaticObstacles();
-      scene::Polytope *scnPoly;
+      scnSos = new scene3d::StaticObstacles();
+      scene3d::Polytope *scnPoly;
       for(int i=0; i<staticObstacles.size(); ++i){
         vector<RVO::Vector3> polyRVO = obstaclesRVO[i];
         scnPoly = scnSos->add_so();
@@ -778,11 +781,12 @@ int main(){
           scnPoint = scnPoly->add_point();
           scnPoint->set_x(pRVO.x());
           scnPoint->set_y(pRVO.y());
+          scnPoint->set_z(pRVO.z());
         }
       }
       scn.set_allocated_sos(scnSos);
       //dos
-      scnDos = new scene::DynamicObstacles();
+      scnDos = new scene3d::DynamicObstacles();
       for(int i=staticObstacles.size(); i<obstaclesRVO.size(); ++i){
         vector<RVO::Vector3> polyRVO = obstaclesRVO[i];
         scnPoly = scnDos->add_do_();
@@ -791,13 +795,15 @@ int main(){
           scnPoint = scnPoly->add_point();
           scnPoint->set_x(pRVO.x());
           scnPoint->set_y(pRVO.y());
+          scnPoint->set_z(pRVO.z());
         }
       }
       scn.set_allocated_dos(scnDos);
       //gDir
-      scnGDir = new scene::GDir();
+      scnGDir = new scene3d::GDir();
       scnGDir->set_x(gDir(0));
       scnGDir->set_y(gDir(1));
+      scnGDir->set_z(gDir(2));
       scn.set_allocated_gdir(scnGDir);
       //lcpRelated(scnA, scnB, currCentroid) are set in function
       //formation

@@ -59,3 +59,18 @@ def draw_3d_convhull(points, ax, **kwargs):
         artists.append(poly)
     return artists
 
+def get_3d_convhull(points, ax, **kwargs):
+    kwargs.setdefault("edgecolor", "k")
+    kwargs.setdefault("facecolor", "r")
+    kwargs.setdefault("alpha", 0.5)
+    kwargs["facecolor"] = colorConverter.to_rgba(kwargs["facecolor"], kwargs["alpha"])
+    hull = scipy.spatial.ConvexHull(points)
+    artists = []
+    for simplex in hull.simplices:
+        poly = a3.art3d.Poly3DCollection([points[simplex]], **kwargs)
+        if "alpha" in kwargs:
+            poly.set_alpha(kwargs["alpha"])
+#        ax.add_collection3d(poly)
+        artists.append(poly)
+    return artists
+
