@@ -192,6 +192,10 @@ int getFormationGoal(
       rFormationGoal[i] = _gDir;
     }
     res = -1;
+
+    cout << "no formation" << endl;
+
+
 //    return -1;
   }
 
@@ -301,29 +305,31 @@ int main(){
   //gDir
   vector<Point> path;
   Point gDir;
-  gDir << 0,4,0;
+//  gDir << 0,4,0;
+//  path.push_back(gDir);
+//  gDir << 0,5,0;
+//  path.push_back(gDir);
+//  //  gDir << 0,6,0;
+//  //  path.push_back(gDir);
+//  //  gDir << 0,7,0;
+//  //  path.push_back(gDir);
+//  //  gDir << 0,8,0;
+//  //  path.push_back(gDir);
+//  //  gDir << 0,9,0;
+//  //  path.push_back(gDir);
+//  gDir << 0,10,0;
+//  path.push_back(gDir);
+//  gDir << 0,12,0;
+//  path.push_back(gDir);
+//  gDir << 0,14,0;
+//  path.push_back(gDir);
+//  gDir << 0,16,0;
+//  path.push_back(gDir);
+//  gDir << 0,18,0;
+//  path.push_back(gDir);
+  gDir << 0,15,0;
   path.push_back(gDir);
-  gDir << 0,5,0;
-  path.push_back(gDir);
-  //  gDir << 0,6,0;
-  //  path.push_back(gDir);
-  //  gDir << 0,7,0;
-  //  path.push_back(gDir);
-  //  gDir << 0,8,0;
-  //  path.push_back(gDir);
-  //  gDir << 0,9,0;
-  //  path.push_back(gDir);
-  gDir << 0,10,0;
-  path.push_back(gDir);
-  gDir << 0,12,0;
-  path.push_back(gDir);
-  gDir << 0,14,0;
-  path.push_back(gDir);
-  gDir << 0,16,0;
-  path.push_back(gDir);
-  gDir << 0,18,0;
-  path.push_back(gDir);
-  gDir << 0,20,0;
+  gDir << 0,30,0;
   path.push_back(gDir);
   gDir = path[0];
 
@@ -473,7 +479,7 @@ int main(){
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
-  Formation formation1(templateUavs, uavShapes, convexHull, 1);
+  Formation formation1(templateUavs, uavShapes, convexHull, 1.1);
   formations.push_back(formation1);
 
   //staticObstacles
@@ -659,7 +665,7 @@ int main(){
     double eachOrcaTime = timeInterval / orcaTimes;
     double timeStep = eachOrcaTime / 2;
     double radiusRVO = getRadius(uavShapes[0]);
-    double neighborDistRVO = 5 * radiusRVO;
+    double neighborDistRVO = 2 * radiusRVO;
     int maxNeighborsRVO = uavs.size();
     double timeHorizonRVO = 5;
     double timeHorizonObstRVO = 5;
@@ -864,10 +870,11 @@ int main(){
     ++currDirCount;
     double disCentroid = (currCentroid - gDir).transpose() * (currCentroid - gDir);
     disCentroid = sqrt(disCentroid);
+    cout << "disCentroid: " << disCentroid << endl;
     //    if(disCentroid < DELTA*10){
     //      ++currDirIdx;
     //    }
-    if(currDirCount>10 || disCentroid < DELTA*10){
+    if(currDirCount>20 || disCentroid < DELTA*10*uavs.size()){
       currDirCount = 0;
       ++currDirIdx;
     }

@@ -9,6 +9,7 @@ import sys, os
 import mpl_toolkits.mplot3d as a3
 import os, sys
 import subprocess
+import shutil
 
 # default scenes file name
 input_file_name = './scenes.txt'
@@ -22,7 +23,7 @@ ax = a3.Axes3D(fig)
 x_min = -15
 x_max = 15
 y_min = -10
-y_max = 25
+y_max = 30
 z_min = -15
 z_max = 15
 
@@ -30,9 +31,30 @@ ax.set_xlim(x_min, x_max)
 ax.set_ylim(y_min, y_max)
 ax.set_zlim3d(z_min, z_max)
 
+
 uavRadius = 1
-uavsDirRadius = 0.2
+uavDirRadius = 0.2
 gDirRadius = 0.2
+
+obsColor = 'b'
+uavColor = 'r'
+uavDirColor = 'g'
+gDirColor = 'r'
+
+topPath = 'top'
+leftPath = 'left'
+frontPath = 'front'
+
+if os.path.exists(topPath):
+    shutil.rmtree(topPath)
+if os.path.exists(leftPath):
+    shutil.rmtree(leftPath)
+if os.path.exists(frontPath):
+    shutil.rmtree(frontPath)
+
+os.mkdir(topPath)
+os.mkdir(leftPath)
+os.mkdir(frontPath)
 
 # data Var
 uavs = None
@@ -111,7 +133,6 @@ def updateData():
                     so_temp[i, 1] = pPb.y
                     so_temp[i, 2] = pPb.z
                 sos.append(so_temp)
-                print soPb
             #dos
             dosPb = scene.dos.do
             dos = []
@@ -131,45 +152,55 @@ def updateData():
             break;
         else:
             s += line
+    if s=='':
+        return False
+    else:
+        return True
+
+def draw(convhull, **kwargs):
+    irispy.drawing.draw_3d_convhull(convhull, plt.gca(), **kwargs)
+
+def toCube(coord, radius):
+    cube = np.empty((0,3))
+    for i in [-radius,radius]:
+        for j in [-radius,radius]:
+            for z in [-radius,radius]:
+                temp_coord = np.copy(coord)
+                temp_coord[0]+=i
+                temp_coord[1]+=j
+                temp_coord[2]+=z
+                cube = np.insert(cube, cube.shape[0], temp_coord, 0)
+    return cube
 
 
-updateData()
+counter = 0
 
+while(updateData()):
+    if counter%50==0:
+        print counter
+    plt.cla()
 
-points = np.array([
-    [0,0,0],
-    [1,0,0],
-    [1,1,0],
-    [0,1,0],
-    [0,0,1],
-    [1,0,1],
-    [1,1,1],
-    [0,1,1],
-    ])
+    for i in range(len(sos)):
+        draw(sos[i], facecolor=obsColor)
+    for i in range(len(uavs)):
+        draw(toCube(uavs[i],uavRadius), facecolor=uavColor)
+    for i in range(len(uavsDir)):
+        draw(toCube(uavsDir[i],uavDirRadius), facecolor=uavDirColor)
+    draw(toCube(gDir,gDirRadius), facecolor=gDirColor)
 
-print sos[0]
+    # top view
+    ax.view_init(90, 90)
+    plt.savefig(os.path.join(topPath, '%06d.jpg' % counter))
+    # left view
+    ax.view_init(0, 180)
+    plt.savefig(os.path.join(leftPath, '%06d.jpg' % counter))
+    # front view
+    ax.view_init(0, 90)
+    plt.savefig(os.path.join(frontPath, '%06d.jpg' % counter))
 
-print sos[1]
+    counter += 1
 
-#artists = irispy.drawing.get_3d_convhull(sos[0], ax)
-#
-#for artist in artists:
-#    ax.add_collection3d(artist)
-#
-#points[0,0] = -1
-#
-#plt.savefig('000000.jpg')
-#
-#plt.cla()
-#
-#artists = irispy.drawing.get_3d_convhull(points, ax)
-#
-#for artist in artists:
-#    ax.add_collection3d(artist)
-#
-#plt.savefig('000001.jpg')
-#
-#cmd = ['convert', '-delay', '100', '*.jpg', 'hhh.gif']
+#cmd = ['convert', '-delay', '1', os.path.join(jpgPath, '*.jpg'), 'anim.gif']
 #subprocess.call(cmd)
 
 fd.close()
