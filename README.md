@@ -1,6 +1,6 @@
 ## Description
 
-This is an implementation of formation navigation described in IROS 2015 paper "Multi-Robot Navigation in Formation Via Sequential Convex　Programming"
+This is an implementation of formation navigation algorithm described in IROS 2015 paper "Multi-Robot Navigation in Formation Via Sequential Convex　Programming"
 
 	Multi-Robot Navigation in Formation Via Sequential Convex Programming
 	J. Alonso-Mora, S. Baker, and R. Siegwart
