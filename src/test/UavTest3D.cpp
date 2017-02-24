@@ -117,8 +117,8 @@ int getFormationGoal(
     //largest convex polytope debug info
     Eigen::MatrixXd disp_A = lcpA;
     Eigen::VectorXd disp_B = lcpB;
-    reducePolyDim(disp_A, disp_B, 2, 0);
-    reducePolyDim(disp_A, disp_B, 2, _timeInterval);
+//    reducePolyDim(disp_A, disp_B, 2, 0);
+    reducePolyDim(disp_A, disp_B, 3, _timeInterval);
 
     //for visualize
     //a

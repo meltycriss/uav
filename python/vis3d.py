@@ -62,7 +62,7 @@ def updateData():
                 abBot = np.split(ab,2)[1]
                 if (np.allclose(abTop,abBot)):
                     ab = abTop
-                    ab = np.hsplit(ab, np.array([2]))
+                    ab = np.hsplit(ab, np.array([3]))
                     a = ab[0]
                     b = ab[1]
             #sos
@@ -227,6 +227,8 @@ while(updateData()):
     for i in range(len(uavsDir)):
         draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor, linewidth=0)
     draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor, linewidth=0)
+    #lcp = irispy.Polyhedron(a,b)
+    #draw(lcp.getDrawingVertices(), ax)
 
     # normal view
     ax.view_init(20, 60)
