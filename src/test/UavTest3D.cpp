@@ -479,7 +479,9 @@ int main(){
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
-  Formation formation1(templateUavs, uavShapes, convexHull, 1.1);
+  //Formation formation1(templateUavs, uavShapes, convexHull, 1.1);
+  //to display do, better use param below
+  Formation formation1(templateUavs, uavShapes, convexHull, 1.02);
   formations.push_back(formation1);
 
   //staticObstacles
@@ -503,7 +505,7 @@ int main(){
   staticObstacle.push_back(p);
   p << 9,20,10;
   staticObstacle.push_back(p);
-  //staticObstacles.push_back(staticObstacle);
+  staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
@@ -523,7 +525,7 @@ int main(){
   staticObstacle.push_back(p);
   p << -5,20,10;
   staticObstacle.push_back(p);
-  //staticObstacles.push_back(staticObstacle);
+  staticObstacles.push_back(staticObstacle);
 
   //dynamicObstacles and corresponding trajectory function
   vector<Polytope> dynamicObstacles;
@@ -551,8 +553,8 @@ int main(){
   dynamicObstacle.push_back(p);
 
   dynamicObstaclesTrajectory = &traj1;
-  dynamicObstacles.push_back(dynamicObstacle);
-  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  //dynamicObstacles.push_back(dynamicObstacle);
+  //dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
   double timeInterval = 1;
@@ -562,8 +564,11 @@ int main(){
 
   //weight of optimization cost
   double wT = 1;
-  double wS = 1;
-  double wQ = 1;
+  //double wS = 1;
+  //double wQ = 1;
+  //to display do, better use param below
+  double wS = 2;
+  double wQ = 2;
 
   //prefered param
   double sPref = 1;
@@ -885,7 +890,23 @@ int main(){
     //    if(disCentroid < DELTA*10){
     //      ++currDirIdx;
     //    }
-    if(currDirCount>20 || disCentroid < DELTA*10*uavs.size()){
+    //if(currDirCount>20 || disCentroid < DELTA*10*uavs.size()){
+    //  currDirCount = 0;
+    //  ++currDirIdx;
+    //}
+    
+    bool allReached = true;
+    for(int i=0; i<uavsDir.size(); ++i){
+      Point uavDir = uavsDir[i];
+      Point uavCentroid = getCentroid(uavs[i]);
+      double dis = (uavDir - uavCentroid).transpose() * (uavDir - uavCentroid);
+      dis = sqrt(dis);
+      if(dis > 2*DELTA){
+        allReached = false;
+      }
+    }
+
+    if(allReached){
       currDirCount = 0;
       ++currDirIdx;
     }
