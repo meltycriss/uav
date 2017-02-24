@@ -118,12 +118,19 @@ def toCube(coord, radius):
 def resetAxes():
     global axes
     
-    x_min = -15
-    x_max = 15
+#    x_min = -15
+#    x_max = 15
+#    y_min = -10
+#    y_max = 40
+#    z_min = -15
+#    z_max = 15
+
+    x_min = -25
+    x_max = 25
     y_min = -10
     y_max = 40
-    z_min = -15
-    z_max = 15
+    z_min = -25
+    z_max = 25
     
     for ax in axes:
         ax.clear()
