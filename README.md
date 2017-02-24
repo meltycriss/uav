@@ -41,6 +41,7 @@ Require environment of the followings'
 - [IRIS](https://github.com/rdeits/iris-distro)
 - [Drake](http://drake.mit.edu/)
 - [Snopt](https://ccom.ucsd.edu/~optimizers/solvers/snopt/)
+- [ORCA](http://gamma.cs.unc.edu/RVO2/)
 - [Protocol Buffer](https://developers.google.com/protocol-buffers/)
 - [imagemagick](https://www.imagemagick.org/script/install-source.php)
 - ...
