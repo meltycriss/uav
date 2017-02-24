@@ -213,6 +213,8 @@ while(updateData()):
 
     for i in range(len(sos)):
         draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
+    for i in range(len(dos)):
+        draw(dos[i], ax, facecolor=obsColor, alpha=0.2)
     for i in range(len(uavs)):
         draw(toCube(uavs[i],uavRadius), ax, facecolor=uavColor)
     for i in range(len(uavsDir)):

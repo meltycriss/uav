@@ -48,10 +48,10 @@ void printScene(ostream &stm){
 
 Point traj1(Point p, double t){
   Point res = p;
-  Point dir(-1, 0, 0);
+  Point dir(-0.5, 0, 0);
   int auxT = floor(t);
-  t = t - (auxT/18)*18;
-  t = t<9 ? t:18-t;
+  t = t - (auxT/26)*26;
+  t = t<13 ? t:26-t;
   res += dir * t;
   //relative coordinate
   res -= currCentroid;
@@ -503,7 +503,7 @@ int main(){
   staticObstacle.push_back(p);
   p << 9,20,10;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
@@ -523,7 +523,7 @@ int main(){
   staticObstacle.push_back(p);
   p << -5,20,10;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //dynamicObstacles and corresponding trajectory function
   vector<Polytope> dynamicObstacles;
@@ -531,20 +531,31 @@ int main(){
   //do0
   Polytope dynamicObstacle;
   trajectory dynamicObstaclesTrajectory;
-  p << 11,9,0;
+
+  dynamicObstacle.clear();
+  p << 11,15,-1;
   dynamicObstacle.push_back(p);
-  p << 11,8,0;
+  p << 11,13,-1;
   dynamicObstacle.push_back(p);
-  p << 12,8,0;
+  p << 13,13,-1;
   dynamicObstacle.push_back(p);
-  p << 12,9,0;
+  p << 13,15,-1;
   dynamicObstacle.push_back(p);
+  p << 11,15,1;
+  dynamicObstacle.push_back(p);
+  p << 11,13,1;
+  dynamicObstacle.push_back(p);
+  p << 13,13,1;
+  dynamicObstacle.push_back(p);
+  p << 13,15,1;
+  dynamicObstacle.push_back(p);
+
   dynamicObstaclesTrajectory = &traj1;
-//  dynamicObstacles.push_back(dynamicObstacle);
-//  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  dynamicObstacles.push_back(dynamicObstacle);
+  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
-  double timeInterval = 3;
+  double timeInterval = 1;
 
   //currTime
   double currTime = 0;
@@ -661,7 +672,7 @@ int main(){
     //  hyper-param for ORCA
     //----------------------------------------------------------------------------
 
-    double orcaTimes = 4;
+    double orcaTimes = 1;
     double eachOrcaTime = timeInterval / orcaTimes;
     double timeStep = eachOrcaTime / 2;
     double radiusRVO = getRadius(uavShapes[0]);

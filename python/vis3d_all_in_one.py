@@ -180,7 +180,7 @@ uavDirColor = 'g'
 gDirColor = 'r'
 
 # output path
-jpgPath = 'jpg'
+jpgPath = 'all'
 
 if os.path.exists(jpgPath):
     shutil.rmtree(jpgPath)
@@ -199,7 +199,7 @@ currCentroid = None
 
 fd = open(input_file_name, 'r')
 
-fig = plt.figure(figsize=(8,8), dpi=80)
+fig = plt.figure(figsize=(16,16), dpi=80)
 
 gs = gridspec.GridSpec(2,2,wspace=0,hspace=0)
 
@@ -225,6 +225,8 @@ while(updateData()):
     for ax in axes:
         for i in range(len(sos)):
             draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
+        for i in range(len(dos)):
+            draw(dos[i], ax, facecolor=obsColor, alpha=0.2)
         for i in range(len(uavs)):
             draw(toCube(uavs[i],uavRadius), ax, facecolor=uavColor)
         for i in range(len(uavsDir)):
