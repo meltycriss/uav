@@ -6,6 +6,10 @@ This is an implementation of formation navigation described in IROS 2015 paper "
 	J. Alonso-Mora, S. Baker, and R. Siegwart
 	IEEE/RSJ Int. Conf. on Intelligent Robots and Systems, 2015	
 
+## Illustration
+
+![](https://github.com/meltycriss/uav/blob/master/python/examples/gif/3d/static_obstacle/all.gif)
+
 ## Folder Structure
 
 ### src
