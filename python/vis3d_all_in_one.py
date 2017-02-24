@@ -13,65 +13,6 @@ import shutil
 #import matplotlib.ticker as ticker
 import matplotlib.gridspec as gridspec
 
-NORMAL = 0
-TOP = 1
-FRONT = 2
-SIDE = 3
-
-# default scenes file name
-input_file_name = './scenes.txt'
-if(len(sys.argv)==2):
-    input_file_name = sys.argv[1]
-
-fig = plt.figure(figsize=(8,8), dpi=80)
-
-gs = gridspec.GridSpec(2,2,wspace=0,hspace=0)
-
-
-#ax = a3.Axes3D(fig)
-
-axes = []
-#axes.append(fig.add_subplot(2,2,1,projection='3d'))
-#axes.append(fig.add_subplot(2,2,2,projection='3d'))
-#axes.append(fig.add_subplot(2,2,3,projection='3d'))
-#axes.append(fig.add_subplot(2,2,4,projection='3d'))
-axes.append(fig.add_subplot(gs[0,0],projection='3d'))
-axes.append(fig.add_subplot(gs[0,1],projection='3d'))
-axes.append(fig.add_subplot(gs[1,0],projection='3d'))
-axes.append(fig.add_subplot(gs[1,1],projection='3d'))
-
-
-
-uavRadius = 1
-uavDirRadius = 0.2
-gDirRadius = 0.2
-
-obsColor = 'b'
-uavColor = 'r'
-uavDirColor = 'g'
-gDirColor = 'r'
-
-jpgPath = 'jpg'
-
-if os.path.exists(jpgPath):
-    shutil.rmtree(jpgPath)
-
-os.mkdir(jpgPath)
-
-# data Var
-uavs = None
-uavsDir = None
-gDir = None
-a = None
-b = None
-dos = None
-sos = None
-currCentroid = None
-
-fd = open(input_file_name, 'r')
-
-DIM = 3
-
 def updateData():
     global fd
     global DIM
@@ -176,7 +117,6 @@ def toCube(coord, radius):
 
 def resetAxes():
     global axes
-
     
     x_min = -15
     x_max = 15
@@ -216,28 +156,93 @@ def resetAxes():
     plt.tight_layout(pad=0, w_pad=0, h_pad=0)
 
 
+
+# main script
+
+NORMAL = 0
+TOP = 1
+FRONT = 2
+SIDE = 3
+
+# default scenes file name
+input_file_name = './scenes.txt'
+if(len(sys.argv)==2):
+    input_file_name = sys.argv[1]
+
+# param for visualization
+uavRadius = 1
+uavDirRadius = 0.2
+gDirRadius = 0.2
+
+obsColor = 'b'
+uavColor = 'r'
+uavDirColor = 'g'
+gDirColor = 'r'
+
+# output path
+jpgPath = 'jpg'
+
+if os.path.exists(jpgPath):
+    shutil.rmtree(jpgPath)
+
+os.mkdir(jpgPath)
+
+# data Var
+uavs = None
+uavsDir = None
+gDir = None
+a = None
+b = None
+dos = None
+sos = None
+currCentroid = None
+
+fd = open(input_file_name, 'r')
+
+fig = plt.figure(figsize=(8,8), dpi=80)
+
+gs = gridspec.GridSpec(2,2,wspace=0,hspace=0)
+
+axes = []
+axes.append(fig.add_subplot(gs[0,0],projection='3d'))
+axes.append(fig.add_subplot(gs[0,1],projection='3d'))
+axes.append(fig.add_subplot(gs[1,0],projection='3d'))
+axes.append(fig.add_subplot(gs[1,1],projection='3d'))
+
+DIM = 3
+
+# jpg part
+
 counter = 0
 
+print 'generating jpg'
 while(updateData()):
     if counter%50==0:
         print counter
+
     resetAxes()
+
     for ax in axes:
         for i in range(len(sos)):
-            draw(sos[i], ax, facecolor=obsColor)
+            draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
         for i in range(len(uavs)):
             draw(toCube(uavs[i],uavRadius), ax, facecolor=uavColor)
         for i in range(len(uavsDir)):
-            draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor)
-        draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor)
-#    if counter==1:
-#    plt.show()
+            draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor, linewidth=0)
+        draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor, linewidth=0)
 
     plt.savefig(os.path.join(jpgPath, '%06d.jpg' % counter), dpi=fig.dpi)
 
     counter += 1
 
-#cmd = ['convert', '-delay', '1', os.path.join(jpgPath, '*.jpg'), 'anim.gif']
-#subprocess.call(cmd)
-
 fd.close()
+
+# gif part
+
+numJpg = len(os.listdir(jpgPath))
+firstJpg = '%06d.jpg' % 0
+lastJpg = '%06d.jpg' % (numJpg-1)
+
+print 'generating gif'
+cmd = ['convert', '-delay', '150', os.path.join(jpgPath, firstJpg), '-delay', '8', os.path.join(jpgPath, '*.jpg'), '-delay', '150', os.path.join(jpgPath, lastJpg), 'all.gif']
+subprocess.call(cmd)

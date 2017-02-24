@@ -11,69 +11,7 @@ import os, sys
 import subprocess
 import shutil
 
-# default scenes file name
-input_file_name = './scenes.txt'
-if(len(sys.argv)==2):
-    input_file_name = sys.argv[1]
-
-fig = plt.figure(figsize=(8,8), dpi=80)
-
-ax = a3.Axes3D(fig)
-
-x_min = -15
-x_max = 15
-y_min = -10
-y_max = 40
-z_min = -15
-z_max = 15
-
-ax.set_xlim(x_min, x_max)
-ax.set_ylim(y_min, y_max)
-ax.set_zlim3d(z_min, z_max)
-
-
-uavRadius = 1
-uavDirRadius = 0.2
-gDirRadius = 0.2
-
-obsColor = 'b'
-uavColor = 'r'
-uavDirColor = 'g'
-gDirColor = 'r'
-
-topPath = 'top'
-leftPath = 'left'
-frontPath = 'front'
-normalPath = 'normal'
-
-if os.path.exists(topPath):
-    shutil.rmtree(topPath)
-if os.path.exists(leftPath):
-    shutil.rmtree(leftPath)
-if os.path.exists(frontPath):
-    shutil.rmtree(frontPath)
-if os.path.exists(normalPath):
-    shutil.rmtree(normalPath)
-
-os.mkdir(topPath)
-os.mkdir(leftPath)
-os.mkdir(frontPath)
-os.mkdir(normalPath)
-
-# data Var
-uavs = None
-uavsDir = None
-gDir = None
-a = None
-b = None
-dos = None
-sos = None
-currCentroid = None
-
-fd = open(input_file_name, 'r')
-
-DIM = 3
-
+# read data from protobuf
 def updateData():
     global fd
     global DIM
@@ -161,9 +99,11 @@ def updateData():
     else:
         return True
 
-def draw(convhull, **kwargs):
-    irispy.drawing.draw_3d_convhull(convhull, plt.gca(), **kwargs)
+# draw convex hull
+def draw(convhull, ax, **kwargs):
+    irispy.drawing.draw_3d_convhull(convhull, ax, **kwargs)
 
+# inflate a point to a cube
 def toCube(coord, radius):
     cube = np.empty((0,3))
     for i in [-radius,radius]:
@@ -176,38 +116,139 @@ def toCube(coord, radius):
                 cube = np.insert(cube, cube.shape[0], temp_coord, 0)
     return cube
 
+# clear Ax
+def resetAx():
+    global ax
+
+    ax.clear()
+
+    x_min = -15
+    x_max = 15
+    y_min = -10
+    y_max = 40
+    z_min = -15
+    z_max = 15
+    
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+    ax.set_zlim3d(z_min, z_max)
+    ax.w_xaxis.set_pane_color((1,1,1,0))
+    ax.w_yaxis.set_pane_color((1,1,1,0))
+    ax.w_zaxis.set_pane_color((1,1,1,0))
+    ax.w_xaxis.line.set_color((1,1,1,0))
+    ax.w_yaxis.line.set_color((1,1,1,0))
+    ax.w_zaxis.line.set_color((1,1,1,0))
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_zticks([])
+
+
+
+
+# main script
+
+# default scenes file name
+input_file_name = './scenes.txt'
+if(len(sys.argv)==2):
+    input_file_name = sys.argv[1]
+
+# param for visualization
+uavRadius = 1
+uavDirRadius = 0.2
+gDirRadius = 0.2
+
+obsColor = 'b'
+uavColor = 'r'
+uavDirColor = 'g'
+gDirColor = 'r'
+
+# output path
+topPath = 'top'
+leftPath = 'left'
+frontPath = 'front'
+normalPath = 'normal'
+paths = [topPath, leftPath, frontPath, normalPath]
+
+if os.path.exists(topPath):
+    shutil.rmtree(topPath)
+if os.path.exists(leftPath):
+    shutil.rmtree(leftPath)
+if os.path.exists(frontPath):
+    shutil.rmtree(frontPath)
+if os.path.exists(normalPath):
+    shutil.rmtree(normalPath)
+
+os.mkdir(topPath)
+os.mkdir(leftPath)
+os.mkdir(frontPath)
+os.mkdir(normalPath)
+
+# data Var
+uavs = None
+uavsDir = None
+gDir = None
+a = None
+b = None
+dos = None
+sos = None
+currCentroid = None
+
+fd = open(input_file_name, 'r')
+
+fig = plt.figure(figsize=(8,8), dpi=80)
+ax = a3.Axes3D(fig)
+
+DIM = 3
+
+# jpg part
 
 counter = 0
 
+print 'generating jpg'
 while(updateData()):
     if counter%50==0:
         print counter
-    plt.cla()
+
+    resetAx()
 
     for i in range(len(sos)):
-        draw(sos[i], facecolor=obsColor)
+        draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
     for i in range(len(uavs)):
-        draw(toCube(uavs[i],uavRadius), facecolor=uavColor)
+        draw(toCube(uavs[i],uavRadius), ax, facecolor=uavColor)
     for i in range(len(uavsDir)):
-        draw(toCube(uavsDir[i],uavDirRadius), facecolor=uavDirColor)
-    draw(toCube(gDir,gDirRadius), facecolor=gDirColor)
+        draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor, linewidth=0)
+    draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor, linewidth=0)
 
     # normal view
     ax.view_init(20, 60)
+    ax.set_title('Normal View')
     plt.savefig(os.path.join(normalPath, '%06d.jpg' % counter))
     # top view
     ax.view_init(90, 90)
+    ax.set_title('Top View')
     plt.savefig(os.path.join(topPath, '%06d.jpg' % counter))
     # left view
     ax.view_init(0, 0)
+    ax.set_title('Left View')
     plt.savefig(os.path.join(leftPath, '%06d.jpg' % counter))
     # front view
     ax.view_init(0, 90)
+    ax.set_title('Front View')
     plt.savefig(os.path.join(frontPath, '%06d.jpg' % counter))
 
     counter += 1
 
-#cmd = ['convert', '-delay', '1', os.path.join(jpgPath, '*.jpg'), 'anim.gif']
-#subprocess.call(cmd)
-
 fd.close()
+
+# gif part
+
+numJpg = len(os.listdir(paths[0]))
+firstJpg = '%06d.jpg' % 0
+lastJpg = '%06d.jpg' % (numJpg-1)
+
+print 'generating gif'
+for path in paths:
+    print 'processing ' + path
+    cmd = ['convert', '-delay', '150', os.path.join(path, firstJpg), '-delay', '8', os.path.join(path, '*.jpg'), '-delay', '150', os.path.join(path, lastJpg), path+'.gif']
+    subprocess.call(cmd)
+
