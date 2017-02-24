@@ -10,6 +10,8 @@ import mpl_toolkits.mplot3d as a3
 import os, sys
 import subprocess
 import shutil
+#import matplotlib.ticker as ticker
+import matplotlib.gridspec as gridspec
 
 NORMAL = 0
 TOP = 1
@@ -23,34 +25,22 @@ if(len(sys.argv)==2):
 
 fig = plt.figure(figsize=(8,8), dpi=80)
 
+gs = gridspec.GridSpec(2,2,wspace=0,hspace=0)
+
+
 #ax = a3.Axes3D(fig)
 
 axes = []
-axes.append(fig.add_subplot(2,2,1,projection='3d'))
-axes.append(fig.add_subplot(2,2,2,projection='3d'))
-axes.append(fig.add_subplot(2,2,3,projection='3d'))
-axes.append(fig.add_subplot(2,2,4,projection='3d'))
+#axes.append(fig.add_subplot(2,2,1,projection='3d'))
+#axes.append(fig.add_subplot(2,2,2,projection='3d'))
+#axes.append(fig.add_subplot(2,2,3,projection='3d'))
+#axes.append(fig.add_subplot(2,2,4,projection='3d'))
+axes.append(fig.add_subplot(gs[0,0],projection='3d'))
+axes.append(fig.add_subplot(gs[0,1],projection='3d'))
+axes.append(fig.add_subplot(gs[1,0],projection='3d'))
+axes.append(fig.add_subplot(gs[1,1],projection='3d'))
 
-# normal view
-axes[0].view_init(20, 60)
-# top view
-axes[1].view_init(90, 90)
-# front view
-axes[2].view_init(0, 90)
-# side view
-axes[3].view_init(0, 0)
 
-x_min = -15
-x_max = 15
-y_min = -10
-y_max = 40
-z_min = -15
-z_max = 15
-
-for ax in axes:
-    ax.set_xlim(x_min, x_max)
-    ax.set_ylim(y_min, y_max)
-    ax.set_zlim3d(z_min, z_max)
 
 uavRadius = 1
 uavDirRadius = 0.2
@@ -184,14 +174,55 @@ def toCube(coord, radius):
                 cube = np.insert(cube, cube.shape[0], temp_coord, 0)
     return cube
 
+def resetAxes():
+    global axes
+
+    
+    x_min = -15
+    x_max = 15
+    y_min = -10
+    y_max = 40
+    z_min = -15
+    z_max = 15
+    
+    for ax in axes:
+        ax.clear()
+        ax.w_xaxis.set_pane_color((1,1,1,0))
+        ax.w_yaxis.set_pane_color((1,1,1,0))
+        ax.w_zaxis.set_pane_color((1,1,1,0))
+        ax.w_xaxis.line.set_color((1,1,1,0))
+        ax.w_yaxis.line.set_color((1,1,1,0))
+        ax.w_zaxis.line.set_color((1,1,1,0))
+        ax.set_xlim(x_min, x_max)
+        ax.set_ylim(y_min, y_max)
+        ax.set_zlim3d(z_min, z_max)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_zticks([])
+
+    # normal view
+    axes[0].view_init(20, 60)
+    axes[0].set_title('Normal View')
+    # top view
+    axes[1].view_init(90, 90)
+    axes[1].set_title('Top View')
+    # front view
+    axes[2].view_init(0, 90)
+    axes[2].set_title('Front View')
+    # side view
+    axes[3].view_init(0, 0)
+    axes[3].set_title('Side View')
+    
+    plt.tight_layout(pad=0, w_pad=0, h_pad=0)
+
 
 counter = 0
 
 while(updateData()):
     if counter%50==0:
         print counter
+    resetAxes()
     for ax in axes:
-        ax.clear()
         for i in range(len(sos)):
             draw(sos[i], ax, facecolor=obsColor)
         for i in range(len(uavs)):
@@ -200,7 +231,7 @@ while(updateData()):
             draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor)
         draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor)
 #    if counter==1:
-#        plt.show()
+#    plt.show()
 
     plt.savefig(os.path.join(jpgPath, '%06d.jpg' % counter), dpi=fig.dpi)
 
