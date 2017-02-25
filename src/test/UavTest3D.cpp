@@ -46,12 +46,25 @@ void printScene(ostream &stm){
   stm << str << endl << "###" << endl;
 }
 
+//// vertical v formation
+//Point traj1(Point p, double t){
+//  Point res = p;
+//  Point dir(-0.5, 0, 0);
+//  int auxT = floor(t);
+//  t = t - (auxT/26)*26;
+//  t = t<13 ? t:26-t;
+//  res += dir * t;
+//  //relative coordinate
+//  res -= currCentroid;
+//  return res;
+//}
+
 Point traj1(Point p, double t){
   Point res = p;
   Point dir(-0.5, 0, 0);
   int auxT = floor(t);
-  t = t - (auxT/26)*26;
-  t = t<13 ? t:26-t;
+  t = t - (auxT/30)*30;
+  t = t<15 ? t:30-t;
   res += dir * t;
   //relative coordinate
   res -= currCentroid;
@@ -431,51 +444,90 @@ int main(){
   Formation formation0(templateUavs, uavShapes, convexHull, 1);
   formations.push_back(formation0);
 
-  //formation1 : vertical
+  //formation1 : vertical line
   //templateUavs
   templateUavs.clear();
   //templateUav0
-  p << 0,4,0;
+  p << 0,0,0;
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
   //templateUav1
-  p << 0,-5,9;
+  p << 0,0,9;
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
   //templateUav2
-  p << 0,-5,-9;
+  p << 0,0,-9;
   templateUav.clear();
   templateUav.push_back(p);
   templateUavs.push_back(templateUav);
 
   //convex hull of formation
   convexHull.clear();
-  p << -1,5,-1;
+  p << -1,1,10;
   convexHull.push_back(p);
-  p << -1,-4,-10;
+  p << -1,-1,10;
   convexHull.push_back(p);
-  p << -1,-6,-10;
+  p << 1,-1,10;
   convexHull.push_back(p);
-  p << -1,-6,10;
+  p << 1,1,10;
   convexHull.push_back(p);
-  p << -1,-4,10;
+  p << -1,1,-10;
   convexHull.push_back(p);
-  p << -1,5,1;
+  p << -1,-1,-10;
   convexHull.push_back(p);
-  p << 1,5,-1;
+  p << 1,-1,-10;
   convexHull.push_back(p);
-  p << 1,-4,-10;
+  p << 1,1,-10;
   convexHull.push_back(p);
-  p << 1,-6,-10;
-  convexHull.push_back(p);
-  p << 1,-6,10;
-  convexHull.push_back(p);
-  p << 1,-4,10;
-  convexHull.push_back(p);
-  p << 1,5,1;
-  convexHull.push_back(p);
+
+  //vertical v formation
+
+//  //templateUavs
+//  templateUavs.clear();
+//  //templateUav0
+//  p << 0,4,0;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+//  //templateUav1
+//  p << 0,-5,9;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+//  //templateUav2
+//  p << 0,-5,-9;
+//  templateUav.clear();
+//  templateUav.push_back(p);
+//  templateUavs.push_back(templateUav);
+
+//  //convex hull of formation
+//  convexHull.clear();
+//  p << -1,5,-1;
+//  convexHull.push_back(p);
+//  p << -1,-4,-10;
+//  convexHull.push_back(p);
+//  p << -1,-6,-10;
+//  convexHull.push_back(p);
+//  p << -1,-6,10;
+//  convexHull.push_back(p);
+//  p << -1,-4,10;
+//  convexHull.push_back(p);
+//  p << -1,5,1;
+//  convexHull.push_back(p);
+//  p << 1,5,-1;
+//  convexHull.push_back(p);
+//  p << 1,-4,-10;
+//  convexHull.push_back(p);
+//  p << 1,-6,-10;
+//  convexHull.push_back(p);
+//  p << 1,-6,10;
+//  convexHull.push_back(p);
+//  p << 1,-4,10;
+//  convexHull.push_back(p);
+//  p << 1,5,1;
+//  convexHull.push_back(p);
 
   //template formation
   //caution: uavs in formation is not necessarily the same as actual uavs
@@ -505,7 +557,7 @@ int main(){
   staticObstacle.push_back(p);
   p << 9,20,10;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //so1
   staticObstacle.clear();
@@ -525,7 +577,7 @@ int main(){
   staticObstacle.push_back(p);
   p << -5,20,10;
   staticObstacle.push_back(p);
-  staticObstacles.push_back(staticObstacle);
+  //staticObstacles.push_back(staticObstacle);
 
   //dynamicObstacles and corresponding trajectory function
   vector<Polytope> dynamicObstacles;
@@ -553,8 +605,8 @@ int main(){
   dynamicObstacle.push_back(p);
 
   dynamicObstaclesTrajectory = &traj1;
-  //dynamicObstacles.push_back(dynamicObstacle);
-  //dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
+  dynamicObstacles.push_back(dynamicObstacle);
+  dynamicObstaclesTrajectories.push_back(dynamicObstaclesTrajectory);
 
   //timeInterval
   double timeInterval = 1;
