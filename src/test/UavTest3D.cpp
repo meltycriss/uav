@@ -265,6 +265,7 @@ void setPreferredVelocities(RVO::RVOSimulator *sim)
   for (int i = 0; i < static_cast<int>(sim->getNumAgents()); ++i) {
     RVO::Vector3 goalVector = goals[i] - sim->getAgentPosition(i);
 
+    // preferred velocity is not necessarily a unit vector
     if (RVO::absSq(goalVector) > 1.0f) {
       goalVector = RVO::normalize(goalVector);
     }
