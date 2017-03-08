@@ -8,7 +8,7 @@ This is an implementation of formation navigation algorithm described in IROS 20
 
 ## Illustration
 
-![](https://github.com/meltycriss/uav/blob/master/python/examples/gif/3d/static_obstacle_line/all.gif)
+![](python/examples/gif/3d/static_obstacle_line/all.gif)
 
 ## Folder Structure
 

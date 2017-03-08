@@ -199,6 +199,9 @@ b = None
 dos = None
 sos = None
 currCentroid = None
+uavPaths = []
+doPaths = []
+
 
 fd = open(input_file_name, 'r')
 
@@ -216,6 +219,16 @@ while(updateData()):
     if counter%50==0:
         print counter
 
+    if counter == 0:
+        for i in range(len(uavs)):
+            uavPaths.append(np.ones((0, DIM)))
+        for i in range(len(dos)):
+            doPaths.append(np.ones((0, DIM)))
+    for i in range(len(uavs)):
+        uavPaths[i] = np.append(uavPaths[i], [uavs[i,:]], 0)
+    for i in range(len(dos)):
+        doPaths[i] = np.append(doPaths[i], [np.sum(dos[i], axis=0)/dos[i].shape[0]], 0)
+
     resetAx()
 
     for i in range(len(sos)):
@@ -229,6 +242,11 @@ while(updateData()):
     draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor, linewidth=0)
     #lcp = irispy.Polyhedron(a,b)
     #draw(lcp.getDrawingVertices(), ax)
+
+    for i in range(len(uavPaths)):
+        ax.plot(uavPaths[i][:,0], uavPaths[i][:,1], uavPaths[i][:,2], ls='dashdot', c=uavColor)
+    for i in range(len(doPaths)):
+        ax.plot(doPaths[i][:,0], doPaths[i][:,1], doPaths[i][:,2], ls='dashdot', c=obsColor)
 
     # normal view
     ax.view_init(20, 60)

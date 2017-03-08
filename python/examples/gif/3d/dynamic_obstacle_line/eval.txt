@@ -10,18 +10,18 @@ template formations:
 vertices of formation 0: 12
 vertices of formation 1: 8
 evaluation of lcp
-min: 0.07486
-max: 0.262875
-mean: 0.111654
-stdev: 0.0449297
+min: 0.072938
+max: 0.259708
+mean: 0.109712
+stdev: 0.0444842
 evaluation of NL Opt
-min: 0.026623
-max: 0.072931
-mean: 0.0407138
-stdev: 0.0133912
+min: 0.026588
+max: 0.290012
+mean: 0.0487133
+stdev: 0.0402177
 evaluation of assign
-min: 2.5e-05
-max: 3.8e-05
-mean: 2.78824e-05
-stdev: 2.27214e-06
+min: 2.4e-05
+max: 3.4e-05
+mean: 2.64706e-05
+stdev: 1.48658e-06
 -------------------------------------------------------
