@@ -13,8 +13,15 @@
 #include "scene3d.pb.h"
 #include <fstream>
 #include <ctime>
+#include <algorithm>
+#include <numeric>
 using namespace std;
 using namespace uav;
+
+//performance evaluation
+vector<double> timeNlOpt;
+vector<double> timeLcp;
+vector<double> timeAssign;
 
 //visualization helper
 scene3d::Scene scn;
@@ -39,6 +46,19 @@ Eigen::IOFormat np_array(Eigen::StreamPrecision, 0, ", ", ",\n", "[", "]", "np.a
 
 //current uavs centroid
 Point currCentroid = Point(0,0,0);
+
+pair<double, double> getMeanStdev(const vector<double> &v){
+  double sum = std::accumulate(v.begin(), v.end(), 0.0);
+  double mean = sum / v.size();
+
+  vector<double> diff(v.size());
+  transform(v.begin(), v.end(), diff.begin(),
+      bind2nd(minus<double>(), mean));
+  double sq_sum = inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+  double stdev = sqrt(sq_sum/v.size());
+
+  return make_pair(mean, stdev);
+}
 
 void printScene(ostream &stm){
   string str;
@@ -118,6 +138,11 @@ int getFormationGoal(
   Eigen::MatrixXd lcpA;
   Eigen::VectorXd lcpB;
   bool shouldFormation = lcp.getLargestConvexPolytope(lcpA, lcpB);
+
+  clock_t tEnd = clock();
+  double elapsed_secs = double(tEnd-tBegin) / CLOCKS_PER_SEC;
+  timeLcp.push_back(elapsed_secs);
+  tBegin = clock();
 
   //----------------------------------------------------------------------------
   //  assign goal for each uav
@@ -212,9 +237,10 @@ int getFormationGoal(
 //    return -1;
   }
 
-  clock_t tEnd = clock();
-  double elapsed_secs = double(tEnd-tBegin) / CLOCKS_PER_SEC;
+  tEnd = clock();
+  elapsed_secs = double(tEnd-tBegin) / CLOCKS_PER_SEC;
   cout << "formation time: " << elapsed_secs << endl;
+  timeNlOpt.push_back(elapsed_secs);
 
   return res;
 }
@@ -701,7 +727,13 @@ int main(){
 
       //matching with respect to distance
       Eigen::MatrixXd matCost = getDisMat(uavs, formationGoal);
+      clock_t tBegin = clock();
+
       vecAssign = hungarian(matCost);
+
+      clock_t tEnd = clock();
+      double elapsed_secs = double(tEnd-tBegin) / CLOCKS_PER_SEC;
+      timeAssign.push_back(elapsed_secs);
     }
 
     //assign goal for each uav (formation)
@@ -965,6 +997,59 @@ int main(){
     }
 
   }
+
+
+  // performance evaluation
+  fstream fd_eval("eval.txt", ios::out);
+
+  double sum = std::accumulate(timeNlOpt.begin(), timeNlOpt.end(), 0.0);
+  double mean = sum / timeNlOpt.size();
+
+  vector<double> diff(timeNlOpt.size());
+  transform(timeNlOpt.begin(), timeNlOpt.end(), diff.begin(),
+      bind2nd(minus<double>(), mean));
+  double sq_sum = inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+  double stdev = sqrt(sq_sum/timeNlOpt.size());
+
+  fd_eval << "-------------------------------------------------------" << endl;
+  fd_eval << "CONFIGURATION " << endl;
+  fd_eval << "static obstacles: " << endl;
+  fd_eval << "# of sos: " << staticObstacles.size() << endl;
+  for(int i=0; i<staticObstacles.size(); ++i){
+    fd_eval << "vertices of so " << i << ": "  << staticObstacles[i].size() << endl;
+  }
+  fd_eval << "dynamic obstacles: " << endl;
+  fd_eval << "# of dos: " << dynamicObstacles.size() << endl;
+  for(int i=0; i<dynamicObstacles.size(); ++i){
+    fd_eval << "vertices of do " << i << ": "  << dynamicObstacles[i].size() << endl;
+  }
+  fd_eval << "template formations: " << endl;
+  fd_eval << "# of template formations: " << formations.size() << endl;
+  for(int i=0; i<formations.size(); ++i ){
+    fd_eval << "vertices of formation " << i << ": " << formations[i].convexHull.size() << endl;
+  }
+  fd_eval << "evaluation of lcp" << endl;
+  pair<double, double> evalLcp = getMeanStdev(timeLcp);
+  fd_eval << "min: " << *min_element(timeLcp.begin(), timeLcp.end()) << endl;
+  fd_eval << "max: " << *max_element(timeLcp.begin(), timeLcp.end()) << endl;
+  fd_eval << "mean: " << evalLcp.first << endl;
+  fd_eval << "stdev: " << evalLcp.second << endl;
+  fd_eval << "evaluation of NL Opt" << endl;
+  pair<double, double> evalNlOpt = getMeanStdev(timeNlOpt);
+  fd_eval << "min: " << *min_element(timeNlOpt.begin(), timeNlOpt.end()) << endl;
+  fd_eval << "max: " << *max_element(timeNlOpt.begin(), timeNlOpt.end()) << endl;
+  fd_eval << "mean: " << evalNlOpt.first << endl;
+  fd_eval << "stdev: " << evalNlOpt.second << endl;
+  fd_eval << "evaluation of assign" << endl;
+  pair<double, double> evalAssign = getMeanStdev(timeAssign);
+  fd_eval << "min: " << *min_element(timeAssign.begin(), timeAssign.end()) << endl;
+  fd_eval << "max: " << *max_element(timeAssign.begin(), timeAssign.end()) << endl;
+  fd_eval << "mean: " << evalAssign.first << endl;
+  fd_eval << "stdev: " << evalAssign.second << endl;
+  fd_eval << "-------------------------------------------------------" << endl;
+  fd_eval.close();
+
+
 
   fd.close();
 

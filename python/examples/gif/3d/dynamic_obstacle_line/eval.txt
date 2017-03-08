@@ -1,0 +1,27 @@
+-------------------------------------------------------
+CONFIGURATION 
+static obstacles: 
+# of sos: 0
+dynamic obstacles: 
+# of dos: 1
+vertices of do 0: 8
+template formations: 
+# of template formations: 2
+vertices of formation 0: 12
+vertices of formation 1: 8
+evaluation of lcp
+min: 0.07486
+max: 0.262875
+mean: 0.111654
+stdev: 0.0449297
+evaluation of NL Opt
+min: 0.026623
+max: 0.072931
+mean: 0.0407138
+stdev: 0.0133912
+evaluation of assign
+min: 2.5e-05
+max: 3.8e-05
+mean: 2.78824e-05
+stdev: 2.27214e-06
+-------------------------------------------------------
