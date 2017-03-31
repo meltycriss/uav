@@ -30,6 +30,8 @@ def updateData():
         pos = np.array(posAux[1:])
     else:
         pos = np.array(posAux)
+    if(drawPath):
+        paths.append(pos)
     return True;
 
 def updateAx():
@@ -39,10 +41,15 @@ def updateAx():
     ax.set_ylim(-RANGE, RANGE)
     ax.axis('off')
     for i in range(pos.shape[0]):
-        ax.add_patch(plt.Circle((pos[i][0],pos[i][1]), RADIUS, color=COLORS[i%len(COLORS)]))
+        currColor = COLORS[i%len(COLORS)]
+        ax.add_patch(plt.Circle((pos[i][0],pos[i][1]), RADIUS, color=currColor))
+
+        if(drawPath):
+            path = np.vstack([p[i] for p in paths])
+            ax.plot(path[:,0], path[:,1], ls='dashdot', c=currColor)
     for so in sos:
         # bottom left to top right
-        ax.add_patch(patches.Rectangle((so[0], so[1]), SIDE_LENGTH, SIDE_LENGTH, facecolor='grey', edgecolor='none'))
+        ax.add_patch(patches.Rectangle((so[0], so[1]), WIDTH, LENGTH, facecolor='grey', edgecolor='none'))
     if do is not None:
         ax.add_patch(patches.Rectangle((do[0], do[1]), WIDTH, LENGTH, facecolor='grey', edgecolor='none'))
 
@@ -51,6 +58,7 @@ parser = OptionParser()
 parser.add_option('-b', '--blocks', action='store_const', const='blocks', dest='scene', default='blocks')
 parser.add_option('-c', '--circle', action='store_const', const='circle', dest='scene')
 parser.add_option('-d', '--dynamic', action='store_const', const='dynamic', dest='scene')
+parser.add_option('-f', '--four_agent', action='store_const', const='four_agent', dest='scene')
 
 options, args = parser.parse_args()
 
@@ -63,18 +71,20 @@ pos = None
 COLORS = []
 RANGE = None
 RADIUS = None
-SIDE_LENGTH = None
 WIDTH = None
 LENGTH = None
 sos = []
 do = None
+drawPath = False
+paths = []
 
 if(options.scene=='blocks'):
     # blocks
     COLORS = ['b', 'g', 'r', 'y']
     RANGE = 100
     RADIUS = 2
-    SIDE_LENGTH = 30
+    WIDTH = 30
+    LENGTH = WIDTH
     sos = []
     for i in [0, 50]:
         for j in [0, 50]:
@@ -89,7 +99,7 @@ elif(options.scene=='circle'):
     COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
     RANGE = 210
     RADIUS = 1.5
-else:
+elif(options.scene=='dynamic'):
     # dynamic
     STRIDE = 10
     WIDTH = 3 * 2
@@ -97,6 +107,12 @@ else:
     COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
     RANGE = 70
     RADIUS = 2
+elif(options.scene=='four_agent'):
+    STRIDE = 10
+    COLORS = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    RANGE = 25
+    RADIUS = 2
+    drawPath = True
 
 
 
