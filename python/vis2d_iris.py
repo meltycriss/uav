@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os, sys, shutil
 import random
+from matplotlib.ticker import NullLocator
 
 def plot_obstacle(point, side_length, *args, **kwargs):
     global ax
@@ -16,7 +17,7 @@ if os.path.isdir(outputFile):
     shutil.rmtree(outputFile)
 os.mkdir(outputFile)
 
-ratio = 1.1
+ratio = 1.01
 side_length = 1
 x_min = -10
 x_max = 10
@@ -45,6 +46,8 @@ ax = plt.gca()
 for i in range(2*len(info.polyhedron_history)):
     ax.clear()
     ax.axis('off')
+    ax.xaxis.set_major_locator(NullLocator())
+    ax.yaxis.set_major_locator(NullLocator())
     ax.set_xlim([ratio*x_min, ratio*x_max])
     ax.set_ylim([ratio*y_min, ratio*y_max])
     bounds.draw(edgecolor='r')
@@ -61,4 +64,5 @@ for i in range(2*len(info.polyhedron_history)):
             info.ellipsoid_history[i/2].draw(edgecolor='b')
     filename = '%06d' % i
     outputPath = os.path.join(outputFile, filename)
-    plt.savefig(outputPath, dpi=fig.dpi)
+    #plt.show()
+    plt.savefig(outputPath, dpi=fig.dpi, bbox_inches='tight', pad_inches=0)

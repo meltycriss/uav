@@ -116,5 +116,17 @@ ELSE(V2D)
 
 ENDIF(V2D)
 
+ADD_EXECUTABLE(HungarianTest ./HungarianTest.cpp ../util.cpp ../definition.cpp)
+TARGET_LINK_LIBRARIES(HungarianTest
+  ${IRIS_LIB}
+  ${IRIS_GEOMETRY_LIB}
+  ${SNOPT7_CPP_LIB}
+  ${SNOPT7_LIB}
+  ${DRAKE_MATH_LIB}
+  ${RVO3D_LIB}
+  proto
+  )
+target_compile_features(HungarianTest PRIVATE cxx_range_for)
+
 
 

@@ -252,14 +252,15 @@ while(updateData()):
     resetAx()
 
     for i in range(len(sos)):
-        #draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
-        draw(sos[i], ax, facecolor=obsColor, linewidth=0, alpha=1)
+        draw(sos[i], ax, facecolor=obsColor, alpha=0.2)
+        #draw(sos[i], ax, facecolor=obsColor, linewidth=0, alpha=1)
     for i in range(len(dos)):
-        #draw(dos[i], ax, facecolor=obsColor, alpha=0.2)
-        draw(dos[i], ax, facecolor=obsColor, linewidth=0, alpha=1)
+        draw(dos[i], ax, facecolor=obsColor, alpha=0.2)
+        #draw(dos[i], ax, facecolor=obsColor, linewidth=0, alpha=1)
     for i in range(len(uavs)):
         #draw(toCube(uavs[i],uavRadius), ax, facecolor=uavColor)
-        draw(toTriangle(uavs[i],uavRadius), ax, facecolor=uavColor, linewidth=0, alpha=1)
+        #draw(toTriangle(uavs[i],uavRadius), ax, facecolor=uavColor, linewidth=0, alpha=1)
+        draw(toTriangle(uavs[i],uavRadius), ax, facecolor=uavColor)
     for i in range(len(uavsDir)):
         draw(toCube(uavsDir[i],uavDirRadius), ax, facecolor=uavDirColor, linewidth=0)
     draw(toCube(gDir,gDirRadius), ax, facecolor=gDirColor, linewidth=0)
